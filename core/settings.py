@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,10 +22,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-22%c7*m++fxxh8mp+2iham())wlw+7ko7^-d$3(2vu075iq(o9'
+SECRET_KEY = config('THE_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('THE_DEBUG', cast=bool)
 
 ALLOWED_HOSTS = []
 
@@ -86,7 +87,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'education_db',
         'USER': 'kasabian',
-        "PASSWORD": 'kasabian1q2w',
+        "PASSWORD": config('DB_PASSWORD'),
         'HOST': 'localhost',
         'PORT': '5432'
     }
