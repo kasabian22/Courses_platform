@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+
+{% block title %}
+E-Learning Platform
+{% endblock title %}
+    
+
+
+
+{% block content %}
+
+    <!-- Navbar -->
+    <nav class="bg-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-gray-800">E-Learn</a>
+            <ul class="flex space-x-4">
+                <li>
+                    <a href="{% url 'accounts:view_profile' %}" class="text-gray-600 hover:text-blue-500">
+                        Welcome, {{ request.user }}
+                    </a>
+                </li>
+                <li><a href="#" class="text-gray-600 hover:text-blue-500">Courses</a></li>
+                <li><a href="#" class="text-gray-600 hover:text-blue-500">Categories</a></li>
+                <li><a href="{% url 'accounts:sign_out' %}" class="text-gray-600 hover:text-blue-500">Sign-out</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+        <div class="container mx-auto text-center">
+            <h1 class="text-5xl font-extrabold mb-6">Discover and Learn New Skills</h1>
+            <p class="text-lg">Explore our wide range of courses and start your learning journey today.</p>
+            <a href="#" class="mt-6 inline-block bg-white text-blue-600 font-bold py-2 px-6 rounded hover:bg-gray-100">Browse Courses</a>
+        </div>
+    </section>
+
+    <!-- Categories and Courses Section -->
+    <section class="py-12">
+        <div class="container mx-auto">
+            <h2 class="text-4xl font-bold mb-8 text-center">Our Subjects</h2>
+
+            <div class="space-y-12">
+                <!-- Category Card -->
+                <div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+
+                        <!-- Course Card -->
+                         
+                         {% for subject in subjects %}
+                            
+                        
+                            
+                        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg">
+                            <h3 class="text-xl font-bold mb-2">{{subject.title}}</h3>
+                            <p class="text-gray-600 mb-4">{{ subject.description }}.</p>
+                            
+                            <ul class="list-disc pl-5">
+                            {% for course in subject.courses.all %}
+                                <li>
+                                    <a href="{% url 'courses:course_detail' course.slug %}"  class="text-blue-500 hover:underline">{{ course.title }}</a>
+                                </li>
+                                {% empty %}
+                                <li>No courese available in this subject</li>
+                            {% endfor %}
+                                
+                            <a href="#" class="text-blue-500 hover:underline">Start Learning</a>
+                        </div>
+                        {% endfor %}
+                       
+
+                        
+                        
+                       
+                       
+                    </div>
+                </div>
+                <br><hr>
+                <h2 class="text-4xl font-bold mb-8 text-center">Our Courses</h2>
+
+                <!-- Another Category -->
+                <div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg">
+                            <img src="{% static 'images/300x200.png' %}" alt="Default Image">
+                            <h3 class="text-xl font-bold mb-2">Python for Data Science</h3>
+                            <p class="text-gray-600 mb-4">Analyze data and build machine learning models with Python.</p>
+                            <a href="#" class="text-blue-500 hover:underline">Start Learning</a>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg">
+                            <img src="{% static 'images/300x200.png' %}" alt="Default Image">
+                            <h3 class="text-xl font-bold mb-2">Data Analysis with R</h3>
+                            <p class="text-gray-600 mb-4">Learn how to clean and analyze data using R.</p>
+                            <a href="#" class="text-blue-500 hover:underline">Start Learning</a>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg">
+                            <img src="{% static 'images/300x200.png' %}" alt="Default Image">
+                            <h3 class="text-xl font-bold mb-2">Machine Learning A-Z</h3>
+                            <p class="text-gray-600 mb-4">Master machine learning algorithms and techniques.</p>
+                            <a href="#" class="text-blue-500 hover:underline">Start Learning</a>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg">
+                            <img src="{% static 'images/300x200.png' %}" alt="Default Image">
+                            <h3 class="text-xl font-bold mb-2">Machine Learning A-Z</h3>
+                            <p class="text-gray-600 mb-4">Master machine learning algorithms and techniques.</p>
+                            <a href="#" class="text-blue-500 hover:underline">Start Learning</a>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg">
+                            <img src="{% static 'images/300x200.png' %}" alt="Default Image">
+                            <h3 class="text-xl font-bold mb-2">Machine Learning A-Z</h3>
+                            <p class="text-gray-600 mb-4">Master machine learning algorithms and techniques.</p>
+                            <a href="#" class="text-blue-500 hover:underline">Start Learning</a>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg">
+                            <img src="{% static 'images/300x200.png' %}" alt="Default Image">
+                            <h3 class="text-xl font-bold mb-2">Machine Learning A-Z</h3>
+                            <p class="text-gray-600 mb-4">Master machine learning algorithms and techniques.</p>
+                            <a href="#" class="text-blue-500 hover:underline">Start Learning</a>
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg">
+                            <img src="{% static 'images/300x200.png' %}" alt="Default Image">
+                            <h3 class="text-xl font-bold mb-2">Machine Learning A-Z</h3>
+                            <p class="text-gray-600 mb-4">Master machine learning algorithms and techniques.</p>
+                            <a href="#" class="text-blue-500 hover:underline">Start Learning</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- More categories can go here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2024 E-Learn Platform. All rights reserved.</p>
+        </div>
+    </footer>
+
+
+{% endblock content %}
+    

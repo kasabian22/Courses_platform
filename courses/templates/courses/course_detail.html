@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ detail.title }}
+{% endblock title %}
+    
+{% block content %}
+<!-- Course Details Section -->
+<section class="py-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+    <div class="container mx-auto text-center">
+        <h1 class="text-4xl font-extrabold mb-6">{{ detail.title }}</h1>
+        <p class="text-lg mb-8">{{ detail.overview }}</p>
+        
+        {% if request.user not in detail.students.all %}
+            <a href="{% url 'courses:enroll_course' detail.slug %}" class="inline-block bg-white text-blue-600 font-bold py-2 px-6 rounded hover:bg-gray-100">Enroll Now</a>
+        {% endif %}
+            
+    
+    </div>
+</section>
+
+<!-- Module Section -->
+<div class="container mx-auto py-12">
+    <div class="text-center mb-8">
+        <h2 class="text-3xl font-bold text-gray-800">Course Modules</h2>
+        <p class="text-gray-600">Explore the modules included in this course.</p>
+    </div>
+
+    {% if perms.courses.can_add_module %}
+        <!-- Add Module Button -->
+        <div class="text-right mb-6">
+            <a href="{% url 'courses:add_module' detail.slug %}" 
+            class="bg-blue-600 text-white font-bold py-2 px-6 rounded hover:bg-blue-700 transition">
+                + Add Module
+            </a>
+        </div>
+    {% else %}
+    {% endif %}
+
+    <!-- Modules List -->
+    {% if detail.modules.exists %}
+    <ul class="divide-y divide-gray-200 bg-gray-50 rounded-lg shadow-lg">
+        {% for module in detail.modules.all %}
+            <li class="px-6 py-4 flex justify-between items-center hover:bg-gray-100 transition">
+                <div>
+                    <h3 class="text-lg font-bold text-gray-800">{{ module.title }}</h3>
+                    <p class="text-sm text-gray-600">{{ module.description }}</p>
+                </div>
+                <a href="{% url 'courses:add_module' detail.slug %}" 
+                class="text-blue-600 hover:underline font-medium">
+                    View Details
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="text-center text-gray-600">
+        <p>No modules have been added to this course yet.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Additional Course Content -->
+<section class="py-12">
+    <div class="container mx-auto">
+        <!-- Course Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div>
+                <h2 class="text-3xl font-semibold mb-4">Course Overview</h2>
+                <p class="text-gray-700 mb-4">{{ detail.overview }}</p>
+            </div>
+            <div>
+                <img src="https://via.placeholder.com/600x400" alt="Course Image" class="rounded shadow-lg">
+            </div>
+        </div>
+
+        <!-- Instructor Section -->
+        <div class="mt-12 bg-gray-100 p-8 rounded-lg">
+            <h2 class="text-3xl font-semibold mb-4">Instructor: {{ detail.owner }}</h2>
+            <div class="flex items-center">
+                <img src="https://via.placeholder.com/100" alt="Instructor Image" class="rounded-full mr-6">
+                <div>
+                    <p class="text-gray-700 mb-2">
+                        John is a data scientist with over 10 years of experience working with big data and machine learning.
+                        He has worked with companies such as XYZ Corp and is passionate about teaching others to use Python for data analysis.
+                    </p>
+                    <a href="#" class="text-blue-500 hover:underline">View Instructor Profile</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

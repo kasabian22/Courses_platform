@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load tailwind_filters %}
+
+
+
+
+{% block title %}
+    Add Module
+{% endblock title %}
+    
+
+
+
+{% block content %}
+<div class="max-w-4xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
+    <h1 class="text-2xl font-semibold mb-6">Add a New Module</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">
+            Add Module
+        </button>
+    </form>
+</div>
+{% endblock content %}
+    
