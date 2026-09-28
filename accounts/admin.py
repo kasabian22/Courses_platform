@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import InstructorProfile
+from .models import InstructorProfile, StudentProfile, UserProfile
 
 # Register your models here.
 
@@ -7,3 +7,7 @@ from .models import InstructorProfile
 class InstructorProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'bio', 'contact_email', 'header')
     search_fields = ('user__username', 'bio', 'contact_email', 'header')
+
+
+admin.site.register(StudentProfile)
+admin.site.register(UserProfile)

@@ -9,5 +9,6 @@ urlpatterns = [
     path('sign-in/', views.sign_in, name='sign_in'),
     # if you see 404 when trying to view the profile this means that the user has no profile, and it happens to the admin user because he has an account without signing in.
     path('view-profile/', views.view_profile, name='view_profile'),
-    path('edit-profile/', views.edit_profile, name='edit_profile'),
+    path('edit-instructor-profile/', views.edit_instructor_profile, name='edit_instructor_profile'),
+    path('edit-student-profile/', views.edit_student_profile, name='edit_student_profile'),
 ]
