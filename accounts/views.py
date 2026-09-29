@@ -10,8 +10,8 @@ from django.contrib.auth import update_session_auth_hash
 
 
 def sign_up(request):
-    
     if request.method == 'POST':
+        # the handling of the profile and it's role is in forms.py.
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
