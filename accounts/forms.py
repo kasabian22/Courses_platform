@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import InstructorProfile, StudentProfile, UserProfile
+from django.contrib.auth.forms import AuthenticationForm
+
 
 class SignUpForm(UserCreationForm):
     ROLE_CHOICES = (
@@ -60,6 +62,12 @@ class SignUpForm(UserCreationForm):
 
         return user
 
+# I added this (over AuthenticationForm) to be able to use placeholders in the sign-in form.
+class CustomSignInForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs['placeholder'] = 'Enter Your Username'
+        self.fields['password'].widget.attrs['placeholder'] = 'Enter Your Password'
 
 
 class InstructorProfileForm(forms.ModelForm):

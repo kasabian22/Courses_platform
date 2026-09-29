@@ -154,3 +154,5 @@ MEDIA_URL = '/media/'
 
 # المسار الفعلي على السيرفر أو جهازك الذي سيتم حفظ الملفات المرفوعة فيه
 MEDIA_ROOT = BASE_DIR / 'media'
+
+LOGIN_URL = 'accounts:sign_in'

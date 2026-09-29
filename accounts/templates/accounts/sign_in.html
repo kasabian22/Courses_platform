@@ -19,20 +19,12 @@
         <h2 class="text-2xl font-bold text-center text-gray-700 mb-6">Sign In for Learning Platform</h2>
         <form method="POST">
             {% csrf_token %}
-            <div class="mb-6">
-                <label >Username</label>
-                <input type="text"  placeholder="Enter Username" name="username" class="w-full px-4 py-2 text-gray rounded-md border-2 border-gray-700 focus:border-pink-600" >
-            </div>
+            {{ form|crispy }}
 
-            <label>Password</label>
             <div class="mb-6">
-                <input type="password" placeholder="Enter Password" name="password" class="w-full px-4 py-2 text-gray rounded-md border-2 border-gray-700 focus:border-blue-600">
+                <button type="submit" class="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none">Sign in</button>
             </div>
-
-          <div class="mb-6">
-            <button type="submit" class="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none">Sign in</button>
-        </div>
-                    <div class="text-center">
+            <div class="text-center">
                 <p class="text-sm text-gray-600">Don't have an account? <a href="{% url 'accounts:sign_up' %}" class="text-indigo-600 hover:underline">Sign Up</a></p>
             </div>
         </form>

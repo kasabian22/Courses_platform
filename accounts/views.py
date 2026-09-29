@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, render, redirect
 
 from courses.models import Course
-from .forms import SignUpForm, InstructorProfileForm, StudentProfileForm, UserUpdateForm
+from .forms import SignUpForm, InstructorProfileForm, StudentProfileForm, UserUpdateForm, CustomSignInForm
 from django.contrib.auth import login, logout, authenticate
 from .models import InstructorProfile, StudentProfile
 from django.contrib.auth.decorators import login_required
@@ -25,31 +25,29 @@ def sign_up(request):
     })
 
 def sign_in(request):
-    ERROR = None
     if request.user.is_authenticated:
         return redirect('courses:subject_courses_list')
 
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
+        form = CustomSignInForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
             login(request, user)
             return redirect('courses:subject_courses_list')
-        else:
-            ERROR = 'Invalid credentials! Password or username is invalid!'
+    else:
+        form = CustomSignInForm()
 
     return render(request, 'accounts/sign_in.html', {
-        'error': ERROR
+        'form': form
     })
 
 
 @require_POST
 def sign_out(request):
     logout(request)
-    return redirect('accounts:sign_up')
+    return redirect('accounts:sign_in')
 
-@login_required(login_url='accounts:sign_up')
+@login_required
 def edit_instructor_profile(request):
     profile = get_object_or_404(InstructorProfile, user=request.user)
     p_form = InstructorProfileForm(instance=profile)
@@ -69,7 +67,7 @@ def edit_instructor_profile(request):
     })
 
 
-@login_required(login_url='accounts:sign_up')
+@login_required
 def edit_student_profile(request):
     profile = get_object_or_404(StudentProfile, user=request.user)
     p_form = StudentProfileForm(instance=profile)
@@ -90,7 +88,7 @@ def edit_student_profile(request):
 
 
 
-@login_required(login_url='accounts:sign_up')
+@login_required
 def view_profile(request):
     if hasattr(request.user, 'userprofile'):
         role = request.user.userprofile.role

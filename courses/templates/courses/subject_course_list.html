@@ -25,12 +25,21 @@
                 <li><a href="#" class="text-gray-600 hover:text-blue-500">Courses</a></li>
                 <li><a href="#" class="text-gray-600 hover:text-blue-500">Categories</a></li>
                 <li>
-                    <form method="post" action="{% url 'accounts:sign_out' %}">
+                    {% if request.user.is_authenticated %}
+                        <form method="post" action="{% url 'accounts:sign_out' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="text-gray-600 hover:text-blue-500">
+                                Sign-out
+                            </button>
+                        </form>
+                    {% else %}
+                    <form method="post" action="{% url 'accounts:sign_in' %}">
                         {% csrf_token %}
                         <button type="submit" class="text-gray-600 hover:text-blue-500">
-                            Sign-out
+                            Sign-in
                         </button>
                     </form>
+                    {% endif %}
                 </li>
             </ul>
         </div>
