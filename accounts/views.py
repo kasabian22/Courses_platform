@@ -5,6 +5,7 @@ from .forms import SignUpForm, InstructorProfileForm, StudentProfileForm, UserUp
 from django.contrib.auth import login, logout, authenticate
 from .models import InstructorProfile, StudentProfile
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
 
@@ -43,7 +44,7 @@ def sign_in(request):
     })
 
 
-
+@require_POST
 def sign_out(request):
     logout(request)
     return redirect('accounts:sign_up')
