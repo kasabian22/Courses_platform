@@ -138,15 +138,13 @@ MAILERS = {
     },
 }
 
-# الرابط الذي تظهر به الملفات في المتصفح
+
 STATIC_URL = '/static/'
 
-# مسار مجلد Static العام للمشروع (إن وجد بجانب manage.py)
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    os.path.join(BASE_DIR, 'static'),
 ]
 
-# المجلد الذي سيتم تجميع كل الملفات فيه وقت الإنتاج (Production) عبر collectstatic
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # الرابط الذي سيتم استخدامه في المتصفح للوصول لملفات الميديا

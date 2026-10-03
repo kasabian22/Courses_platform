@@ -18,7 +18,7 @@ class UserProfile(models.Model):
 
 class StudentProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='students_profiles')
-    photo = models.ImageField(upload_to='Instructor/photos', blank=True, null=True, default='defaults/no-profile-picture-icon.png')
+    photo = models.ImageField(upload_to='Student/photos', blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
     full_name = models.CharField(max_length=100, blank=True)
     # TODO
@@ -32,7 +32,7 @@ class StudentProfile(models.Model):
 class InstructorProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='instructors_profiles')
     bio = models.TextField(blank=True, null=True)
-    photo = models.ImageField(upload_to='Instructor/photos', blank=True, null=True, default='defaults/no-profile-picture-icon.png')
+    photo = models.ImageField(upload_to='Instructor/photos', blank=True, null=True)
     contact_email = models.EmailField(blank=True, null=True)
     header = models.CharField(max_length=250, blank=True, null=True)
 
@@ -41,7 +41,7 @@ class InstructorProfile(models.Model):
 
 
 class SocialMediaAccounts(models.Model):
-    user = models.OneToOneField(InstructorProfile, on_delete=models.CASCADE, related_name='socialmedia')
+    instructor_profile = models.OneToOneField(InstructorProfile, on_delete=models.CASCADE, related_name='socialmedia')
     linkedin = models.URLField(blank=True, null=True)
     github = models.URLField(blank=True, null=True)
     facebook = models.URLField(blank=True, null=True)
