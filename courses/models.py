@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.utils.text import slugify
+from .utils import generate_unique_slug
 
 
 # Create your models here.
@@ -36,10 +37,21 @@ class Course(models.Model):
     def __str__(self):
         return self.title
 
+    #
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Track the initial title in memory to avoid extra database queries later
+        self._initial_title = self.title
+
     def save(self, *args, **kwargs):
-        if not self.slug or self.title != Course.objects.get(pk=self.pk).title if self.pk else None:
-            self.slug = slugify(self.title)
-        return super().save(*args, **kwargs)
+        # Generate a new slug if it is empty OR if the title has changed
+        if not self.slug or self.title != self._initial_title:
+            # i didn't use normal slugify, because it will give IntegrityError as soon as someone use the title of a course that it's used before.
+            self.slug = generate_unique_slug(self, self.title)
+        super().save(*args, **kwargs)
+
+        # Update the tracked title after a successful save
+        self._initial_title = self.title
 
 
 class Module(models.Model):
@@ -53,8 +65,10 @@ class Module(models.Model):
 
 class Content(models.Model):
     module = models.ForeignKey(Module, related_name='contents', on_delete=models.CASCADE)
+
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, limit_choices_to={'model__in': ('text', 'file', 'video', 'image')})
     object_id = models.PositiveIntegerField()
+
     item = GenericForeignKey('content_type', 'object_id')
 
 
@@ -78,8 +92,8 @@ class File(ItemBase):
 
 
 class Image(ItemBase):
-    # use FileField, not ImageField.
-    image = models.FileField(upload_to="images")
+    # Use ImageField instead of FileField to validate if the file uploaded is image with pillow library.
+    image = models.ImageField(upload_to="images")
 
 
 class Video(ItemBase):
