@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import InstructorProfile, StudentProfile, UserProfile
 from django.contrib.auth.forms import AuthenticationForm
+from django.db import transaction
 
 
 class SignUpForm(UserCreationForm):
@@ -42,7 +43,9 @@ class SignUpForm(UserCreationForm):
         self.fields['username'].help_text = ''
         self.fields['password1'].help_text = ''
         self.fields['password2'].help_text = ''
-    
+
+    # Wrap the entire save method in an atomic database transaction (all done or nothing).
+    @transaction.atomic
     def save(self, commit=True):
         user = super().save(commit=commit)
 

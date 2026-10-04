@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.templatetags.static import static
 
 # Additional fields to the default User model.
-# There is another way using AbstractUser but this way benefits when you already started the project and have data in the database.
+# There is another way using AbstractUser, but this way benefits when you already started the project and have data in the database.
 # write request.user.userprofile.field_name anywhere in the project to use it.
 class UserProfile(models.Model):
     ROLE_CHOICES = (
@@ -11,7 +11,7 @@ class UserProfile(models.Model):
         ('instructor', 'Instructor'),
     )
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userprofile')
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='student')
 
     def __str__(self):
         return f"{self.user.username} - {self.role}"

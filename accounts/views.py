@@ -90,6 +90,7 @@ def edit_student_profile(request):
 
 @login_required
 def view_profile(request):
+    
     if hasattr(request.user, 'userprofile'):
         role = request.user.userprofile.role
         if role == "student":
@@ -99,15 +100,20 @@ def view_profile(request):
                 'profile': profile,
                 'enrolled_courses': enrolled_courses
             })
-    
-    profile = get_object_or_404(InstructorProfile, user=request.user)
-    courses = Course.objects.filter(owner=request.user)
-    return render(request, 'accounts/view_instructor_profile.html', {
-        'profile': profile,
-        'courses': courses
-    })
 
-    # return redirect('subject_courses_list')
+        elif role == "instructor":
+            profile = get_object_or_404(InstructorProfile, user=request.user)
+            courses = Course.objects.filter(owner=request.user)
+            return render(request, 'accounts/view_instructor_profile.html', {
+                'profile': profile,
+                'courses': courses
+            })
+        
+    elif request.user.is_superuser or request.user.is_staff:
+        return redirect('admin:index')
+    
+    return redirect('courses:subject_courses_list')
+
 
 
 

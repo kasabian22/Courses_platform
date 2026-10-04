@@ -85,8 +85,8 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'education_db',
-        'USER': 'kasabian',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
         "PASSWORD": config('DB_PASSWORD'),
         'HOST': 'localhost',
         'PORT': '5432'
