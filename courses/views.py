@@ -25,7 +25,7 @@ def course_detail(request, slug):
     })
 
 
-@permission_required('courses.can_add_course', raise_exception=True)
+@permission_required('courses.add_course', raise_exception=True)
 @login_required(login_url='accounts:sign_up')
 def add_course(request):
     if request.method == 'POST':
@@ -61,7 +61,7 @@ def edit_course(request, slug):
 @login_required(login_url='accounts:sign_up')
 @permission_required('courses.add_module', raise_exception=True)
 def add_module(request, slug):
-    course = get_object_or_404(Course, slug=slug)
+    course = get_object_or_404(Course, slug=slug, owner=request.user)
     if request.method == 'POST':
         form = ModuleForm(request.POST)
         if form.is_valid():
@@ -82,7 +82,6 @@ def enroll_course(request, slug):
     course = get_object_or_404(Course, slug=slug)
     if request.user.is_authenticated:
         course.students.add(request.user)
-        course.save()
         messages.success(request, 'You have successfully enrolled in this course')
         return redirect('courses:course_detail', slug=course.slug)
     else:
