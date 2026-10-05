@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.utils.text import slugify
 from .utils import generate_unique_slug
 
@@ -80,6 +80,9 @@ class ItemBase(models.Model):
     title = models.CharField(max_length=200)
     date_created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    # delete the content when item is deleted
+    content_relation = GenericRelation(Content)
 
     class Meta:
         abstract = True

@@ -24,7 +24,7 @@ def course_detail(request, slug):
 
 @login_required
 @permission_required('courses.add_content', raise_exception=True)
-def content_create_update(request, module_id, model_name):
+def content_create_update(request, slug, module_id, model_name):
     modules = {'text': TextForm, 'video': VideoForm, 'image': ImageForm, 'file': FileForm}
     module = get_object_or_404(Module, id=module_id, course__owner=request.user)
     if model_name in modules:
@@ -109,7 +109,9 @@ def add_module(request, slug):
 
 def view_module(request, course_slug, module_id):
     course = get_object_or_404(Course, slug=course_slug, owner=request.user)
-    module = get_object_or_404(Module, course=course, id=module_id)
+    module_qs = Module.objects.prefetch_related('contents__item')
+    module = get_object_or_404(module_qs, course=course, id=module_id)
+
     return render(request, "courses/view_module.html", {
         "course":course,
         "module":module

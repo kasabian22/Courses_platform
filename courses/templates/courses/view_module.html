@@ -1,91 +1,85 @@
 {% extends 'base.html' %}
 {% load static %}
 
-
-
 {% block title %}
     View Module
 {% endblock title %}
     
-
-
-
 {% block content %}
 
-<!-- Main container with a light background and padding for responsive design -->
-<div class="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
-    
-    <!-- Wrapper to center the content and limit its maximum width for readability -->
-    <div class="max-w-5xl mx-auto">
+    <!-- Changed bg-gray-50 to bg-gray-900 to match the dark theme shown in the screenshot -->
+    <div class="min-h-screen bg-gray-900 py-10 px-4 sm:px-6 lg:px-8">
         
-        <!-- Breadcrumbs Navigation: Shows Course Name -> Module Name -->
-        <nav class="flex items-center text-sm font-medium text-gray-500 mb-6">
-            <!-- Link back to the course details -->
-            <a href="{% url 'courses:course_detail' course.slug %}" class="hover:text-indigo-600 transition-colors duration-200">
-                {{ course.title }}
-            </a>
+        <!-- Wrapper to center the content -->
+        <div class="max-w-5xl mx-auto">
             
-            <!-- Separator Icon -->
-            <svg class="w-5 h-5 mx-2 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-            </svg>
-            
-            <!-- Current Module Name -->
-            <span class="text-gray-900">{{ module.title }}</span>
-        </nav>
-
-        <!-- Main Heading: Module Title -->
-        <h1 class="text-3xl font-bold text-gray-900 mb-8">
-            {{ module.title }}
-        </h1>
-
-        <!-- Content Area: Uses aspect-video to maintain a perfect 16:9 ratio on all screens -->
-        <div class="w-full bg-black rounded-xl shadow-2xl overflow-hidden aspect-video flex items-center justify-center mb-8 relative">
-            
-            <!-- 
-            Uncomment this section if the content is a Video 
-            <video controls class="w-full h-full object-cover">
-                <source src="{{ module.video_file.url }}" type="video/mp4">
-                Your browser does not support the video tag.
-            </video> 
-            -->
-            
-            <!-- 
-            Uncomment this section if the content is an Image
-            <img src="{{ module.image.url }}" alt="{{ module.title }}" class="w-full h-full object-cover"> 
-            -->
-
-            <!-- Placeholder content (Remove this entire div when adding actual video/image logic) -->
-            <div class="text-center p-6">
-                <svg class="mx-auto h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            <!-- Breadcrumbs Navigation: Updated text colors for better visibility in dark mode -->
+            <nav class="flex items-center text-sm font-medium text-gray-400 mb-6">
+                <!-- Link back to the course details -->
+                <a href="{% url 'courses:course_detail' course.slug %}" class="hover:text-indigo-400 transition-colors duration-200">
+                    {{ course.title }}
+                </a>
+                
+                <!-- Separator Icon -->
+                <svg class="w-5 h-5 mx-2 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
                 </svg>
-                <p class="text-gray-300 text-lg">Module Content (Video or Image) appears here</p>
-            </div>
-        </div>
+                
+                <!-- Current Module Name -->
+                <span class="text-gray-200">{{ module.title }}</span>
+            </nav>
 
-        <!-- Additional Module Details / Description Area -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4">Module Overview</h2>
-            
-            <!-- Text content of the module -->
-            <div class="text-gray-600 leading-relaxed max-w-none">
-                {{ module.description|linebreaks }}
-            </div>
-            
-            <!-- Action Buttons for Navigation -->
-            <div class="mt-8 flex justify-end space-x-4">
-                <button class="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors duration-200">
-                    Previous
-                </button>
-                <button class="px-6 py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 shadow-md hover:shadow-lg transition-all duration-200">
-                    Complete Module
-                </button>
+            <!-- Main Heading: Changed text-gray-900 to text-white -->
+            <h1 class="text-3xl font-bold text-white mb-8">
+                {{ module.title }}
+            </h1>
+
+            <!-- Content Area: Uses flex column to stack items seamlessly -->
+            <div class="max-w-5xl mx-auto mt-8 flex flex-col gap-6 w-full">
+
+                {% for content in module.contents.all %}
+                    {% if content.content_type.model == 'video' %}
+                        <!-- Responsive video container with 16:9 aspect ratio -->
+                        <div class="w-full aspect-video rounded-xl overflow-hidden shadow-2xl bg-black border border-gray-700">
+                            <!-- Re-applied the youtube_embed_url filter here -->
+                            <iframe 
+                                src="{{ content.item.video }}" 
+                                class="w-full h-full"
+                                frameborder="0"
+                                title="YouTube video player" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin"
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                        
+                    {% elif content.content_type.model == 'text' %}
+                        <!-- Text content styling -->
+                        <div class="w-full bg-[#1c1d22] rounded-xl p-6 border border-gray-700 text-gray-200 shadow-lg">
+                            <p>{{ content.item.content }}</p>
+                        </div>
+                        
+                    {% elif content.content_type.model == 'image' %}
+                        <!-- Image content styling -->
+                        <div class="w-full rounded-xl overflow-hidden shadow-lg border border-gray-700">
+                            <img src="{{ content.item.image.url }}" alt="{{ content.item.title }}" class="w-full h-auto object-cover">
+                        </div>
+                    {% endif %}
+                {% endfor %}
+
+                <!-- Module Overview Card -->
+                <div class="w-full bg-[#1c1d22] border border-gray-700 rounded-xl p-6 shadow-lg mt-2">
+                    <h3 class="text-lg font-semibold text-white mb-2">Module Overview</h3>
+                    <p class="text-gray-400 text-sm mb-6">This the Django part of the course.</p>
+                    
+                    <div class="flex justify-end gap-3">
+                        <button class="px-5 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition">Previous</button>
+                        <button class="px-5 py-2 bg-indigo-700 hover:bg-indigo-600 text-white rounded-lg text-sm font-medium transition">Complete Module</button>
+                    </div>
+                </div>
+
             </div>
         </div>
-        
     </div>
-</div>
 
-{% endblock %}
+{% endblock content %}

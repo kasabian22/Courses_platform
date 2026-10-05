@@ -5,72 +5,109 @@
 {% endblock title %}
     
 {% block content %}
-<!-- Course Details Section -->
-<section class="py-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-    <div class="container mx-auto text-center">
-        <h1 class="text-4xl font-extrabold mb-6">{{ detail.title }}</h1>
-        <p class="text-lg mb-8">{{ detail.overview }}</p>
+<!-- Course Details Header Section -->
+<!-- Changed from blue-to-purple gradient to a dark theme gradient to match your app's UI -->
+<section class="py-16 bg-gradient-to-br from-gray-900 to-gray-800 text-white border-b border-gray-700">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-4xl">
+        <h1 class="text-4xl font-extrabold mb-4">{{ detail.title }}</h1>
+        <p class="text-lg text-gray-300 mb-8 leading-relaxed">{{ detail.overview }}</p>
         
         {% if request.user not in detail.students.all %}
-            <a href="{% url 'courses:enroll_course' detail.slug %}" class="inline-block bg-white text-blue-600 font-bold py-2 px-6 rounded hover:bg-gray-100">Enroll Now</a>
+            <a href="{% url 'courses:enroll_course' detail.slug %}" 
+               class="inline-block bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-indigo-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                Enroll Now
+            </a>
         {% endif %}
-            
-    
     </div>
 </section>
 
-<!-- Module Section -->
-<div class="container mx-auto py-12">
-    <div class="text-center mb-8">
-        <h2 class="text-3xl font-bold text-gray-800">Course Modules</h2>
-        <p class="text-gray-600">Explore the modules included in this course.</p>
-    </div>
-
-    {% if perms.courses.add_module %}
-        <!-- Add Module Button -->
-        <div class="text-right mb-6">
-            <a href="{% url 'courses:add_module' detail.slug %}" 
-            class="bg-blue-600 text-white font-bold py-2 px-6 rounded hover:bg-blue-700 transition">
-                + Add Module
-            </a>
+<!-- Modules Section -->
+<!-- Adjusted the background and text colors to fit the dark theme -->
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12 max-w-5xl">
+    
+    <!-- Section Header -->
+    <div class="flex justify-between items-end mb-8 border-b border-gray-800 pb-4">
+        <div>
+            <h2 class="text-3xl font-bold text-white mb-2">Course Modules</h2>
+            <p class="text-gray-400">Explore the modules included in this course.</p>
         </div>
-    {% else %}
-    {% endif %}
+        
+        {% if perms.courses.add_module %}
+            <!-- Add Module Button aligned to the right of the header -->
+            <div>
+                <a href="{% url 'courses:add_module' detail.slug %}" 
+                   class="inline-flex items-center bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-indigo-700 transition shadow-md">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    Add Module
+                </a>
+            </div>
+        {% endif %}
+    </div>
 
     <!-- Modules List -->
     {% if detail.modules.exists %}
-    <ul class="divide-y divide-gray-200 bg-gray-50 rounded-lg shadow-lg">
+    <!-- Container for the list with dark theme styling -->
+    <ul class="flex flex-col gap-4">
         {% for module in detail.modules.all %}
-            <li class="px-6 py-4 flex justify-between items-center hover:bg-gray-100 transition">
-                <div>
-                    <h3 class="text-lg font-bold text-gray-800">{{ module.title }}</h3>
-                    <p class="text-sm text-gray-600">{{ module.description }}</p>
+            <!-- Individual Module Card -->
+            <li class="bg-[#1c1d22] border border-gray-700 rounded-xl px-6 py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:border-gray-600 transition duration-200 shadow-md">
+                
+                <!-- Module Text Info -->
+                <div class="flex-1">
+                    <h3 class="text-xl font-bold text-gray-100 mb-1">{{ module.title }}</h3>
+                    <p class="text-sm text-gray-400 line-clamp-2">{{ module.description }}</p>
                 </div>
-                <a href="{% url 'courses:add_module' detail.slug %}" 
-                class="text-blue-600 hover:underline font-medium">
-                    Edit Details
-                </a>
-                <a href="{% url 'courses:view_module' detail.slug module.id %}" 
-                class="text-blue-600 hover:underline font-medium">
-                    View Module
-                </a>
-                <a href="#" 
-                class="text-blue-600 hover:underline font-medium">
-                    Add content
-                </a>
-                {% comment %} <a href="{% url 'courses:content_create_update' module.id detail.slug %}" 
-                class="text-blue-600 hover:underline font-medium">
-                    View Module
-                </a> {% endcomment %}
+                
+                <!-- Module Action Buttons Container -->
+                <div class="flex items-center gap-3">
+                    
+                    <!-- View Module (Primary Action) -->
+                    <a href="{% url 'courses:view_module' detail.slug module.id %}" 
+                       class="text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition">
+                        View
+                    </a>
+
+                    {% if perms.courses.add_module %}
+                        <!-- Edit Module -->
+                        <a href="{% url 'courses:add_module' detail.slug %}" 
+                           class="p-2 text-gray-400 hover:text-white bg-transparent hover:bg-gray-700 rounded-lg transition" title="Edit Details">
+                            <!-- SVG Edit Icon -->
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                        </a>
+
+                        <!-- Add Content Dropdown (CSS-based) -->
+                        <div class="relative group">
+                            <!-- Dropdown Trigger Button -->
+                            <button class="inline-flex items-center justify-center text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg transition">
+                                Add Content
+                                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+                            
+                            <!-- Dropdown Menu (Hidden by default, shown on group hover) -->
+                            <div class="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                <div class="py-1">
+                                    <a href="{% url 'courses:content_create_update' detail.slug module.id 'video' %}" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">🎥 Add Video</a>
+                                    <a href="{% url 'courses:content_create_update' detail.slug module.id 'text' %}" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">📝 Add Text</a>
+                                    <a href="{% url 'courses:content_create_update' detail.slug module.id 'image' %}" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">🖼️ Add Image</a>
+                                    <a href="{% url 'courses:content_create_update' detail.slug module.id 'file' %}" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">📎 Add File</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
             </li>
         {% endfor %}
     </ul>
     {% else %}
-    <div class="text-center text-gray-600">
-        <p>No modules have been added to this course yet.</p>
+    <!-- Empty State Styling -->
+    <div class="text-center bg-[#1c1d22] border border-gray-700 rounded-xl py-12">
+        <svg class="w-16 h-16 mx-auto text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+        <p class="text-gray-400 text-lg">No modules have been added to this course yet.</p>
     </div>
     {% endif %}
 </div>
+
+<!-- Rest of your code remains below... -->
 
 <!-- Additional Course Content -->
 <section class="py-12">
