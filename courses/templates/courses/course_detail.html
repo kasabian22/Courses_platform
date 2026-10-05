@@ -26,7 +26,7 @@
         <p class="text-gray-600">Explore the modules included in this course.</p>
     </div>
 
-    {% if perms.courses.can_add_module %}
+    {% if perms.courses.add_module %}
         <!-- Add Module Button -->
         <div class="text-right mb-6">
             <a href="{% url 'courses:add_module' detail.slug %}" 
@@ -48,8 +48,20 @@
                 </div>
                 <a href="{% url 'courses:add_module' detail.slug %}" 
                 class="text-blue-600 hover:underline font-medium">
-                    View Details
+                    Edit Details
                 </a>
+                <a href="{% url 'courses:view_module' detail.slug module.id %}" 
+                class="text-blue-600 hover:underline font-medium">
+                    View Module
+                </a>
+                <a href="#" 
+                class="text-blue-600 hover:underline font-medium">
+                    Add content
+                </a>
+                {% comment %} <a href="{% url 'courses:content_create_update' module.id detail.slug %}" 
+                class="text-blue-600 hover:underline font-medium">
+                    View Module
+                </a> {% endcomment %}
             </li>
         {% endfor %}
     </ul>

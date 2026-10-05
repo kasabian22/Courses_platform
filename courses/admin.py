@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Subject, Course, Module
+from .models import Subject, Course, Module, Content
 
 @admin.register(Subject)
 class Subject(admin.ModelAdmin):
@@ -21,3 +21,4 @@ class Course(admin.ModelAdmin):
     readonly_fields = ['slug']
 
 admin.site.register(Module)
+admin.site.register(Content)

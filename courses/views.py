@@ -1,8 +1,8 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from .forms import CourseForm, TextForm, FileForm, VideoForm, ImageForm, ModuleForm
-from .models import Subject, Course
+from .models import Content, Module, Subject, Course
 from django.contrib.auth.decorators import login_required, permission_required
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.contrib import messages
 
 
@@ -18,14 +18,44 @@ def subject_courses_list(request):
 # you can use id instead of slug.
 def course_detail(request, slug):
     course = get_object_or_404(Course, slug=slug)
-
-
     return render(request, 'courses/course_detail.html', {
         'detail': course
     })
 
+@login_required
+@permission_required('courses.add_content', raise_exception=True)
+def content_create_update(request, module_id, model_name):
+    modules = {'text': TextForm, 'video': VideoForm, 'image': ImageForm, 'file': FileForm}
+    module = get_object_or_404(Module, id=module_id, course__owner=request.user)
+    if model_name in modules:
+        form = modules[model_name]()
+        if request.method == 'POST':
+            form = modules[model_name](request.POST, request.FILES)
+            if form.is_valid():
+                item = form.save(commit=False)
+                item.owner = request.user
+                item.save()
+                # ---------------
+                Content.objects.create(
+                    module=module,
+                    item=item
+                )
+                return redirect("courses:course_detail", slug=module.course.slug)
+                # ----------------
 
-@permission_required('courses.add_course', raise_exception=True)
+    else:
+        return HttpResponseBadRequest()
+
+
+    return render(request, "courses/add_content.html",{
+        "form": form,
+        "model_name": model_name
+    })
+
+
+
+
+# @permission_required('courses.add_course', raise_exception=True)
 @login_required(login_url='accounts:sign_up')
 def add_course(request):
     if request.method == 'POST':
@@ -77,6 +107,13 @@ def add_module(request, slug):
         'course': course
     })
 
+def view_module(request, course_slug, module_id):
+    course = get_object_or_404(Course, slug=course_slug, owner=request.user)
+    module = get_object_or_404(Module, course=course, id=module_id)
+    return render(request, "courses/view_module.html", {
+        "course":course,
+        "module":module
+    })
 
 def enroll_course(request, slug):
     course = get_object_or_404(Course, slug=slug)
