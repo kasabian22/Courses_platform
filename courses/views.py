@@ -104,7 +104,8 @@ def add_module(request, slug):
 
     return render(request, 'courses/add_module.html', {
         'form': form,
-        'course': course
+        'course': course,
+        'type': 'Add'
     })
 
 def view_module(request, course_slug, module_id):
@@ -115,6 +116,20 @@ def view_module(request, course_slug, module_id):
     return render(request, "courses/view_module.html", {
         "course":course,
         "module":module
+    })
+
+def edit_module(request, course_slug, module_id):
+    course = get_object_or_404(Course, slug=course_slug, owner=request.user)
+    module = get_object_or_404(Module, course=course, id=module_id)
+    form = ModuleForm(instance=module)
+    if request.method == 'POST':
+            form = ModuleForm(request.POST, instance=module)
+            if form.is_valid():
+                form.save()
+                return redirect('courses:course_detail', slug=course.slug)
+    return render(request, 'courses/add_module.html', {
+        'form': form,
+        "type": "Edit"
     })
 
 def enroll_course(request, slug):
