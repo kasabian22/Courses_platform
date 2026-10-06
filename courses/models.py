@@ -1,3 +1,5 @@
+import os
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -94,6 +96,10 @@ class ItemBase(models.Model):
 
 class File(ItemBase):
     file = models.FileField(upload_to="files")
+    # Property to extract only the base filename without the folder path
+    @property
+    def filename(self):
+        return os.path.basename(self.file.name)
 
 
 class Image(ItemBase):

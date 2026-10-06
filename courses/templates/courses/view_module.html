@@ -64,6 +64,34 @@
                         <div class="w-full rounded-xl overflow-hidden shadow-lg border border-gray-700">
                             <img src="{{ content.item.image.url }}" alt="{{ content.item.title }}" class="w-full h-auto object-cover">
                         </div>
+                    {% elif content.content_type.model == 'file' %}
+                        <!-- File content styling: A dedicated card for downloadable files -->
+                        <div class="w-full bg-[#1c1d22] rounded-xl p-6 border border-gray-700 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            
+                            <!-- File Icon and Title -->
+                            <div class="flex items-center gap-4">
+                                <!-- Document SVG Icon -->
+                                <div class="p-3 bg-indigo-900/30 rounded-lg text-indigo-400 border border-indigo-800/50">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-semibold text-white">{{ content.item.title }}</h4>
+                                    <p class="text-sm text-gray-400" dir="ltr">{{ content.item.filename }}</p>
+                                </div>
+                            </div>
+
+                            <!-- Download Action Button -->
+                            <a href="{{ content.item.file.url }}" download target="_blank"
+                               class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors shadow-md">
+                                <!-- Download SVG Icon -->
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                </svg>
+                                Download File
+                            </a>
+                        </div>
                     {% endif %}
                 {% endfor %}
 
