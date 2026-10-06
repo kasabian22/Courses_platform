@@ -1,7 +1,8 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from .forms import CourseForm, TextForm, FileForm, VideoForm, ImageForm, ModuleForm
-from .models import Content, Module, Subject, Course
+from .models import Content, Enrollment, Module, Progress, Subject, Course
 from django.contrib.auth.decorators import login_required, permission_required
+from django.views.decorators.http import require_POST
 from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.contrib import messages
 
@@ -18,8 +19,15 @@ def subject_courses_list(request):
 # you can use id instead of slug.
 def course_detail(request, slug):
     course = get_object_or_404(Course, slug=slug)
+    
+    enrollment = None
+    
+    # check if the user enrolled
+    if request.user.is_authenticated and course.students.filter(id=request.user.id).exists():
+        enrollment = Enrollment.objects.filter(user=request.user, course=course).first()
     return render(request, 'courses/course_detail.html', {
-        'detail': course
+        'detail': course,
+        'enrollment': enrollment,
     })
 
 @login_required
@@ -109,13 +117,27 @@ def add_module(request, slug):
     })
 
 def view_module(request, course_slug, module_id):
-    course = get_object_or_404(Course, slug=course_slug, owner=request.user)
+    course = get_object_or_404(Course, slug=course_slug)
     module_qs = Module.objects.prefetch_related('contents__item')
     module = get_object_or_404(module_qs, course=course, id=module_id)
 
+    # Allow access if the user is the course owner OR an enrolled student
+    is_owner = (course.owner == request.user)
+    is_enrolled = course.students.filter(id=request.user.id).exists()
+
+    if not (is_owner or is_enrolled):
+        return redirect('courses:course_detail', slug=course.slug)
+
+    is_completed = Progress.objects.filter(user=request.user, module=module, is_completed=True).exists()
+    previous_module = course.modules.filter(id__lt=module.id).order_by('-id').first()
+    next_module = course.modules.filter(id__gt=module.id).order_by('id').first()
+
     return render(request, "courses/view_module.html", {
         "course":course,
-        "module":module
+        "module":module,
+        'is_completed': is_completed,
+        'previous_module': previous_module,
+        'next_module': next_module,
     })
 
 def edit_module(request, course_slug, module_id):
@@ -132,13 +154,41 @@ def edit_module(request, course_slug, module_id):
         "type": "Edit"
     })
 
+
+@require_POST
+@login_required
+def complete_module(request, course_slug, module_id):
+    module = get_object_or_404(Module, id=module_id)
+    Progress.objects.update_or_create(
+        user=request.user,
+        module=module,
+
+        defaults={'is_completed': True}
+    )
+    return redirect('courses:view_module', module_id=module_id, course_slug=course_slug)
+
+@require_POST
+@login_required
 def enroll_course(request, slug):
     course = get_object_or_404(Course, slug=slug)
-    if request.user.is_authenticated:
+    if request.user not in course.students.all():
         course.students.add(request.user)
         messages.success(request, 'You have successfully enrolled in this course')
         return redirect('courses:course_detail', slug=course.slug)
     else:
-        messages.error(request, 'You need to sign in to enroll in courses.')
-        return redirect('accounts:sign_in')
+        messages.info(request, 'You are already enrolled in this course.')
     
+    return redirect('courses:course_detail', slug=course.slug)
+
+@require_POST
+@login_required
+def unenroll_course(request, slug):
+    course = get_object_or_404(Course, slug=slug)
+    if request.user in course.students.all():
+        course.students.remove(request.user)
+        messages.success(request, 'You have successfully unenrolled out of this course')
+        return redirect('courses:course_detail', slug=course.slug)
+    else:
+        messages.info(request, 'You were not enrolled in this course.')
+    
+    return redirect('courses:course_detail', slug=course.slug)

@@ -13,13 +13,70 @@
         <p class="text-lg text-gray-300 mb-8 leading-relaxed">{{ detail.overview }}</p>
         
         {% if request.user not in detail.students.all %}
-            <a href="{% url 'courses:enroll_course' detail.slug %}" 
-               class="inline-block bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-indigo-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+        <form method="post" action="{% url 'courses:enroll_course' detail.slug %}">
+            {% csrf_token %}
+            <button type="submit" class="inline-block bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-indigo-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                 Enroll Now
-            </a>
+            </button>
+        </form>
+        {% elif request.user in detail.students.all %}
+            <form method="post" action="{% url 'courses:unenroll_course' detail.slug %}">
+                {% csrf_token %}
+                <button type="submit" class="inline-block bg-gray-500 text-white font-semibold py-3 px-8 rounded-lg hover:bg-gray-600 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                    Unenroll
+                </button>
+            </form>
         {% endif %}
     </div>
 </section>
+
+<!-- ========================================== -->
+<!-- CIRCULAR PROGRESS (DONUT) SECTION -->
+<!-- ========================================== -->
+{% if enrollment %}
+<div class="container mx-auto px-4 sm:px-6 lg:px-8 mt-8 max-w-4xl">
+    
+    <!-- Card Container -->
+    <div class="bg-[#1c1d22] border border-gray-700/60 rounded-2xl p-6 shadow-2xl flex items-center justify-between">
+        
+        <!-- Text Content -->
+        <div>
+            <div class="flex items-center gap-3 mb-2">
+                <!-- Premium Badge Icon -->
+                <svg class="w-7 h-7 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                </svg>
+                <h3 class="text-2xl font-bold text-white">Learning Status</h3>
+            </div>
+            <p class="text-gray-400 text-sm">Every module completed brings you closer to mastery.</p>
+        </div>
+
+        <!-- Circular Progress SVG -->
+        <div class="relative w-24 h-24 flex-shrink-0">
+            <!-- SVG Canvas (Rotated to start from top) -->
+            <svg class="w-full h-full transform -rotate-90 drop-shadow-lg" viewBox="0 0 100 100">
+                
+                <!-- Background Track Circle -->
+                <circle cx="50" cy="50" r="40" stroke="#374151" stroke-width="8" fill="transparent"></circle>
+                
+                <!-- Progress Indicator Circle (Uses stroke-dashoffset to draw the arc) -->
+                <circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="8" fill="transparent"
+                        class="text-indigo-500 transition-all duration-1000 ease-out"
+                        stroke-dasharray="251.2"
+                        stroke-dashoffset="calc(251.2 - (251.2 * {{ enrollment.progress_percentage|default:'0' }}) / 100)"
+                        stroke-linecap="round"></circle>
+            </svg>
+            
+            <!-- Percentage Text Centered Inside the Ring -->
+            <div class="absolute inset-0 flex items-center justify-center">
+                <span class="text-xl font-extrabold text-white">{{ enrollment.progress_percentage|floatformat:0 }}%</span>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endif %}
+<!-- ========================================== -->
 
 <!-- Modules Section -->
 <!-- Adjusted the background and text colors to fit the dark theme -->

@@ -31,7 +31,7 @@ class Course(models.Model):
     overview = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=2, choices=Status.choices, default=Status.AVAILABLE)
-    students = models.ManyToManyField(User, related_name='enrolled_courses', blank=True)
+    students = models.ManyToManyField(User, through='Enrollment', related_name='enrolled_courses', blank=True)
 
     class Meta:
         ordering = ['-date_created']
@@ -75,6 +75,53 @@ class Content(models.Model):
 
     item = GenericForeignKey('content_type', 'object_id')
 
+
+class Enrollment(models.Model):
+    user = models.ForeignKey(User, related_name='students_enrolled', on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, related_name='courses_enrolled', on_delete=models.CASCADE)
+    enrolled_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        # Enforce database-level uniqueness to prevent a user from enrolling in the same course twice
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'course'], 
+                name='unique_user_course_enrollment'
+            )
+        ]
+
+    @property
+    def progress_percentage(self):
+        total_modules = self.course.modules.count()
+        
+        if total_modules == 0:
+            return 0
+            
+        completed_modules = self.user.students_progress.filter(
+            module__course=self.course,
+            is_completed=True
+        ).count()
+        
+        percentage = (completed_modules / float(total_modules)) * 100.0
+
+        return round(percentage, 2)
+
+    def __str__(self):
+        return f"{self.user.username} enrolled in {self.course.title}"
+
+class Progress(models.Model):
+    user = models.ForeignKey(User, related_name='students_progress', on_delete=models.CASCADE)
+    module = models.ForeignKey(Module, related_name='students_completed_modules', on_delete=models.CASCADE)
+    is_completed = models.BooleanField(default=False)
+    completed_at = models.DateTimeField(auto_now=True)
+    class Meta:
+        # Enforce database-level uniqueness to prevent a user from enrolling in the same course twice
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'module'], 
+                name='unique_user_content_progress'
+            )
+        ]
+    
 
 # This Model is an abstract Model, means that it's not created in the database, but other models can inherit from it, and we benefit from that because we don't repeat our code.
 class ItemBase(models.Model):
