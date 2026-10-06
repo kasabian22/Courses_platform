@@ -159,19 +159,21 @@ def edit_module(request, course_slug, module_id):
 @login_required
 def complete_module(request, course_slug, module_id):
     module = get_object_or_404(Module, id=module_id)
-    Progress.objects.update_or_create(
-        user=request.user,
-        module=module,
-
-        defaults={'is_completed': True}
-    )
+    is_enrolled = module.course.students.filter(id=request.user.id).exists()
+    
+    if is_enrolled:
+        Progress.objects.update_or_create(
+            user=request.user,
+            module=module,
+            defaults={'is_completed': True}
+        )
     return redirect('courses:view_module', module_id=module_id, course_slug=course_slug)
 
 @require_POST
 @login_required
 def enroll_course(request, slug):
     course = get_object_or_404(Course, slug=slug)
-    if request.user not in course.students.all():
+    if not course.students.filter(id=request.user.id).exists():
         course.students.add(request.user)
         messages.success(request, 'You have successfully enrolled in this course')
         return redirect('courses:course_detail', slug=course.slug)
@@ -184,7 +186,7 @@ def enroll_course(request, slug):
 @login_required
 def unenroll_course(request, slug):
     course = get_object_or_404(Course, slug=slug)
-    if request.user in course.students.all():
+    if not course.students.filter(id=request.user.id).exists():
         course.students.remove(request.user)
         messages.success(request, 'You have successfully unenrolled out of this course')
         return redirect('courses:course_detail', slug=course.slug)
