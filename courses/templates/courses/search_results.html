@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Search Results
+{% endblock title %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-12">
+    <!-- Search Header -->
+    <div class="mb-10 text-center">
+        <h1 class="text-4xl font-bold text-white mb-4">Search Results</h1>
+        {% if query %}
+            <p class="text-gray-400 text-lg">Showing results for: <span class="text-indigo-400 font-semibold">"{{ query }}"</span></p>
+        {% else %}
+            <p class="text-gray-400 text-lg">Please enter a search term to find courses.</p>
+        {% endif %}
+    </div>
+
+    <!-- Results Grid -->
+    {% if courses %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for course in courses %}
+                <!-- Course Card -->
+                <div class="bg-[#1c1d22] border border-gray-700 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+                    <div class="p-6">
+                        <!-- Subject Badge -->
+                        <span class="inline-block px-3 py-1 bg-gray-800 text-indigo-400 text-xs font-semibold rounded-full mb-3">
+                            {{ course.subject.title }}
+                        </span>
+                        
+                        <h3 class="text-xl font-bold text-white mb-2">{{ course.title }}</h3>
+                        <p class="text-gray-400 text-sm mb-4 line-clamp-3">{{ course.overview }}</p>
+                        
+                        <a href="{% url 'courses:course_detail' course.slug %}" class="inline-flex items-center text-indigo-400 hover:text-indigo-300 font-medium text-sm transition-colors">
+                            View Course 
+                            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Empty State (No results found) -->
+        {% if query %}
+            <div class="text-center py-16 bg-[#1c1d22] rounded-xl border border-gray-700 max-w-2xl mx-auto">
+                <svg class="w-16 h-16 mx-auto text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <h3 class="text-xl font-bold text-white mb-2">No courses found</h3>
+                <p class="text-gray-400">We couldn't find any courses matching "{{ query }}". Try searching for different keywords.</p>
+            </div>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock content %}

@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.templatetags.static import static
 
+from courses.models import Course
+
 # Additional fields to the default User model.
 # There is another way using AbstractUser, but this way benefits when you already started the project and have data in the database.
 # write request.user.userprofile.field_name anywhere in the project to use it.

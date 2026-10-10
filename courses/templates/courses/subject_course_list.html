@@ -12,38 +12,7 @@
 
 {% block content %}
 
-    <!-- Navbar -->
-    <nav class="bg-white p-4 shadow-md">
-        <div class="container mx-auto flex justify-between items-center">
-            <a href="#" class="text-2xl font-bold text-gray-800">E-Learn</a>
-            <ul class="flex space-x-4">
-                <li>
-                    <a href="{% url 'accounts:view_profile' %}" class="text-gray-600 hover:text-blue-500">
-                        Welcome, {{ request.user }}
-                    </a>
-                </li>
-                <li><a href="#" class="text-gray-600 hover:text-blue-500">Courses</a></li>
-                <li><a href="#" class="text-gray-600 hover:text-blue-500">Categories</a></li>
-                <li>
-                    {% if request.user.is_authenticated %}
-                        <form method="post" action="{% url 'accounts:sign_out' %}">
-                            {% csrf_token %}
-                            <button type="submit" class="text-gray-600 hover:text-blue-500">
-                                Sign-out
-                            </button>
-                        </form>
-                    {% else %}
-                    <form method="post" action="{% url 'accounts:sign_in' %}">
-                        {% csrf_token %}
-                        <button type="submit" class="text-gray-600 hover:text-blue-500">
-                            Sign-in
-                        </button>
-                    </form>
-                    {% endif %}
-                </li>
-            </ul>
-        </div>
-    </nav>
+    
 
     <!-- Hero Section -->
     <section class="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
@@ -54,49 +23,11 @@
         </div>
     </section>
 
-    <!-- Categories and Courses Section -->
-    <section class="py-12">
-        <div class="container mx-auto">
-            <h2 class="text-4xl font-bold mb-8 text-center">Our Subjects</h2>
-
-            <div class="space-y-12">
-                <!-- Category Card -->
-                <div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-
-                        <!-- Course Card -->
-                         
-                         {% for subject in subjects %}
-                            
-                        
-                            
-                        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg">
-                            <h3 class="text-xl font-bold mb-2">{{subject.title}}</h3>
-                            <p class="text-gray-600 mb-4">{{ subject.description }}.</p>
-                            
-                            <ul class="list-disc pl-5">
-                            {% for course in subject.courses.all %}
-                                <li>
-                                    <a href="{% url 'courses:course_detail' course.slug %}"  class="text-blue-500 hover:underline">{{ course.title }}</a>
-                                </li>
-                                {% empty %}
-                                <li>No courese available in this subject</li>
-                            {% endfor %}
-                                
-                            <a href="#" class="text-blue-500 hover:underline">Start Learning</a>
-                        </div>
-                        {% endfor %}
-                       
-
-                        
-                        
-                       
-                       
-                    </div>
-                </div>
+    
                 <br><hr>
-                <h2 class="text-4xl font-bold mb-8 text-center">Our Courses</h2>
+                <br>
+                <br>
+                <h2 class="text-4xl font-bold mb-8 text-center">Trending Courses</h2>
 
                 <!-- Another Category -->
                 <div>
@@ -153,13 +84,7 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-6">
-        <div class="container mx-auto text-center">
-            <p>&copy; 2024 E-Learn Platform. All rights reserved.</p>
-        </div>
-    </footer>
-
+    
 
 {% endblock content %}
     

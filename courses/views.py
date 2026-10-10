@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.views.decorators.http import require_POST
 from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.contrib import messages
+from django.db.models import Q
 
 
 def subject_courses_list(request):
@@ -15,6 +16,15 @@ def subject_courses_list(request):
         'subjects': subjects
     })
 
+
+def category_courses(request, subject_slug):
+    subject = get_object_or_404(Subject, slug=subject_slug)
+    courses = Course.objects.filter(subject=subject, status=Course.Status.AVAILABLE)
+    
+    return render(request, 'courses/category_courses.html', {
+        'subject': subject,
+        'courses': courses
+    })
 
 # you can use id instead of slug.
 def course_detail(request, slug):
@@ -28,6 +38,27 @@ def course_detail(request, slug):
     return render(request, 'courses/course_detail.html', {
         'detail': course,
         'enrollment': enrollment,
+    })
+
+
+def search_courses(request):
+    # Get the search query from the URL (e.g., ?q=python), default to empty string
+    query = request.GET.get('q', '')
+    
+    # Start with all available courses
+    courses = Course.objects.filter(status=Course.Status.AVAILABLE)
+    
+    if query:
+        # Search in course title OR course overview OR subject title
+        courses = courses.filter(
+            Q(title__icontains=query) | 
+            Q(overview__icontains=query) |
+            Q(subject__title__icontains=query)
+        ).distinct() # .distinct() prevents duplicate results if the query matches multiple fields
+
+    return render(request, 'courses/search_results.html', {
+        'query': query,
+        'courses': courses
     })
 
 @login_required
@@ -194,3 +225,20 @@ def unenroll_course(request, slug):
         messages.info(request, 'You were not enrolled in this course.')
     
     return redirect('courses:course_detail', slug=course.slug)
+
+@require_POST
+@login_required
+def toggle_wishlist(request, slug):
+    course = get_object_or_404(Course, slug=slug)
+    if course.wishlist.filter(id=request.user.id).exists():
+        course.wishlist.remove(request.user)
+        messages.success(request, 'Course removed from wishlist')
+    else:
+        course.wishlist.add(request.user)
+        messages.success(request, 'Course added to wishlist')
+    return redirect('courses:course_detail', slug=course.slug)
+
+@login_required
+def view_wishlist(request):
+    wishlist = request.user.wishlist.all()
+    return render(request, 'courses/wishlist.html', {'wishlist': wishlist})

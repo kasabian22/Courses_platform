@@ -15,7 +15,7 @@ class Course(admin.ModelAdmin):
     list_display = ['title', 'subject', 'date_created', "status"]
     list_filter = ['date_created', 'subject']
     search_fields = ['title', 'overview']
-    prepopulated_fields = {'slug': ('title',)}
+    readonly_fields = ('slug',)
     # when created a course automtically added under it's module.
     inlines = [ModuleInline]
     readonly_fields = ['slug']

@@ -12,21 +12,53 @@
         <h1 class="text-4xl font-extrabold mb-4">{{ detail.title }}</h1>
         <p class="text-lg text-gray-300 mb-8 leading-relaxed">{{ detail.overview }}</p>
         
-        {% if request.user not in detail.students.all %}
-        <form method="post" action="{% url 'courses:enroll_course' detail.slug %}">
-            {% csrf_token %}
-            <button type="submit" class="inline-block bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-indigo-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                Enroll Now
-            </button>
-        </form>
-        {% elif request.user in detail.students.all %}
-            <form method="post" action="{% url 'courses:unenroll_course' detail.slug %}">
-                {% csrf_token %}
-                <button type="submit" class="inline-block bg-gray-500 text-white font-semibold py-3 px-8 rounded-lg hover:bg-gray-600 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                    Unenroll
-                </button>
-            </form>
-        {% endif %}
+        <!-- Action Buttons Section -->
+        <div class="flex items-center justify-center gap-4 mt-8">
+            
+            <!-- 1. Enroll / Unenroll Button -->
+            {% if request.user not in detail.students.all %}
+                <form method="post" action="{% url 'courses:enroll_course' detail.slug %}">
+                    {% csrf_token %}
+                    <button type="submit" class="inline-block bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-indigo-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                        Enroll Now
+                    </button>
+                </form>
+            {% else %}
+                <form method="post" action="{% url 'courses:unenroll_course' detail.slug %}">
+                    {% csrf_token %}
+                    <button type="submit" class="inline-block bg-gray-500 text-white font-semibold py-3 px-8 rounded-lg hover:bg-gray-600 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                        Unenroll
+                    </button>
+                </form>
+            {% endif %}
+
+            <!-- 2. Wishlist Toggle Button (The Heart Icon) -->
+            <!-- Ensure user is logged in to show the button -->
+            {% if request.user.is_authenticated %}
+                <!-- Note: Replace 'courses:toggle_wishlist' with the actual name you gave in your urls.py -->
+                <form method="post" action="{% url 'courses:toggle_wishlist' detail.slug %}" class="inline-block">
+                    {% csrf_token %}
+                    <button type="submit" 
+                            class="p-3 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition group focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-md"
+                            title="{% if request.user in detail.wishlist.all %}Remove from Wishlist{% else %}Add to Wishlist{% endif %}">
+                        
+                        <!-- The SVG Heart -->
+                        <!-- The logic here checks if the current user is in the wishlist relationship you created in step 1 -->
+                        <svg class="w-6 h-6 transition-colors duration-200 
+                                  {% if request.user in detail.wishlist.all %}
+                                      text-red-500 fill-current 
+                                  {% else %}
+                                      text-gray-400 group-hover:text-red-400
+                                  {% endif %}" 
+                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                    </button>
+                </form>
+            {% endif %}
+            
+        </div>
     </div>
 </section>
 

@@ -32,6 +32,7 @@ class Course(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=2, choices=Status.choices, default=Status.AVAILABLE)
     students = models.ManyToManyField(User, through='Enrollment', related_name='enrolled_courses', blank=True)
+    wishlist = models.ManyToManyField(User, related_name='wishlist', blank=True)
 
     class Meta:
         ordering = ['-date_created']
