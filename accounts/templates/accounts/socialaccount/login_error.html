@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Login Error{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-20 max-w-2xl text-center">
+    <div class="bg-[#1c1d22] border border-red-900/50 rounded-xl p-10 shadow-2xl">
+        <!-- Error Icon -->
+        <svg class="w-20 h-20 text-red-500 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>
+        
+        <h1 class="text-3xl font-bold text-white mb-4">Authentication Failed</h1>
+        
+        <p class="text-gray-400 mb-8 text-lg">
+            We encountered an issue while trying to connect your Google account. This usually happens if the login link expired or was used twice.
+        </p>
+        
+        <a href="{% url 'accounts:sign_in' %}" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors shadow-md">
+            Try Logging In Again
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -45,16 +45,16 @@ def search_courses(request):
     # Get the search query from the URL (e.g., ?q=python), default to empty string
     query = request.GET.get('q', '')
     
-    # Start with all available courses
     courses = Course.objects.filter(status=Course.Status.AVAILABLE)
     
     if query:
-        # Search in course title OR course overview OR subject title
+        # Search in course title OR course overview OR subject title OR course owner
         courses = courses.filter(
             Q(title__icontains=query) | 
             Q(overview__icontains=query) |
-            Q(subject__title__icontains=query)
-        ).distinct() # .distinct() prevents duplicate results if the query matches multiple fields
+            Q(subject__title__icontains=query)|
+            Q(owner__username__icontains=query)
+        ).distinct() 
 
     return render(request, 'courses/search_results.html', {
         'query': query,
