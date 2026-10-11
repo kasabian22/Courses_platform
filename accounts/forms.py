@@ -34,7 +34,17 @@ class SignUpForm(UserCreationForm):
     # We add here the placeholders of the fields, and hiding help_text that appers always under fields in default settings.
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if 'password1' in self.fields:
+            self.fields['password1'].widget.attrs.update({
+                'class': 'pr-10',
+                'id': 'my-password-field'
+            })
         
+        if 'password2' in self.fields:
+            self.fields['password2'].widget.attrs.update({
+                'class': 'pr-10',
+                'id': 'my-password-field-2'
+            })
         self.fields['username'].widget.attrs['placeholder'] = 'Enter Your Username'
         self.fields['email'].widget.attrs['placeholder'] = 'Enter Your Email'
         self.fields['password1'].widget.attrs['placeholder'] = 'Enter Your Password'
@@ -69,6 +79,11 @@ class SignUpForm(UserCreationForm):
 class CustomSignInForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if 'password' in self.fields:
+            self.fields['password'].widget.attrs.update({
+                'class': 'pr-10',
+                'id': 'my-password-field'
+            })
         self.fields['username'].widget.attrs['placeholder'] = 'Enter Your Username'
         self.fields['password'].widget.attrs['placeholder'] = 'Enter Your Password'
 
