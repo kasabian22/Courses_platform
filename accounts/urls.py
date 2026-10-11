@@ -11,4 +11,5 @@ urlpatterns = [
     path('view-profile/', views.view_profile, name='view_profile'),
     path('edit-instructor-profile/', views.edit_instructor_profile, name='edit_instructor_profile'),
     path('edit-student-profile/', views.edit_student_profile, name='edit_student_profile'),
+    path('upgrade-instructor/', views.upgrade_to_instructor, name='upgrade_instructor'),
 ]

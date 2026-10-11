@@ -23,6 +23,10 @@ class StudentProfile(models.Model):
     photo = models.ImageField(upload_to='Student/photos', blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
     full_name = models.CharField(max_length=100, blank=True)
+    is_eligible_for_instructor = models.BooleanField(
+    default=False, 
+    help_text="Designates whether this user is allowed to upgrade to an instructor."
+    )
     # TODO
     # country = models.CharField(max_length=100, blank=True, choices="")
     # education = models.CharField(max_length=100, blank=True, choices="")

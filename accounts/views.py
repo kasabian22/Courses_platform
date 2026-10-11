@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
+from django.contrib import messages
 
 
 def sign_up(request):
@@ -114,7 +115,19 @@ def view_profile(request):
     
     return redirect('courses:subject_courses_list')
 
+@login_required
+def upgrade_to_instructor(request):
+    if request.method == 'POST' and request.user.students_profiles.is_eligible_for_instructor:
+        request.user.userprofile.role = 'instructor'
+        request.user.userprofile.save()
 
+        request.user.students_profiles.is_eligible_for_instructor = False
+        request.user.students_profiles.save()
+
+        InstructorProfile.objects.get_or_create(user=request.user)
+        messages.success(request, "Congratulations! You are now an instructor.")
+    
+    return redirect('accounts:view_profile')
 
 
 
