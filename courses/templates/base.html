@@ -12,6 +12,37 @@
          
         </title>
     <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            .dark-form label {
+                color: #9ca3af;
+            }
+
+            .dark-form input:not([type="checkbox"]):not([type="radio"]),
+            .dark-form select,
+            .dark-form textarea {
+                background-color: #151718;
+                border-color: #3c4043;
+                color: #e5e7eb;
+                color-scheme: dark;
+            }
+
+            .dark-form input::placeholder,
+            .dark-form textarea::placeholder {
+                color: #6b7280;
+            }
+
+            .dark-form input:focus,
+            .dark-form select:focus,
+            .dark-form textarea:focus {
+                border-color: #6366f1;
+                outline: none;
+            }
+
+            .dark-form .helptext,
+            .dark-form [class*="help"] {
+                color: #9ca3af;
+            }
+        </style>
 </head>
 
 <body class="bg-[#1E2022] text-gray-300 flex flex-col min-h-screen">

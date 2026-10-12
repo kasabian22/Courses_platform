@@ -109,11 +109,15 @@ def view_profile(request):
                 'profile': profile,
                 'courses': courses
             })
-        
-    elif request.user.is_superuser or request.user.is_staff:
-        return redirect('admin:index')
     
-    return redirect('courses:subject_courses_list')
+    profile = get_object_or_404(InstructorProfile, user=request.user)
+    courses = Course.objects.filter(owner=request.user)
+    return render(request, 'accounts/view_instructor_profile.html', {
+        'profile': profile,
+        'courses': courses
+        })
+    
+    # return redirect('courses:subject_courses_list')
 
 @login_required
 def upgrade_to_instructor(request):

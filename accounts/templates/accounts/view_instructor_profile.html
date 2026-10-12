@@ -5,37 +5,37 @@
 {% endblock title %}
 
 {% block content %}
-    <div class="min-h-screen bg-slate-50 py-10 px-4 sm:px-6 lg:px-8">
+    <div class="min-h-screen bg-[#1e2022] py-10 px-4 sm:px-6 lg:px-8">
         <div class="max-w-6xl mx-auto space-y-8">
 
             <!-- 1. البطاقة العلوية: بيانات البروفايل والبايو والأزرار -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 sm:p-8">
+            <div class="bg-[#1c1d22] rounded-2xl shadow-lg border border-gray-700 p-6 sm:p-8">
                 <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                     
                     <!-- Profile picture, name, and email-->
                     <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5">
                         {% if profile.avatar %}
                             <img src="{{ profile.avatar.url }}" alt="{{ request.user.username }}" 
-                                class="w-24 h-24 rounded-full object-cover ring-4 ring-indigo-50">
+                                class="w-24 h-24 rounded-full object-cover ring-4 ring-indigo-900/50">
                         {% else %}
                             <!-- A stylish avatar featuring the first letter of the username.-->
-                            <div class="w-24 h-24 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-3xl font-bold ring-4 ring-indigo-50">
+                            <div class="w-24 h-24 rounded-full bg-indigo-900/40 text-indigo-300 flex items-center justify-center text-3xl font-bold ring-4 ring-indigo-900/30">
                                 {{ request.user.username|slice:":1"|upper }}
                             </div>
                         {% endif %}
 
                         <div class="text-center sm:text-left">
                             <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3">
-                                <h1 class="text-2xl font-bold text-slate-900">{{ request.user.username }}</h1>
+                                <h1 class="text-2xl font-bold text-white">{{ request.user.username }}</h1>
                                 <!-- Role Badge -->
-                                <span class="px-3 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-700">
+                                <span class="px-3 py-1 text-xs font-semibold rounded-full bg-indigo-900/40 text-indigo-300 border border-indigo-800/50">
                                     {{ request.user.userprofile.role|title }}
                                 </span>
                             </div>
-                            <p class="text-sm text-slate-500 mt-1">{{ request.user.email }}</p>
+                            <p class="text-sm text-gray-400 mt-1">{{ request.user.email }}</p>
 
                             <!-- Bio section -->
-                            <p class="mt-4 text-slate-600 max-w-2xl leading-relaxed text-sm sm:text-base">
+                            <p class="mt-4 text-gray-300 max-w-2xl leading-relaxed text-sm sm:text-base">
                                 {{ profile.bio|default:"No bio has been added yet. Click Edit Profile to add a bio." }}
                             </p>
                         </div>
@@ -44,14 +44,14 @@
                     <!-- Control buttons (Edit profile, Change password, Add course) -->
                     <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-center md:justify-end">
                         <a href="{% url 'accounts:edit_instructor_profile' %}" 
-                        class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition">
+                        class="px-4 py-2 text-sm font-medium text-gray-300 bg-[#1e2022] border border-gray-700 rounded-xl hover:bg-gray-800 hover:text-white transition">
                             Edit Profile
                         </a>
                         
                         {% comment %} TODO {% endcomment %}
                         {% comment %} <a href="{% url 'accounts:change_password' %}"  {% endcomment %}
                         <a href="#" 
-                        class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition">
+                        class="px-4 py-2 text-sm font-medium text-gray-300 bg-[#1e2022] border border-gray-700 rounded-xl hover:bg-gray-800 hover:text-white transition">
                             Change Password
                         </a>
 
@@ -67,7 +67,7 @@
             <!-- 2. Second Section: View Courses -->
             <div>
                 <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-xl font-bold text-slate-900">
+                    <h2 class="text-xl font-bold text-white">
                         Created Courses ({{ courses.count }})
                     </h2>
                 </div>
@@ -75,13 +75,13 @@
                 {% if courses %}
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {% for course in courses %}
-                            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition flex flex-col">
+                            <div class="bg-[#1c1d22] rounded-2xl shadow-lg border border-gray-700 overflow-hidden hover:border-gray-600 transition flex flex-col">
                                 <!-- Course Image-->
-                                <div class="h-44 bg-slate-200 relative">
+                                <div class="h-44 bg-gray-800 relative">
                                     {% if course.image %}
                                         <img src="{{ course.image.url }}" alt="{{ course.title }}" class="w-full h-full object-cover">
                                     {% else %}
-                                        <div class="w-full h-full flex items-center justify-center text-slate-400 font-medium">
+                                        <div class="w-full h-full flex items-center justify-center text-gray-400 font-medium">
                                             No Course Image
                                         </div>
                                     {% endif %}
@@ -90,12 +90,12 @@
                                 <!-- Course Details-->
                                 <div class="p-5 flex-1 flex flex-col justify-between">
                                     <div>
-                                        <h3 class="font-bold text-lg text-slate-900 line-clamp-1">{{ course.title }}</h3>
-                                        <p class="text-sm text-slate-500 mt-2 line-clamp-2">{{ course.overview }}</p>
+                                        <h3 class="font-bold text-lg text-white line-clamp-1">{{ course.title }}</h3>
+                                        <p class="text-sm text-gray-400 mt-2 line-clamp-2">{{ course.overview }}</p>
                                     </div>
 
-                                    <div class="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between">
-                                        <a href="{% url 'courses:edit_course' course.slug %}" class="text-sm font-semibold text-indigo-600 hover:text-indigo-800">
+                                    <div class="mt-5 pt-4 border-t border-gray-700 flex items-center justify-between">
+                                        <a href="{% url 'courses:edit_course' course.slug %}" class="text-sm font-semibold text-indigo-400 hover:text-indigo-300">
                                             Manage Course &rarr;
                                         </a>
                                     </div>
@@ -105,8 +105,8 @@
                     </div>
                 <!-- if there is no courses -->
                 {% else %}
-                    <div class="bg-white rounded-2xl border border-dashed border-slate-300 p-12 text-center">
-                        <p class="text-slate-500">No courses yet.</p>
+                    <div class="bg-[#1c1d22] rounded-2xl border border-dashed border-gray-700 p-12 text-center">
+                        <p class="text-gray-400">No courses yet.</p>
                     </div>
                 {% endif %}
             </div>
