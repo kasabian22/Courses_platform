@@ -6,6 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.utils.text import slugify
 from .utils import generate_unique_slug
+from django_quill.fields import QuillField
 
 
 # Create your models here.
@@ -28,11 +29,21 @@ class Course(models.Model):
     subject = models.ForeignKey(Subject, related_name='courses', on_delete=models.CASCADE)
     title = models.CharField(max_length=250)
     slug = models.SlugField(max_length=250, unique=True, blank=True, null=True)
-    overview = models.TextField()
+    overview = QuillField(help_text="Write the discription of the course here")
     date_created = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=2, choices=Status.choices, default=Status.AVAILABLE)
     students = models.ManyToManyField(User, through='Enrollment', related_name='enrolled_courses', blank=True)
     wishlist = models.ManyToManyField(User, related_name='wishlist', blank=True)
+    # TODO
+    # level
+    # requirements
+    # time_to_complete
+    # review
+    # rating
+    # language
+    # number of students in the course
+    # bestseller badge
+
 
     class Meta:
         ordering = ['-date_created']

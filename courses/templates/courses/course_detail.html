@@ -205,7 +205,9 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
             <div>
                 <h2 class="text-3xl font-semibold mb-4">Course Overview</h2>
-                <p class="text-gray-700 mb-4">{{ detail.overview }}</p>
+                <div class="prose prose-slate max-w-none mt-4 text-gray-300">
+                    {{ course.overview.html|safe }}
+                </div>
             </div>
             <div>
                 <img src="https://via.placeholder.com/600x400" alt="Course Image" class="rounded shadow-lg">

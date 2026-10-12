@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'django_quill',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
