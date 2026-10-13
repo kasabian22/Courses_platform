@@ -15,6 +15,7 @@ urlpatterns = [
     path('course/<slug:slug>/unenroll-course/', views.unenroll_course, name='unenroll_course'),
     path('course/<slug:slug>/module/<int:module_id>/content/<str:model_name>/create', views.content_create_update, name='content_create_update'),
     path('course/<slug:slug>/delete-course/', views.delete_course, name='delete_course'),
+    path('course/<slug:slug>/review-course/', views.review_course, name='review_course'),
     path('category/<slug:subject_slug>/', views.category_courses, name='category_courses'),
     path('search/', views.search_courses, name='search_courses'),
     path('course/<slug:slug>/toggle-wishlist/', views.toggle_wishlist, name='toggle_wishlist'),

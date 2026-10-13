@@ -83,8 +83,8 @@ SOCIALACCOUNT_PROVIDERS = {
 LOGIN_REDIRECT_URL = 'accounts:view_profile'
 ACCOUNT_LOGOUT_REDIRECT_URL = 'accounts:sign_in'
 
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
+ACCOUNT_LOGIN_METHODS = {'email', 'username'}
 SOCIALACCOUNT_QUERY_EMAIL = True
 
 ROOT_URLCONF = 'core.urls'

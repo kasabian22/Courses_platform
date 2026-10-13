@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}
+    Review {{ course.title }}
+{% endblock title %}
+
+{% block content %}
+<!-- Main Container with Dark Background -->
+<div class="flex justify-center items-center min-h-screen bg-[#1e2022] py-12 px-4 sm:px-6 lg:px-8">
+    
+    <!-- Form Card with Lighter Dark Background -->
+    <div class="w-full max-w-lg bg-[#2a2d30] border border-[#3c4043] p-8 rounded-2xl shadow-lg">
+        
+        <!-- Header Section -->
+        <div class="mb-8 text-center">
+            <h2 class="text-2xl font-bold text-gray-100">Leave a Review</h2>
+            <p class="text-sm text-gray-400 mt-2">
+                Your thoughts on <span class="font-semibold text-indigo-400">{{ course.title }}</span>
+            </p>
+        </div>
+
+        <!-- Review Form -->
+        <form method="POST">
+            {% csrf_token %}
+            
+            <!-- Assuming ReviewForm has a 'rating' field (e.g., IntegerField from 1 to 5) -->
+            <div class="mb-6">
+                <label for="{{ form.rating.id_for_label }}" class="block text-gray-400 font-medium mb-2">
+                    Rating (1-5)*
+                </label>
+                <!-- Using widget_tweaks to inject Tailwind classes directly -->
+                {% render_field form.rating class="w-full bg-[#151718] border border-[#3c4043] text-gray-200 placeholder-gray-500 rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" max="5" min="1" placeholder="e.g., 5" %}
+                
+                <!-- Display any field-specific errors -->
+                {% if form.rating.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.rating.errors.as_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Assuming ReviewForm has a 'comment' or 'content' text area -->
+            <div class="mb-6">
+                <label for="{{ form.comment.id_for_label }}" class="block text-gray-400 font-medium mb-2">
+                    Your Review*
+                </label>
+                <!-- We apply similar styles, with a larger height for the textarea -->
+                {% render_field form.comment rows="5" class="w-full bg-[#151718] border border-[#3c4043] text-gray-200 placeholder-gray-500 rounded-lg px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors resize-none" placeholder="What did you think of the course?" %}
+                
+                {% if form.comment.errors %}
+                    <p class="text-red-500 text-sm mt-1">{{ form.comment.errors.as_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Submit and Cancel Buttons -->
+            <div class="flex items-center justify-between mt-8 gap-4">
+                <!-- Cancel Link: Redirects back to the course detail page -->
+                <a href="{% url 'courses:course_detail' course.slug %}" 
+                   class="w-1/2 text-center px-4 py-3 text-sm font-semibold text-gray-300 bg-transparent border border-[#3c4043] rounded-lg hover:bg-[#3c4043] transition-colors focus:outline-none">
+                    Cancel
+                </a>
+                
+                <!-- Submit Button -->
+                <button type="submit" 
+                        class="w-1/2 px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-[#2a2d30]">
+                    Submit Review
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+{% endblock content %}

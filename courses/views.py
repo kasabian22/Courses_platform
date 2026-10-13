@@ -1,16 +1,19 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from .forms import CourseForm, TextForm, FileForm, VideoForm, ImageForm, ModuleForm, ReviewForm
-from .models import Content, Enrollment, Module, Progress, Subject, Course
+from .models import Content, Enrollment, Module, Progress, Review, Subject, Course
 from django.contrib.auth.decorators import login_required, permission_required
 from django.views.decorators.http import require_POST
 from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 
 
 def subject_courses_list(request):
     # get all the courses and the subjects with on query instead of two.
-    subjects = Subject.objects.prefetch_related('courses').all()
+    courses = Course.objects.filter(status=Course.Status.AVAILABLE)
+    subjects = Subject.objects.prefetch_related(
+        Prefetch('courses', queryset=courses)
+    )
 
     return render(request, 'courses/subject_course_list.html', {
         'subjects': subjects
@@ -29,15 +32,17 @@ def category_courses(request, subject_slug):
 # you can use id instead of slug.
 def course_detail(request, slug):
     course = get_object_or_404(Course, slug=slug)
-    
+    reviews = Review.objects.filter(course=course).order_by('-created_at')
     enrollment = None
     
     # check if the user enrolled
     if request.user.is_authenticated and course.students.filter(id=request.user.id).exists():
         enrollment = Enrollment.objects.filter(user=request.user, course=course).first()
+        print(f"Enrollment found for user {request.user.username} in course {course.title}: {enrollment}")
     return render(request, 'courses/course_detail.html', {
         'detail': course,
         'enrollment': enrollment,
+        'reviews': reviews
     })
 
 
@@ -133,6 +138,25 @@ def delete_course(request, slug):
     course.delete()
     return redirect('accounts:view_profile')
 
+@login_required
+def review_course(request, slug):
+    course = get_object_or_404(Course, slug=slug)
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.course = course
+            review.user = request.user
+            review.save()
+            return redirect('courses:course_detail', slug=course.slug)
+    else:
+        form = ReviewForm()
+    
+    return render(request, 'courses/review_course.html', {
+        'form': form,
+        'course': course
+    })
+
 
 @login_required
 @permission_required('courses.add_module', raise_exception=True)
@@ -176,6 +200,7 @@ def view_module(request, course_slug, module_id):
         'is_completed': is_completed,
         'previous_module': previous_module,
         'next_module': next_module,
+        'is_enrolled': is_enrolled
     })
 
 def edit_module(request, course_slug, module_id):

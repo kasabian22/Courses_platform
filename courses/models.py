@@ -7,6 +7,8 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.utils.text import slugify
 from .utils import generate_unique_slug
 from django_quill.fields import QuillField
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db.models import Avg
 
 
 # Create your models here.
@@ -34,15 +36,29 @@ class Course(models.Model):
     status = models.CharField(max_length=2, choices=Status.choices, default=Status.AVAILABLE)
     students = models.ManyToManyField(User, through='Enrollment', related_name='enrolled_courses', blank=True)
     wishlist = models.ManyToManyField(User, related_name='wishlist', blank=True)
-    # TODO
-    # level
-    # requirements
-    # time_to_complete
-    # review
-    # rating
-    # language
-    # number of students in the course
-    # bestseller badge
+    level = models.CharField(max_length=50, choices=[('beginner', 'Beginner'), ('intermediate', 'Intermediate'), ('advanced', 'Advanced')], default='beginner')
+    time_to_complete = models.DurationField(help_text="Enter the time required to complete the course", null=True, blank=True)
+    reviews = models.ManyToManyField(User, through='Review', related_name='course_reviews', blank=True)
+    language = models.CharField(max_length=50, choices=[('english', 'English'), ('arabic', 'Arabic'), ('spanish', 'Spanish')], default='english')
+    bestseller_badge = models.BooleanField(default=False)
+    
+    @property
+    def students_count(self):
+        return self.students.count()
+    
+    @property
+    def reviews_count(self):
+        return self.review_details.count()
+   
+    @property
+    def average_rating(self):
+        avg = self.review_details.aggregate(Avg('rating'))['rating__avg']
+        
+        if avg is not None:
+            return round(avg, 1)  
+        # No reviews yet, return 0.0 as the average rating
+        return 0.0
+    
 
 
     class Meta:
@@ -134,6 +150,22 @@ class Progress(models.Model):
             )
         ]
     
+class Review(models.Model):
+    user = models.ForeignKey(User, related_name='reviews', on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, related_name='review_details', on_delete=models.CASCADE)
+    rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # Enforce database-level uniqueness to prevent a user from reviewing the same course twice
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'course'], 
+                name='unique_user_course_review'
+            )
+        ]
+
 
 # This Model is an abstract Model, means that it's not created in the database, but other models can inherit from it, and we benefit from that because we don't repeat our code.
 class ItemBase(models.Model):

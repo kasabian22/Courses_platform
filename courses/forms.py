@@ -1,5 +1,5 @@
 from django import forms
-from .models import Course, Text, Video, Image, File, Module
+from .models import Course, Text, Video, Image, File, Module, Review
 
 
 class CourseForm(forms.ModelForm):
@@ -33,3 +33,9 @@ class ImageForm(forms.ModelForm):
     class Meta:
         model = Image
         fields = ['image']
+
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['rating', 'comment']

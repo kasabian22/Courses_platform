@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load static %}
 
 
 
@@ -24,26 +23,35 @@
     </section>
 
     
-                <br><hr>
-                <br>
-                <br>
-                <h2 class="text-4xl font-bold mb-8 text-center">Trending Courses</h2>
-
-                <!-- Another Category -->
-                <div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div style="margin: 2rem 2rem 2rem 2rem;" class="bg-[#2a2d30] border border-[#3c4043] rounded-2xl shadow-md hover:shadow-lg">
-                            <img src="{% static 'images/300x200.png' %}" alt="Default Image">
-                            <h3 class="text-xl font-bold mb-2">Machine Learning A-Z</h3>
-                            <p class="text-gray-600 mb-4">Master machine learning algorithms and techniques.</p>
-                            <a href="#" class="text-blue-500 hover:underline">Start Learning</a>
-                        </div>
+    <section class="container mx-auto px-4 py-12">
+        {% for subject in subjects %}
+            {% if subject.courses.all %}
+                <div class="mb-12">
+                    <div class="mb-6 flex items-center justify-between">
+                        <h2 class="text-2xl font-bold text-white">{{ subject.title }}</h2>
+                        <a href="{% url 'courses:category_courses' subject.slug %}" class="text-sm font-semibold text-blue-400 hover:text-blue-300">
+                            View all &rarr;
+                        </a>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {% for course in subject.courses.all|slice:":3" %}
+                            <div class="flex flex-col rounded-2xl border border-[#3c4043] bg-[#2a2d30] p-5 shadow-md transition hover:shadow-lg">
+                                <div class="mb-4">
+                                    {% include 'courses/partials/review_badges.html' %}
+                                </div>
+                                <h3 class="mb-2 text-xl font-bold text-white">{{ course.title }}</h3>
+                                <p class="mb-5 flex-1 text-sm text-gray-400 line-clamp-3">{{ course.overview.plain }}</p>
+                                <a href="{% url 'courses:course_detail' course.slug %}" class="text-sm font-semibold text-blue-400 hover:text-blue-300">
+                                    View Course &rarr;
+                                </a>
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
-
-                <!-- More categories can go here -->
-            </div>
-        </div>
+            {% endif %}
+        {% empty %}
+            <p class="py-12 text-center text-gray-400">No courses available yet.</p>
+        {% endfor %}
     </section>
 
     
