@@ -1,5 +1,5 @@
 from django.shortcuts import redirect, render, get_object_or_404
-from .forms import CourseForm, TextForm, FileForm, VideoForm, ImageForm, ModuleForm
+from .forms import CourseForm, TextForm, FileForm, VideoForm, ImageForm, ModuleForm, ReviewForm
 from .models import Content, Enrollment, Module, Progress, Subject, Course
 from django.contrib.auth.decorators import login_required, permission_required
 from django.views.decorators.http import require_POST
@@ -126,8 +126,15 @@ def edit_course(request, slug):
         'course': course
     })
 
+@require_POST
+@login_required
+def delete_course(request, slug):
+    course = get_object_or_404(Course, slug=slug, owner=request.user)
+    course.delete()
+    return redirect('accounts:view_profile')
 
-@login_required(login_url='accounts:sign_up')
+
+@login_required
 @permission_required('courses.add_module', raise_exception=True)
 def add_module(request, slug):
     course = get_object_or_404(Course, slug=slug, owner=request.user)
