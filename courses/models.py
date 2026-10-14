@@ -11,7 +11,6 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Avg
 
 
-# Create your models here.
 class Subject(models.Model):
     title = models.CharField(max_length=250)
     slug = models.SlugField(max_length=250, unique=True)
@@ -40,7 +39,6 @@ class Course(models.Model):
     time_to_complete = models.DurationField(help_text="Enter the time required to complete the course", null=True, blank=True)
     reviews = models.ManyToManyField(User, through='Review', related_name='course_reviews', blank=True)
     language = models.CharField(max_length=50, choices=[('english', 'English'), ('arabic', 'Arabic'), ('spanish', 'Spanish')], default='english')
-    bestseller_badge = models.BooleanField(default=False)
     
     @property
     def students_count(self):
@@ -58,6 +56,11 @@ class Course(models.Model):
             return round(avg, 1)  
         # No reviews yet, return 0.0 as the average rating
         return 0.0
+
+    @property
+    def bestseller_badge(self):
+        # Returns True automatically if students count is 2 or more, otherwise False
+        return self.students_count >= 2
     
 
 

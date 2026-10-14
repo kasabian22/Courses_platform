@@ -14,22 +14,28 @@
         
         <!-- Action Buttons Section -->
         <div class="flex items-center justify-center gap-4 mt-8">
-            
-            <!-- 1. Enroll / Unenroll Button -->
-            {% if request.user not in detail.students.all %}
-                <form method="post" action="{% url 'courses:enroll_course' detail.slug %}">
-                    {% csrf_token %}
-                    <button type="submit" class="inline-block bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-indigo-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                        Enroll Now
-                    </button>
-                </form>
+            {% if request.user == detail.owner %}
+                <a href="{% url 'courses:edit_course' detail.slug %}" 
+                   class="inline-block bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-indigo-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                    Edit Course
+                </a>
             {% else %}
-                <form method="post" action="{% url 'courses:unenroll_course' detail.slug %}">
-                    {% csrf_token %}
-                    <button type="submit" class="inline-block bg-gray-500 text-white font-semibold py-3 px-8 rounded-lg hover:bg-gray-600 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                        Unenroll
-                    </button>
-                </form>
+                <!-- 1. Enroll / Unenroll Button -->
+                {% if request.user not in detail.students.all %}
+                    <form method="post" action="{% url 'courses:enroll_course' detail.slug %}">
+                        {% csrf_token %}
+                        <button type="submit" class="inline-block bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-indigo-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                            Enroll Now
+                        </button>
+                    </form>
+                {% else %}
+                    <form method="post" action="{% url 'courses:unenroll_course' detail.slug %}">
+                        {% csrf_token %}
+                        <button type="submit" class="inline-block bg-gray-500 text-white font-semibold py-3 px-8 rounded-lg hover:bg-gray-600 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                            Unenroll
+                        </button>
+                    </form>
+                {% endif %}
             {% endif %}
 
             <!-- 2. Wishlist Toggle Button (The Heart Icon) -->
@@ -58,6 +64,40 @@
                 </form>
             {% endif %}
             
+        </div>
+    </div>
+</section>
+
+<!-- Course Details and Included Benefits -->
+<section class="container mx-auto px-4 sm:px-6 lg:px-8 mt-8 max-w-5xl" aria-label="Course details">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+        <div class="lg:col-span-2 bg-[#1c1d22] border border-gray-700/60 rounded-xl p-5">
+            <p class="text-sm text-gray-400 mb-1">Language</p>
+            <p class="text-lg font-semibold text-white">{{ detail.get_language_display }}</p>
+        </div>
+        <div class="lg:col-span-2 bg-[#1c1d22] border border-gray-700/60 rounded-xl p-5">
+            <p class="text-sm text-gray-400 mb-1">Time to complete</p>
+            <p class="text-lg font-semibold text-white">{{ detail.time_to_complete|default:"Not specified" }}</p>
+        </div>
+        <div class="lg:col-span-2 bg-[#1c1d22] border border-gray-700/60 rounded-xl p-5">
+            <p class="text-sm text-gray-400 mb-1">Level</p>
+            <p class="text-lg font-semibold text-white">{{ detail.get_level_display }}</p>
+        </div>
+        <div class="sm:col-span-1 lg:col-span-3 bg-[#1c1d22] border border-gray-700/60 rounded-xl p-5 flex items-center gap-3">
+            <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-400" aria-hidden="true">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622C17.176 19.29 21 14.591 21 9c0-1.042-.133-2.053-.382-3.016z"></path>
+                </svg>
+            </span>
+            <p class="font-semibold text-white">Shareable certificate</p>
+        </div>
+        <div class="sm:col-span-1 lg:col-span-3 bg-[#1c1d22] border border-gray-700/60 rounded-xl p-5 flex items-center gap-3">
+            <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-400" aria-hidden="true">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </span>
+            <p class="font-semibold text-white">Flexible schedule <span class="block text-sm font-normal text-gray-400">(Learn at your own pace)</span></p>
         </div>
     </div>
 </section>

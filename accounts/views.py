@@ -3,8 +3,9 @@ from django.shortcuts import get_object_or_404, render, redirect
 from courses.models import Course
 from .forms import SignUpForm, InstructorProfileForm, StudentProfileForm, UserUpdateForm, CustomSignInForm
 from django.contrib.auth import login, logout, authenticate
-from .models import InstructorProfile, StudentProfile
+from .models import InstructorProfile, StudentProfile, UserProfile
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 from django.views.decorators.http import require_POST
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
@@ -91,31 +92,40 @@ def edit_student_profile(request):
 
 @login_required
 def view_profile(request):
-    
-    if hasattr(request.user, 'userprofile'):
-        role = request.user.userprofile.role
-        if role == "student":
-            profile = get_object_or_404(StudentProfile, user=request.user)
-            enrolled_courses = Course.objects.filter(students=request.user)
-            return render(request, 'accounts/view_student_profile.html', {
-                'profile': profile,
-                'enrolled_courses': enrolled_courses
-            })
-
-        elif role == "instructor":
-            profile = get_object_or_404(InstructorProfile, user=request.user)
-            courses = Course.objects.filter(owner=request.user)
-            return render(request, 'accounts/view_instructor_profile.html', {
-                'profile': profile,
-                'courses': courses
-            })
-    
-    profile = get_object_or_404(InstructorProfile, user=request.user)
-    courses = Course.objects.filter(owner=request.user)
-    return render(request, 'accounts/view_instructor_profile.html', {
-        'profile': profile,
-        'courses': courses
+    user_profile, created = UserProfile.objects.get_or_create(
+        user=request.user,
+        defaults={'role': 'student'}
+    )
+    role = user_profile.role
+    if role == "student":
+        profile, _ = StudentProfile.objects.get_or_create(user=request.user)
+        enrolled_courses = Course.objects.filter(students=request.user).annotate(
+            enrolled_students_count=Count('students', distinct=True)
+        )
+        return render(request, 'accounts/view_student_profile.html', {
+            'profile': profile,
+            'enrolled_courses': enrolled_courses
         })
+
+    elif role == "instructor":
+        profile, _ = InstructorProfile.objects.get_or_create(user=request.user)
+        courses = Course.objects.filter(owner=request.user).annotate(
+            enrolled_students_count=Count('students', distinct=True)
+        )
+        return render(request, 'accounts/view_instructor_profile.html', {
+            'profile': profile,
+            'courses': courses
+        })
+    # admin or superuser
+    else:
+        profile, _ = InstructorProfile.objects.get_or_create(user=request.user)
+        courses = Course.objects.filter(owner=request.user).annotate(
+            enrolled_students_count=Count('students', distinct=True)
+        )
+        return render(request, 'accounts/view_instructor_profile.html', {
+            'profile': profile,
+            'courses': courses
+            })
     
     # return redirect('courses:subject_courses_list')
 

@@ -69,9 +69,9 @@ class SignUpForm(UserCreationForm):
 
             # this is one of three ways to add profile when the user makes an account, the second way is made with signals in models.py file, the third is to take the same line and use it in views.py.
             if selected_role == 'student':
-                StudentProfile.objects.create(user=user)
+                StudentProfile.objects.get_or_create(user=user)
             elif selected_role == 'instructor':
-                InstructorProfile.objects.create(user=user)
+                InstructorProfile.objects.get_or_create(user=user)
 
         return user
 

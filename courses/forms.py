@@ -5,7 +5,7 @@ from .models import Course, Text, Video, Image, File, Module, Review
 class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
-        fields = ['subject', 'title', 'overview', 'status']
+        fields = ['subject', 'title', 'overview', 'status', 'level', 'language', 'time_to_complete']
 
 
 class ModuleForm(forms.ModelForm):

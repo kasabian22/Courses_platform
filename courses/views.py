@@ -5,12 +5,14 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.views.decorators.http import require_POST
 from django.http import HttpResponseBadRequest, HttpResponseForbidden
 from django.contrib import messages
-from django.db.models import Prefetch, Q
+from django.db.models import Count, Prefetch, Q
 
 
 def subject_courses_list(request):
     # get all the courses and the subjects with on query instead of two.
-    courses = Course.objects.filter(status=Course.Status.AVAILABLE)
+    courses = Course.objects.filter(status=Course.Status.AVAILABLE).annotate(
+        enrolled_students_count=Count('students', distinct=True)
+    )
     subjects = Subject.objects.prefetch_related(
         Prefetch('courses', queryset=courses)
     )
@@ -22,7 +24,9 @@ def subject_courses_list(request):
 
 def category_courses(request, subject_slug):
     subject = get_object_or_404(Subject, slug=subject_slug)
-    courses = Course.objects.filter(subject=subject, status=Course.Status.AVAILABLE)
+    courses = Course.objects.filter(subject=subject, status=Course.Status.AVAILABLE).annotate(
+        enrolled_students_count=Count('students', distinct=True)
+    )
     
     return render(request, 'courses/category_courses.html', {
         'subject': subject,
@@ -50,7 +54,9 @@ def search_courses(request):
     # Get the search query from the URL (e.g., ?q=python), default to empty string
     query = request.GET.get('q', '')
     
-    courses = Course.objects.filter(status=Course.Status.AVAILABLE)
+    courses = Course.objects.filter(status=Course.Status.AVAILABLE).annotate(
+        enrolled_students_count=Count('students', distinct=True)
+    )
     
     if query:
         # Search in course title OR course overview OR subject title OR course owner
@@ -249,7 +255,7 @@ def enroll_course(request, slug):
 @login_required
 def unenroll_course(request, slug):
     course = get_object_or_404(Course, slug=slug)
-    if not course.students.filter(id=request.user.id).exists():
+    if course.students.filter(id=request.user.id).exists():
         course.students.remove(request.user)
         messages.success(request, 'You have successfully unenrolled out of this course')
         return redirect('courses:course_detail', slug=course.slug)
@@ -272,5 +278,7 @@ def toggle_wishlist(request, slug):
 
 @login_required
 def view_wishlist(request):
-    wishlist = request.user.wishlist.all()
+    wishlist = request.user.wishlist.annotate(
+        enrolled_students_count=Count('students', distinct=True)
+    )
     return render(request, 'courses/wishlist.html', {'wishlist': wishlist})
