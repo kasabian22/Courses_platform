@@ -36,6 +36,7 @@
                 <div class="p-5 flex-1 flex flex-col justify-between">
                     <div>
                         <h3 class="font-bold text-lg text-gray-100 line-clamp-1">{{ course.title }}</h3>
+                        {% include 'courses/partials/course_owner.html' with course=course %}
                         <p class="text-sm text-gray-400 mt-2 line-clamp-2">{{ course.overview.plain }}</p>
                     </div>
             

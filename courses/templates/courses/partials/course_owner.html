@@ -1,0 +1,3 @@
+<p class="mt-1 text-xs text-gray-500">
+    By <span class="font-medium text-gray-300">{{ course.owner.instructors_profiles.full_name|default:course.owner.get_full_name|default:course.owner.username }}</span>
+</p>

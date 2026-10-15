@@ -17,9 +17,15 @@
                     <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 w-full lg:w-2/3">
                         
                         <!-- Avatar Placeholder (يمكنك تركه كما هو لديك) -->
-                        <div class="w-24 h-24 rounded-full bg-indigo-900/50 flex items-center justify-center text-3xl font-bold text-indigo-400 border-2 border-indigo-500/20 shrink-0">
-                            {{ request.user.username|make_list|first|upper }}
-                        </div>
+                        {% if profile.photo %}
+                            <img src="{{ profile.photo.url }}" alt="{{ request.user.username }}" 
+                                class="w-24 h-24 rounded-full object-cover ring-4 ring-indigo-900/50">
+                        {% else %}
+                            <!-- A stylish avatar featuring the first letter of the username.-->
+                            <div class="w-24 h-24 rounded-full bg-indigo-900/40 text-indigo-300 flex items-center justify-center text-3xl font-bold ring-4 ring-indigo-900/30">
+                                {{ request.user.username|slice:":1"|upper }}
+                            </div>
+                        {% endif %}
                         
                         <!-- Text Details -->
                         <div class="text-center sm:text-left mt-2 sm:mt-0">
@@ -124,6 +130,7 @@
                             <div class="p-5 flex-1 flex flex-col justify-between">
                                 <div>
                                     <h3 class="font-bold text-lg text-gray-100 line-clamp-1">{{ course.title }}</h3>
+                                    {% include 'courses/partials/course_owner.html' with course=course %}
                                     <p class="text-sm text-gray-400 mt-2 line-clamp-2">{{ course.overview.plain }}</p>
                                 </div>
                         

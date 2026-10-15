@@ -9,6 +9,7 @@ from .utils import generate_unique_slug
 from django_quill.fields import QuillField
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Avg
+from django.conf.global_settings import LANGUAGES
 
 
 class Subject(models.Model):
@@ -38,7 +39,7 @@ class Course(models.Model):
     level = models.CharField(max_length=50, choices=[('beginner', 'Beginner'), ('intermediate', 'Intermediate'), ('advanced', 'Advanced')], default='beginner')
     time_to_complete = models.DurationField(help_text="Enter the time required to complete the course", null=True, blank=True)
     reviews = models.ManyToManyField(User, through='Review', related_name='course_reviews', blank=True)
-    language = models.CharField(max_length=50, choices=[('english', 'English'), ('arabic', 'Arabic'), ('spanish', 'Spanish')], default='english')
+    language = models.CharField(max_length=50, choices=LANGUAGES, default='english')
     
     @property
     def students_count(self):

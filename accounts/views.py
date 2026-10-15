@@ -92,34 +92,41 @@ def edit_student_profile(request):
 
 @login_required
 def view_profile(request):
-    user_profile, created = UserProfile.objects.get_or_create(
-        user=request.user,
-        defaults={'role': 'student'}
-    )
-    role = user_profile.role
-    if role == "student":
-        profile, _ = StudentProfile.objects.get_or_create(user=request.user)
-        enrolled_courses = Course.objects.filter(students=request.user).annotate(
-            enrolled_students_count=Count('students', distinct=True)
+    if not request.user.is_superuser and not request.user.is_staff:
+        user_profile, created = UserProfile.objects.get_or_create(
+            user=request.user,
+            defaults={'role': 'student'}
         )
-        return render(request, 'accounts/view_student_profile.html', {
-            'profile': profile,
-            'enrolled_courses': enrolled_courses
-        })
+        role = user_profile.role
+        if role == "student":
+            profile, _ = StudentProfile.objects.get_or_create(user=request.user)
+            enrolled_courses = Course.objects.filter(students=request.user).select_related(
+                'owner', 'owner__instructors_profiles'
+            ).annotate(
+                enrolled_students_count=Count('students', distinct=True)
+            )
+            return render(request, 'accounts/view_student_profile.html', {
+                'profile': profile,
+                'enrolled_courses': enrolled_courses
+            })
 
-    elif role == "instructor":
-        profile, _ = InstructorProfile.objects.get_or_create(user=request.user)
-        courses = Course.objects.filter(owner=request.user).annotate(
-            enrolled_students_count=Count('students', distinct=True)
-        )
-        return render(request, 'accounts/view_instructor_profile.html', {
-            'profile': profile,
-            'courses': courses
-        })
+        elif role == "instructor":
+            profile, _ = InstructorProfile.objects.get_or_create(user=request.user)
+            courses = Course.objects.filter(owner=request.user).select_related(
+                'owner', 'owner__instructors_profiles'
+            ).annotate(
+                enrolled_students_count=Count('students', distinct=True)
+            )
+            return render(request, 'accounts/view_instructor_profile.html', {
+                'profile': profile,
+                'courses': courses
+            })
     # admin or superuser
     else:
         profile, _ = InstructorProfile.objects.get_or_create(user=request.user)
-        courses = Course.objects.filter(owner=request.user).annotate(
+        courses = Course.objects.filter(owner=request.user).select_related(
+            'owner', 'owner__instructors_profiles'
+        ).annotate(
             enrolled_students_count=Count('students', distinct=True)
         )
         return render(request, 'accounts/view_instructor_profile.html', {
@@ -127,7 +134,6 @@ def view_profile(request):
             'courses': courses
             })
     
-    # return redirect('courses:subject_courses_list')
 
 @login_required
 def upgrade_to_instructor(request):
@@ -140,10 +146,28 @@ def upgrade_to_instructor(request):
 
         InstructorProfile.objects.get_or_create(user=request.user)
         messages.success(request, "Congratulations! You are now an instructor.")
+
+        StudentProfile.objects.filter(user=request.user).delete()
     
     return redirect('accounts:view_profile')
 
+def public_instructor_profile(request, instructor_id):
+    instructor_profile = get_object_or_404(
+        InstructorProfile.objects.select_related('user'),
+        user__id=instructor_id
+    )
 
+    courses = Course.objects.filter(
+        owner=instructor_profile.user,
+        status=Course.Status.AVAILABLE
+    ).annotate(
+        enrolled_students_count=Count('students', distinct=True)
+    )
+
+    return render(request, 'accounts/public_instructor_profile.html', {
+        'profile': instructor_profile,
+        'courses': courses
+    })
 
 # TODO
 # @login_required

@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ profile.full_name|default:profile.user.username }} | Instructor Profile
+{% endblock title %}
+
+{% block content %}
+<div class="min-h-screen bg-[#1e2022] py-10 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto space-y-8">
+
+        <!-- ==================== 1. Top Card: Instructor Bio, Metadata & Social Links ==================== -->
+        <div class="bg-[#1c1d22] rounded-2xl shadow-lg border border-[#3c4043] p-6 sm:p-8">
+            <div class="flex flex-col lg:flex-row items-start justify-between gap-8">
+                
+                <!-- Left Side: Avatar, Name, Header, Metadata Badges, and Bio -->
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 w-full lg:w-3/4">
+                    
+                    <!-- Instructor Photo or Initial Avatar -->
+                    {% if profile.photo %}
+                        <img src="{{ profile.photo.url }}" alt="{{ profile.full_name|default:profile.user.username }}" 
+                             class="w-28 h-28 rounded-full object-cover ring-4 ring-indigo-900/50 shrink-0">
+                    {% else %}
+                        <div class="w-28 h-28 rounded-full bg-indigo-900/40 text-indigo-300 flex items-center justify-center text-4xl font-bold ring-4 ring-indigo-900/30 shrink-0">
+                            {{ profile.full_name|default:profile.user.username|slice:":1"|upper }}
+                        </div>
+                    {% endif %}
+
+                    <div class="text-center sm:text-left flex-1">
+                        <!-- Full Name & Role Badge -->
+                        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3">
+                            <h1 class="text-2xl sm:text-3xl font-bold text-white">
+                                {{ profile.full_name|default:profile.user.username }}
+                            </h1>
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-indigo-900/40 text-indigo-300 border border-indigo-800/50">
+                                Instructor
+                            </span>
+                        </div>
+
+                        <!-- Username handle if full_name is set -->
+                        {% if profile.full_name %}
+                            <p class="text-xs text-gray-500 mt-0.5">@{{ profile.user.username }}</p>
+                        {% endif %}
+
+                        <!-- Professional Header / Headline -->
+                        {% if profile.header %}
+                            <p class="text-base font-medium text-indigo-400 mt-2">
+                                {{ profile.header }}
+                            </p>
+                        {% endif %}
+
+                        <!-- Demographic & Academic Pills (Country, Education, Language) -->
+                        {% if profile.country or profile.education or profile.primary_language_spoken %}
+                            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 mt-4">
+                                
+                                <!-- Country Badge -->
+                                {% if profile.country %}
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-[#2a2d30] text-gray-300 border border-[#3c4043]">
+                                        <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                        {{ profile.country.name }}
+                                    </span>
+                                {% endif %}
+
+                                <!-- Education Level Badge -->
+                                {% if profile.education %}
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-[#2a2d30] text-gray-300 border border-[#3c4043]">
+                                        <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 14l9-5-9-5-9 5 9 5z"/>
+                                            <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                                        </svg>
+                                        {{ profile.get_education_display }}
+                                    </span>
+                                {% endif %}
+
+                                <!-- Primary Language Badge -->
+                                {% if profile.primary_language_spoken %}
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-[#2a2d30] text-gray-300 border border-[#3c4043]">
+                                        <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
+                                        </svg>
+                                        {{ profile.get_primary_language_spoken_display }}
+                                    </span>
+                                {% endif %}
+
+                            </div>
+                        {% endif %}
+
+                        <!-- Bio Section -->
+                        <div class="mt-5 text-gray-300 max-w-2xl leading-relaxed text-sm sm:text-base">
+                            {% if profile.bio %}
+                                {{ profile.bio|linebreaks }}
+                            {% else %}
+                                <p class="text-gray-500 italic">This instructor hasn't added a bio yet.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side: Contact Email & Social Media Links -->
+                {% if profile.contact_email or profile.linkedin or profile.github or profile.facebook %}
+                    <div class="flex flex-col sm:flex-row lg:flex-col items-center sm:items-end justify-center gap-3 w-full lg:w-auto shrink-0 border-t lg:border-t-0 border-[#3c4043] pt-5 lg:pt-0">
+                        
+                        <!-- Public Contact Email Button -->
+                        {% if profile.contact_email %}
+                            <a href="mailto:{{ profile.contact_email }}" 
+                               class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-200 bg-[#2a2d30] border border-[#3c4043] rounded-xl hover:bg-[#3c4043] hover:text-white transition-colors">
+                                <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                </svg>
+                                Contact Instructor
+                            </a>
+                        {% endif %}
+
+                        <!-- Social Media Icon Buttons -->
+                        <div class="flex items-center gap-2.5">
+                            {% if profile.linkedin %}
+                                <a href="{{ profile.linkedin }}" target="_blank" rel="noopener noreferrer" 
+                                   title="LinkedIn"
+                                   class="p-2.5 rounded-xl bg-[#2a2d30] border border-[#3c4043] text-gray-400 hover:text-white hover:border-indigo-500/50 transition-colors">
+                                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                                        <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+                                    </svg>
+                                </a>
+                            {% endif %}
+
+                            {% if profile.github %}
+                                <a href="{{ profile.github }}" target="_blank" rel="noopener noreferrer" 
+                                   title="GitHub"
+                                   class="p-2.5 rounded-xl bg-[#2a2d30] border border-[#3c4043] text-gray-400 hover:text-white hover:border-indigo-500/50 transition-colors">
+                                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+                                    </svg>
+                                </a>
+                            {% endif %}
+
+                            {% if profile.facebook %}
+                                <a href="{{ profile.facebook }}" target="_blank" rel="noopener noreferrer" 
+                                   title="Facebook"
+                                   class="p-2.5 rounded-xl bg-[#2a2d30] border border-[#3c4043] text-gray-400 hover:text-white hover:border-indigo-500/50 transition-colors">
+                                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/>
+                                    </svg>
+                                </a>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                {% endif %}
+
+            </div>
+        </div>
+
+        <!-- ==================== 2. Middle Section: Instructor Statistics ==================== -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            
+            <!-- Total Courses Card -->
+            <div class="bg-[#1c1d22] rounded-2xl shadow-lg border border-[#3c4043] p-6 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-blue-900/30 text-blue-400 flex items-center justify-center shrink-0">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-400">Published Courses</p>
+                    <p class="mt-1 text-2xl font-bold text-white">{{ courses.count }}</p>
+                </div>
+            </div>
+
+            <!-- Total Students Card (from InstructorProfile @property) -->
+            <div class="bg-[#1c1d22] rounded-2xl shadow-lg border border-[#3c4043] p-6 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-indigo-900/40 text-indigo-300 flex items-center justify-center shrink-0">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.196-2.04M17 20H7m10 0v-2c0-.728-.195-1.411-.536-2M7 20H2v-2a3 3 0 015.196-2.04M7 20v-2c0-.728.195-1.411.536-2m0 0a5.002 5.002 0 019.928 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-400">Total Students</p>
+                    <p class="mt-1 text-2xl font-bold text-white">{{ profile.total_students }}</p>
+                </div>
+            </div>
+
+            <!-- Total Reviews Card (from InstructorProfile @property) -->
+            <div class="bg-[#1c1d22] rounded-2xl shadow-lg border border-[#3c4043] p-6 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-amber-900/30 text-amber-300 flex items-center justify-center shrink-0">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.95a1 1 0 00.95.69h4.154c.969 0 1.371 1.24.588 1.81l-3.36 2.44a1 1 0 00-.364 1.118l1.284 3.95c.3.922-.755 1.688-1.54 1.118l-3.36-2.44a1 1 0 00-1.176 0l-3.36 2.44c-.784.57-1.838-.196-1.539-1.117l1.284-3.951a1 1 0 00-.363-1.118l-3.36-2.44c-.784-.57-.382-1.81.587-1.81h4.154a1 1 0 00.951-.69l1.282-3.95z" />
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-sm font-medium text-gray-400">Total Reviews</p>
+                    <p class="mt-1 text-2xl font-bold text-white">{{ profile.total_reviews }}</p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ==================== 3. Bottom Section: Instructor's Courses ==================== -->
+        <div>
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-white">
+                    Courses by {{ profile.full_name|default:profile.user.username }} ({{ courses.count }})
+                </h2>
+            </div>
+
+            {% if courses %}
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for course in courses %}
+                        <div class="bg-[#2a2d30] rounded-2xl shadow-sm border border-[#3c4043] overflow-hidden hover:border-gray-500 transition flex flex-col">
+                            
+                            <!-- Course Image & Badges -->
+                            <div class="h-44 bg-[#1e2022] relative border-b border-[#3c4043]">
+                                {% if course.image %}
+                                    <img src="{{ course.image.url }}" alt="{{ course.title }}" class="w-full h-full object-cover">
+                                {% else %}
+                                    <div class="w-full h-full flex items-center justify-center text-gray-500 font-medium">
+                                        No Course Image
+                                    </div>
+                                {% endif %}
+                                {% include 'courses/partials/bestseller_badge.html' with course=course %}
+                                <div class="absolute top-3 left-3">
+                                    {% include 'courses/partials/review_badges.html' %}
+                                </div>
+                            </div>
+
+                            <!-- Course Details -->
+                            <div class="p-5 flex-1 flex flex-col justify-between">
+                                <div>
+                                    <h3 class="font-bold text-lg text-gray-100 line-clamp-1">{{ course.title }}</h3>
+                                    <p class="text-sm text-gray-400 mt-2 line-clamp-2">{{ course.overview.plain }}</p>
+                                </div>
+
+                                <!-- Card Footer: Student View Course Link (No Edit/Delete buttons) -->
+                                <div class="mt-5 pt-4 border-t border-[#3c4043] flex items-center justify-between">
+                                    <a href="{% url 'courses:course_detail' course.slug %}" class="text-sm font-semibold text-blue-400 hover:text-blue-300 transition-colors">
+                                        View Course &rarr;
+                                    </a>
+                                </div>
+                            </div>
+
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="bg-[#1c1d22] rounded-2xl border border-dashed border-[#3c4043] p-12 text-center">
+                    <p class="text-gray-400">This instructor has not published any courses yet.</p>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock content %}

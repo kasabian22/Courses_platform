@@ -91,13 +91,13 @@ class CustomSignInForm(AuthenticationForm):
 class InstructorProfileForm(forms.ModelForm):
     class Meta:
         model = InstructorProfile
-        fields = ['bio', 'photo', 'contact_email', 'header']
+        fields = ['bio', 'photo', 'contact_email', 'header', 'country', 'education', 'primary_language_spoken', 'linkedin', 'github', 'facebook']
 
 
 class StudentProfileForm(forms.ModelForm):
     class Meta:
         model = StudentProfile  
-        fields = ["photo", "bio"]
+        fields = ["photo", "bio", "full_name", "country", "education", "primary_language_spoken", "linkedin", "github", "facebook"]
 
 
 class UserUpdateForm(forms.ModelForm):

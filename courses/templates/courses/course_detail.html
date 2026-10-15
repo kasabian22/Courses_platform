@@ -10,7 +10,7 @@
 <section class="py-16 bg-gradient-to-br from-gray-900 to-gray-800 text-white border-b border-gray-700">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-4xl">
         <h1 class="text-4xl font-extrabold mb-4">{{ detail.title }}</h1>
-        <p class="text-lg text-gray-300 mb-8 leading-relaxed">{{ detail.overview }}</p>
+        <p class="text-lg text-gray-300 mb-8 leading-relaxed">{{ detail.overview.html|safe }}</p>
         
         <!-- Action Buttons Section -->
         <div class="flex items-center justify-center gap-4 mt-8">
@@ -97,7 +97,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
             </span>
-            <p class="font-semibold text-white">Flexible schedule <span class="block text-sm font-normal text-gray-400">(Learn at your own pace)</span></p>
+            <p class="font-semibold text-white">Flexible schedule <span class="block text-sm font-normal text-gray-400">Learn at your own pace</span></p>
         </div>
     </div>
 </section>
@@ -161,7 +161,7 @@
             <p class="text-gray-400">Explore the modules included in this course.</p>
         </div>
         
-        {% if perms.courses.add_module %}
+        {% if perms.courses.add_module and request.user == detail.owner %}
             <!-- Add Module Button aligned to the right of the header -->
             <div>
                 <a href="{% url 'courses:add_module' detail.slug %}" 
@@ -196,7 +196,7 @@
                         View
                     </a>
 
-                    {% if perms.courses.add_module %}
+                    {% if perms.courses.add_module and request.user == detail.owner %}
                         <!-- Edit Module -->
                         <a href="{% url 'courses:edit_module' detail.slug module.id %}" 
                            class="p-2 text-gray-400 hover:text-white bg-transparent hover:bg-gray-700 rounded-lg transition" title="Edit Details">
@@ -236,7 +236,6 @@
     {% endif %}
 </div>
 
-<!-- Rest of your code remains below... -->
 
 <!-- Additional Course Content -->
 <section class="py-12">
@@ -245,26 +244,36 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
             <div>
                 <h2 class="text-3xl font-semibold mb-4">Course Overview</h2>
-                <div class="prose prose-slate max-w-none mt-4 text-gray-300">
-                    {{ course.overview.html|safe }}
-                </div>
-            </div>
-            <div>
-                <img src="https://via.placeholder.com/600x400" alt="Course Image" class="rounded shadow-lg">
+                {% if course.overview %}
+                    <div class="prose prose-slate max-w-none mt-4 text-gray-300">
+                        {{ course.overview.html|safe }}
+                    </div>
+                {% else %}
+                    <p class="text-gray-400">No overview available for this course.</p>
+                {% endif %}
             </div>
         </div>
 
         <!-- Instructor Section -->
-        <div class="mt-12 bg-gray-100 p-8 rounded-lg">
-            <h2 class="text-3xl font-semibold mb-4">Instructor: {{ detail.owner }}</h2>
+        <div class="mt-12 bg-[#1c1d22] border border-gray-700 p-8 rounded-2xl shadow-lg">
+            <h2 class="text-3xl font-semibold text-white mb-4">Instructor: {{ detail.owner|title }}</h2>
             <div class="flex items-center">
-                <img src="https://via.placeholder.com/100" alt="Instructor Image" class="rounded-full mr-6">
+                {% if detail.owner.instructors_profiles.photo %}
+                    <img src="{{ detail.owner.instructors_profiles.photo.url }}" alt="{{ detail.owner.username }}" class="w-16 h-16 rounded-full object-cover mr-4">
+                {% else %}
+                    <div class="w-16 h-16 rounded-full bg-gray-600 flex items-center justify-center text-white font-bold mr-4">
+                        {{ detail.owner.username|slice:":1"|upper }}
+                    </div>
+                {% endif %}
                 <div>
-                    <p class="text-gray-700 mb-2">
-                        John is a data scientist with over 10 years of experience working with big data and machine learning.
-                        He has worked with companies such as XYZ Corp and is passionate about teaching others to use Python for data analysis.
+                    <p class="text-gray-300 mb-2">
+                        {% if detail.owner.instructors_profiles.bio %}
+                            {{ detail.owner.instructors_profiles.bio }}
+                        {% else %}
+                            This instructor has not provided a bio yet.
+                        {% endif %}
                     </p>
-                    <a href="#" class="text-blue-500 hover:underline">View Instructor Profile</a>
+                    <a href="{% url 'accounts:public_instructor_profile' detail.owner.id %}" class="text-indigo-400 hover:text-indigo-300 hover:underline transition-colors">View Instructor Profile</a>
                 </div>
             </div>
         </div>

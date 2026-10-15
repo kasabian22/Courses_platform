@@ -10,7 +10,9 @@ from django.db.models import Count, Prefetch, Q
 
 def subject_courses_list(request):
     # get all the courses and the subjects with on query instead of two.
-    courses = Course.objects.filter(status=Course.Status.AVAILABLE).annotate(
+    courses = Course.objects.filter(status=Course.Status.AVAILABLE).select_related(
+        'owner', 'owner__instructors_profiles'
+    ).annotate(
         enrolled_students_count=Count('students', distinct=True)
     )
     subjects = Subject.objects.prefetch_related(
@@ -24,7 +26,9 @@ def subject_courses_list(request):
 
 def category_courses(request, subject_slug):
     subject = get_object_or_404(Subject, slug=subject_slug)
-    courses = Course.objects.filter(subject=subject, status=Course.Status.AVAILABLE).annotate(
+    courses = Course.objects.filter(subject=subject, status=Course.Status.AVAILABLE).select_related(
+        'owner', 'owner__instructors_profiles'
+    ).annotate(
         enrolled_students_count=Count('students', distinct=True)
     )
     
@@ -42,7 +46,6 @@ def course_detail(request, slug):
     # check if the user enrolled
     if request.user.is_authenticated and course.students.filter(id=request.user.id).exists():
         enrollment = Enrollment.objects.filter(user=request.user, course=course).first()
-        print(f"Enrollment found for user {request.user.username} in course {course.title}: {enrollment}")
     return render(request, 'courses/course_detail.html', {
         'detail': course,
         'enrollment': enrollment,
@@ -54,7 +57,9 @@ def search_courses(request):
     # Get the search query from the URL (e.g., ?q=python), default to empty string
     query = request.GET.get('q', '')
     
-    courses = Course.objects.filter(status=Course.Status.AVAILABLE).annotate(
+    courses = Course.objects.filter(status=Course.Status.AVAILABLE).select_related(
+        'owner', 'owner__instructors_profiles'
+    ).annotate(
         enrolled_students_count=Count('students', distinct=True)
     )
     
@@ -278,7 +283,9 @@ def toggle_wishlist(request, slug):
 
 @login_required
 def view_wishlist(request):
-    wishlist = request.user.wishlist.annotate(
+    wishlist = request.user.wishlist.select_related(
+        'owner', 'owner__instructors_profiles'
+    ).annotate(
         enrolled_students_count=Count('students', distinct=True)
     )
     return render(request, 'courses/wishlist.html', {'wishlist': wishlist})
