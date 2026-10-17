@@ -1,10 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.templatetags.static import static
 from django.conf.global_settings import LANGUAGES
 from django_countries.fields import CountryField
-from courses.models import Course, Review
-from django_quill.fields import QuillField
+from courses.models import Review
 
 class EducationLevel(models.TextChoices):
     HIGH_SCHOOL = 'high_school', 'High School / Secondary'

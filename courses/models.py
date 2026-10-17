@@ -41,7 +41,7 @@ class Course(models.Model):
     time_to_complete = models.DurationField(help_text="Enter the course duration in HH:MM:SS format (e.g., 02:30:00 for 2 and a half hours)", null=True, blank=True)
     reviews = models.ManyToManyField(User, through='Review', related_name='course_reviews', blank=True)
     language = models.CharField(max_length=50, choices=LANGUAGES, default='en', help_text="Select the language of the course")
-    image = models.ImageField(upload_to='course_images/', null=True, blank=True, help_text="Upload an image for the course")
+    image = models.ImageField(upload_to='course_images/', null=True, blank=True, help_text="Upload an image for the course (Recommended aspect ratio: 16:9)")
     
     @property
     def students_count(self):

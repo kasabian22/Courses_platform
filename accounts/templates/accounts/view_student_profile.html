@@ -1,82 +1,122 @@
 {% extends 'base.html' %}
 
 {% block title %}
-        {{ request.user.username }} Profile
+    {{ profile.full_name|default:request.user.username }} | Student Profile
 {% endblock title %}
 
 {% block content %}
-    <div class="min-h-screen bg-[#1e2022] py-10 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-6xl mx-auto space-y-8">
-            <!-- Main Profile Card Container -->
-            <div class="bg-[#1c1d22] rounded-2xl shadow-lg border border-gray-700 p-6 sm:p-8">
+<div class="min-h-screen bg-[#1e2022] py-10 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto space-y-8">
+        
+        <!-- 1. Main Profile Card Container -->
+        <div class="bg-[#1c1d22] rounded-2xl shadow-lg border border-[#3c4043] p-6 sm:p-8">
+            
+            <div class="flex flex-col lg:flex-row justify-between items-start gap-8">
                 
-                <!-- ==================== Top Section: Profile Info & Buttons ==================== -->
-                <div class="flex flex-col lg:flex-row justify-between items-start gap-8">
+                <!-- Left: Avatar & Text Info -->
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 w-full lg:w-2/3">
                     
-                    <!-- Left: Avatar & Text Info -->
-                    <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 w-full lg:w-2/3">
+                    {% if profile.photo %}
+                        <img src="{{ profile.photo.url }}" alt="{{ request.user.username }}" 
+                             class="w-28 h-28 rounded-full object-cover ring-4 ring-indigo-900/50 shrink-0">
+                    {% else %}
+                        <div class="w-28 h-28 rounded-full bg-indigo-900/40 text-indigo-300 flex items-center justify-center text-4xl font-bold ring-4 ring-indigo-900/30 shrink-0">
+                            {{ profile.full_name|default:request.user.username|slice:":1"|upper }}
+                        </div>
+                    {% endif %}
+                    
+                    <div class="text-center sm:text-left flex-1">
+                        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3">
+                            <h1 class="text-2xl sm:text-3xl font-bold text-white">
+                                {{ profile.full_name|default:request.user.username }}
+                            </h1>
+                            <span class="px-3 py-1 text-xs font-semibold rounded-full bg-emerald-900/30 text-emerald-400 border border-emerald-800/50">
+                                {{ request.user.userprofile.role|title }}
+                            </span>
+                        </div>
                         
-                        <!-- Avatar Placeholder (يمكنك تركه كما هو لديك) -->
-                        {% if profile.photo %}
-                            <img src="{{ profile.photo.url }}" alt="{{ request.user.username }}" 
-                                class="w-24 h-24 rounded-full object-cover ring-4 ring-indigo-900/50">
-                        {% else %}
-                            <!-- A stylish avatar featuring the first letter of the username.-->
-                            <div class="w-24 h-24 rounded-full bg-indigo-900/40 text-indigo-300 flex items-center justify-center text-3xl font-bold ring-4 ring-indigo-900/30">
-                                {{ request.user.username|slice:":1"|upper }}
+                        <p class="text-sm text-gray-400 mt-1">
+                            @{{ request.user.username }} &bull; {{ request.user.email }}
+                        </p>
+
+                        <!-- Demographic & Academic Pills -->
+                        {% if profile.country or profile.education or profile.primary_language_spoken %}
+                            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 mt-4">
+                                {% if profile.country %}
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-[#2a2d30] text-gray-300 border border-[#3c4043]">
+                                        <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                        {{ profile.country.name }}
+                                    </span>
+                                {% endif %}
+                                {% if profile.education %}
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-[#2a2d30] text-gray-300 border border-[#3c4043]">
+                                        <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                                        {{ profile.get_education_display }}
+                                    </span>
+                                {% endif %}
+                                {% if profile.primary_language_spoken %}
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-[#2a2d30] text-gray-300 border border-[#3c4043]">
+                                        <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                                        {{ profile.get_primary_language_spoken_display }}
+                                    </span>
+                                {% endif %}
                             </div>
                         {% endif %}
                         
-                        <!-- Text Details -->
-                        <div class="text-center sm:text-left mt-2 sm:mt-0">
-                            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3 mb-2">
-                                <h1 class="text-2xl font-bold text-white">{{ request.user.username }}</h1>
-                                
-                                <!-- Role Badge -->
-                                <span class="px-3 py-1 text-xs font-semibold rounded-full bg-emerald-900/30 text-emerald-400 border border-emerald-800/50">
-                                    {{ request.user.userprofile.role|title }}
-                                </span>
-                            </div>
-                            
-                            <p class="text-sm text-gray-400 mb-4">{{ request.user.email }}</p>
-                            
-                            <!-- Bio -->
-                            <p class="text-gray-300 leading-relaxed text-sm max-w-2xl">
-                                {{ profile.bio|default:"No bio has been added yet. Click 'Edit Profile' to add a bio." }}
-                            </p>
+                        <!-- Bio -->
+                        <div class="mt-4 text-gray-300 leading-relaxed text-sm sm:text-base max-w-2xl">
+                            {% if profile.bio %}
+                                {{ profile.bio|linebreaks }}
+                            {% else %}
+                                <p class="text-gray-500 italic">No bio has been added yet. Click 'Edit Profile' to add a bio.</p>
+                            {% endif %}
                         </div>
-                    </div>
-            
-                    <!-- Right: Action Buttons -->
-                    <div class="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto shrink-0">
-                        <!-- Edit Profile Button -->
-                        <a href="{% url 'accounts:edit_student_profile' %}" 
-                           class="flex items-center justify-center px-5 py-2.5 text-sm font-medium text-gray-300 bg-gray-800 border border-gray-700 rounded-xl hover:bg-gray-700 hover:text-white transition-all shadow-sm">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                            Edit Profile
-                        </a>
-                        
-                        <!-- Change Password Button -->
-                        <a href="{% url 'accounts:change_password' %}" 
-                        class="flex items-center justify-center px-5 py-2.5 text-sm font-medium text-gray-300 bg-gray-800 border border-gray-700 rounded-xl hover:bg-gray-700 hover:text-white transition-all shadow-sm">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-                            Change Password
-                        </a>
+
+                        <!-- Social Links Preview -->
+                        {% if profile.linkedin or profile.github or profile.facebook %}
+                            <div class="flex items-center justify-center sm:justify-start gap-2.5 mt-4">
+                                {% if profile.linkedin %}
+                                    <a href="{{ profile.linkedin }}" target="_blank" rel="noopener noreferrer" class="p-2 rounded-lg bg-[#2a2d30] border border-[#3c4043] text-gray-400 hover:text-white transition-colors" title="LinkedIn">
+                                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+                                    </a>
+                                {% endif %}
+                                {% if profile.github %}
+                                    <a href="{{ profile.github }}" target="_blank" rel="noopener noreferrer" class="p-2 rounded-lg bg-[#2a2d30] border border-[#3c4043] text-gray-400 hover:text-white transition-colors" title="GitHub">
+                                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                                    </a>
+                                {% endif %}
+                                {% if profile.facebook %}
+                                    <a href="{{ profile.facebook }}" target="_blank" rel="noopener noreferrer" class="p-2 rounded-lg bg-[#2a2d30] border border-[#3c4043] text-gray-400 hover:text-white transition-colors" title="Facebook">
+                                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
-            
-                <!-- ==================== Bottom Section: Instructor Invitation Banner ==================== -->
-                {% if request.user.students_profiles.is_eligible_for_instructor %}
+        
+                <!-- Right: Action Buttons -->
+                <div class="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto shrink-0">
+                    <a href="{% url 'accounts:edit_student_profile' %}" 
+                       class="flex items-center justify-center px-5 py-2.5 text-sm font-medium text-gray-300 bg-[#2a2d30] border border-[#3c4043] rounded-xl hover:bg-[#3c4043] hover:text-white transition-colors shadow-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                        Edit Profile
+                    </a>
+                    
+                    <a href="{% url 'accounts:change_password' %}" 
+                       class="flex items-center justify-center px-5 py-2.5 text-sm font-medium text-gray-300 bg-[#2a2d30] border border-[#3c4043] rounded-xl hover:bg-[#3c4043] hover:text-white transition-colors shadow-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                        Change Password
+                    </a>
+                </div>
+            </div>
+        
+            <!-- Bottom Section: Instructor Invitation Banner -->
+            {% if profile.is_eligible_for_instructor %}
                 <div class="mt-8">
-                    <!-- Banner Container with Gradient and Glow -->
                     <div class="relative overflow-hidden rounded-xl bg-gradient-to-r from-indigo-900/40 to-transparent border border-indigo-500/30 p-1">
-                        
-                        <!-- Glowing left border effect -->
                         <div class="absolute top-0 left-0 w-1.5 h-full bg-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.6)]"></div>
-                        
                         <div class="flex flex-col md:flex-row items-center justify-between gap-6 px-6 py-5">
-                            
-                            <!-- Invitation Text -->
                             <div class="text-center md:text-left pl-2">
                                 <h3 class="text-lg font-bold text-white mb-1 flex items-center justify-center md:justify-start gap-2">
                                     <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
@@ -85,34 +125,33 @@
                                 <p class="text-sm text-indigo-200/70">The administration has approved your account to become an instructor on the platform.</p>
                             </div>
                             
-                            <!-- Upgrade Form -->
-                            <form method="post" action="{% url 'accounts:upgrade_instructor' %}" class="w-full md:w-auto shrink-0">
+                            <form method="post" action="{% url 'accounts:upgrade_instructor' %}" class="w-full md:w-auto shrink-0 m-0">
                                 {% csrf_token %}
-                                <button type="submit" class="w-full md:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg shadow-lg hover:shadow-indigo-500/25 transition-all transform hover:-translate-y-0.5">
+                                <button type="submit" class="w-full md:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl shadow-lg hover:shadow-indigo-500/25 transition-all transform hover:-translate-y-0.5">
                                     Accept & Upgrade
                                 </button>
                             </form>
                         </div>
                     </div>
                 </div>
-                {% endif %}
-            
+            {% endif %}
+        
+        </div>
+
+        <!-- 2. Enrolled Courses Section -->
+        <div>
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-white">
+                    Enrolled Courses ({{ enrolled_courses.count }})
+                </h2>
             </div>
 
-            <!-- 2. Second Section: View Courses -->
-            <div>
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-xl font-bold text-gray-300">
-                        Enrolled Courses ({{ enrolled_courses.count }})
-                    </h2>
-                </div>
-
-                {% if enrolled_courses %}
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {% for course in enrolled_courses %}
+            {% if enrolled_courses %}
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for course in enrolled_courses %}
                         <div class="group relative flex flex-col rounded-2xl border border-[#3c4043] bg-[#2a2d30] overflow-hidden shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-indigo-500/50 hover:shadow-xl">
-                                
-                            <!-- Course Thumbnail Image with Badges Overlay -->
+                            
+                            <!-- Course Thumbnail Image -->
                             <div class="h-44 bg-[#181a1b] relative border-b border-[#3c4043] overflow-hidden">
                                 {% if course.image %}
                                     <img src="{{ course.image.url }}" alt="{{ course.title }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
@@ -121,8 +160,6 @@
                                         No Course Image
                                     </div>
                                 {% endif %}
-                                
-                                <!-- Badges inside image container -->
                                 {% include 'courses/partials/bestseller_badge.html' with course=course %}
                                 <div class="absolute top-3 left-3">
                                     {% include 'courses/partials/review_badges.html' %}
@@ -144,23 +181,21 @@
                                 <!-- Card Footer -->
                                 <div class="pt-4 border-t border-[#3c4043] flex items-center justify-between">
                                     <a href="{% url 'courses:course_detail' course.slug %}" class="text-sm font-semibold text-indigo-400 hover:text-indigo-300 transition-colors">
-                                        View Course &rarr;
+                                        Continue Learning &rarr;
                                     </a>
                                 </div>
                             </div>
 
                         </div>
-                        {% endfor %}
-                    </div>
-
-                {% else %}
-                    <!-- if there is no courses -->
-                    <div class="bg-[#1e2022] rounded-2xl border border-dashed border-[#303436] p-12 text-center">
-                        <p class="text-gray-300">No courses yet.</p>
-                    </div>
-                {% endif %}
-            </div>
-
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="bg-[#1c1d22] rounded-2xl border border-dashed border-[#3c4043] p-12 text-center">
+                    <p class="text-gray-400">You haven't enrolled in any courses yet.</p>
+                </div>
+            {% endif %}
         </div>
+
     </div>
+</div>
 {% endblock content %}

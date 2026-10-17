@@ -1,132 +1,176 @@
 {% extends 'base.html' %}
-{% load tailwind_filters %}
 {% load socialaccount %}
+{% load widget_tweaks %}
 
 {% block title %}
-    Sign-Up
+    Sign Up
 {% endblock title %}
-    
-
-
 
 {% block content %}
-    
-
-            
-<div class="flex justify-center items-center min-h-screen bg-[#1e2022] py-10 px-4">
+<div class="flex justify-center items-center min-h-screen bg-[#1e2022] py-12 px-4 sm:px-6 lg:px-8">
     <div class="w-full max-w-md bg-[#2a2d30] border border-[#3c4043] p-8 rounded-2xl shadow-lg">
-        <h2 class="text-2xl font-bold text-center text-gray-100 mb-6">Sign Up for Learning Platform</h2>
-        <form method="POST" class="dark-form">
-            {% csrf_token %}
-           {{ form.username|as_crispy_field }} 
-           {{ form.email|as_crispy_field }} 
-            
-            
-            <!-- 2. بنيجي عند حقل الباسورد ونغلفه عشان نحط العين معاه -->
-            <div class="relative">
-                {{ form.password1|as_crispy_field }}
-                
-                <button id="btn-pass-1" type="button" onclick="togglePass()" class="absolute right-3 top-[36px] text-gray-500 hover:text-indigo-400 focus:outline-none">
-                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                </button>
-            </div>
-            <div class="relative">
-                {{ form.password2|as_crispy_field }}
-                <button id="btn-pass-2" type="button" onclick="togglePass2()" class="absolute right-3 top-[36px] text-gray-500 hover:text-indigo-400 focus:outline-none">
-                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                </button>
-            </div>
-            {{ form.role|as_crispy_field }}
-
-
-          <div class="mb-6">
-            <button type="submit" class="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none">Sign Up</button>
-        </div>
         
-    </form>
-    <div class="mt-8">
-
-        <!-- خط فاصل أنيق (Divider) -->
-        <div class="relative mb-6">
-            <div class="absolute inset-0 flex items-center">
-                <!-- لون الخط متوافق مع الدارك ثيم -->
-                <div class="w-full border-t border-[#3c4043]"></div>
-            </div>
-            <div class="relative flex justify-center text-sm">
-                <!-- Keep the divider label background matched to the form card. -->
-                <span class="px-2 bg-[#2a2d30] text-gray-400 font-medium">Or continue with</span>
-            </div>
+        <!-- Header -->
+        <div class="mb-8 text-center">
+            <h2 class="text-2xl font-bold text-gray-100">Create an Account</h2>
+            <p class="text-sm text-gray-400 mt-2">Join our learning platform today</p>
         </div>
 
-        <!-- شبكة الأزرار (لو حبيت تضيف فيسبوك أو غيره بعدين هيبقوا جنب بعض) -->
-        <div class="grid grid-cols-1 gap-3">
-            
-            <!-- زرار جوجل -->
-            <!-- استخدمنا الرابط الديناميكي بتاع allauth للتوجه لصفحة جوجل -->
-            <form method="post" action="{% provider_login_url 'google' %}">
-                {% csrf_token %}
-                <button type="submit" class="w-full flex items-center justify-center px-4 py-3 border border-gray-700 rounded-lg shadow-sm bg-gray-800 text-sm font-semibold text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-700 focus:ring-offset-gray-900 transition-colors duration-200">
-                    
-                    <!-- لوجو جوجل (SVG) ملون زي ما هو -->
-                    <svg class="h-5 w-5 mr-3" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                    </svg>
-                    
-                    Sign Up with Google
+        <!-- Non-Field Errors -->
+        {% if form.non_field_errors %}
+            <div class="mb-6 p-4 rounded-xl bg-red-900/20 border border-red-800/50 text-red-400 text-sm">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="POST" class="dark-form" novalidate>
+            {% csrf_token %}
+
+            <!-- Username Field -->
+            <div class="mb-5">
+                <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                    Username*
+                </label>
+                {% render_field form.username class="w-full bg-[#151718] border border-[#3c4043] text-gray-200 placeholder-gray-500 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" %}
+                {% if form.username.errors %}
+                    {% for error in form.username.errors %}
+                        <p class="text-red-400 text-xs font-medium mt-1.5">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Email Field -->
+            <div class="mb-5">
+                <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                    Email Address*
+                </label>
+                {% render_field form.email class="w-full bg-[#151718] border border-[#3c4043] text-gray-200 placeholder-gray-500 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" %}
+                {% if form.email.errors %}
+                    {% for error in form.email.errors %}
+                        <p class="text-red-400 text-xs font-medium mt-1.5">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Password 1 Field -->
+            <div class="mb-5">
+                <label for="{{ form.password1.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                    Password*
+                </label>
+                <div class="relative flex items-center">
+                    {% render_field form.password1 class="w-full bg-[#151718] border border-[#3c4043] text-gray-200 placeholder-gray-500 rounded-xl pl-4 pr-11 py-3 focus:outline-none focus:border-indigo-500 transition-colors" %}
+                    <button type="button" onclick="togglePasswordVisibility('{{ form.password1.id_for_label }}', this)" 
+                            class="absolute right-0 inset-y-0 pr-3.5 flex items-center text-gray-500 hover:text-gray-300 focus:outline-none"
+                            tabindex="-1" aria-label="Toggle password visibility">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </button>
+                </div>
+                {% if form.password1.errors %}
+                    {% for error in form.password1.errors %}
+                        <p class="text-red-400 text-xs font-medium mt-1.5">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Password 2 Field -->
+            <div class="mb-5">
+                <label for="{{ form.password2.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                    Confirm Password*
+                </label>
+                <div class="relative flex items-center">
+                    {% render_field form.password2 class="w-full bg-[#151718] border border-[#3c4043] text-gray-200 placeholder-gray-500 rounded-xl pl-4 pr-11 py-3 focus:outline-none focus:border-indigo-500 transition-colors" %}
+                    <button type="button" onclick="togglePasswordVisibility('{{ form.password2.id_for_label }}', this)" 
+                            class="absolute right-0 inset-y-0 pr-3.5 flex items-center text-gray-500 hover:text-gray-300 focus:outline-none"
+                            tabindex="-1" aria-label="Toggle password visibility">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                    </button>
+                </div>
+                {% if form.password2.errors %}
+                    {% for error in form.password2.errors %}
+                        <p class="text-red-400 text-xs font-medium mt-1.5">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Role Selection Field -->
+            <div class="mb-6">
+                <label for="{{ form.role.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                    I want to join as*
+                </label>
+                {% render_field form.role class="w-full bg-[#151718] border border-[#3c4043] text-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" %}
+                {% if form.role.errors %}
+                    {% for error in form.role.errors %}
+                        <p class="text-red-400 text-xs font-medium mt-1.5">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <!-- Submit Button -->
+            <div class="mb-6">
+                <button type="submit" class="w-full px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-semibold transition-colors shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-[#2a2d30]">
+                    Sign Up
                 </button>
-            </form>
-            <div class="text-center">
-                <p class="text-sm text-gray-400">Already have an account? <a href="{% url 'accounts:sign_in' %}" class="text-indigo-400 hover:text-indigo-300 hover:underline">Sign In</a></p>
             </div>
-                
+        </form>
+
+        <div class="mt-8">
+            <!-- Divider -->
+            <div class="relative mb-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-[#3c4043]"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-3 bg-[#2a2d30] text-gray-400 font-medium">Or continue with</span>
+                </div>
+            </div>
+
+            <!-- Google OAuth Button -->
+            <div class="grid grid-cols-1 gap-4">
+                <form method="post" action="{% provider_login_url 'google' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full flex items-center justify-center px-4 py-3 border border-[#3c4043] rounded-xl shadow-sm bg-[#1e2022] hover:bg-[#3c4043] text-gray-200 text-sm font-semibold transition-colors duration-200">
+                        <svg class="h-5 w-5 mr-3" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                        </svg>
+                        Sign Up with Google
+                    </button>
+                </form>
+
+                <div class="text-center mt-2">
+                    <p class="text-sm text-gray-400">
+                        Already have an account? 
+                        <a href="{% url 'accounts:sign_in' %}" class="text-indigo-400 hover:text-indigo-300 font-medium hover:underline">Sign In</a>
+                    </p>
+                </div>
+            </div>
         </div>
-    </div>
+
     </div>
 </div>
+
 <script>
-    // رسومات الـ SVG ثابتة عشان نستخدمها في الدالتين
-    const eyeNormal = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-    </svg>`;
-    
-    const eyeSlash = `<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-    </svg>`;
-
-    // الدالة الأولى بتاعة الحقل الأول
-    function togglePass() {
-        const input = document.getElementById('my-password-field');
-        const btn = document.getElementById('btn-pass-1'); // مسكنا الزرار الأول
-        
+    function togglePasswordVisibility(inputId, btn) {
+        const input = document.getElementById(inputId);
         if (input && btn) {
-            const isPassword = input.type === 'password';
-            input.type = isPassword ? 'text' : 'password'; // تبديل الحقل
-            btn.innerHTML = isPassword ? eyeSlash : eyeNormal; // تبديل الرسمة
-        }
-    }
-
-    // الدالة التانية بتاعة الحقل التاني
-    function togglePass2() {
-        const input = document.getElementById('my-password-field-2');
-        const btn = document.getElementById('btn-pass-2'); // مسكنا الزرار التاني
-        
-        if (input && btn) {
-            const isPassword = input.type === 'password';
-            input.type = isPassword ? 'text' : 'password'; // تبديل الحقل
-            btn.innerHTML = isPassword ? eyeSlash : eyeNormal; // تبديل الرسمة
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.classList.add('text-indigo-400');
+            } else {
+                input.type = 'password';
+                btn.classList.remove('text-indigo-400');
+            }
         }
     }
 </script>
-
 {% endblock content %}
-    

@@ -32,7 +32,45 @@
                         {{ field.label }}{% if field.field.required %}*{% endif %}
                     </label>
                     
-                    {% render_field field class="w-full bg-[#151718] border border-[#3c4043] text-gray-200 placeholder-gray-500 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500" %}
+                    {% if field.name == 'image' %}
+                            <div class="bg-[#151718] border border-[#3c4043] rounded-xl p-4 space-y-4">
+                                
+                                <!-- If the course already has an uploaded image, show a clean preview & delete toggle -->
+                                {% if field.value %}
+                                    <div class="flex items-center justify-between bg-[#1e2022] p-3 rounded-lg border border-[#3c4043]/60">
+                                        <div class="flex items-center gap-3 overflow-hidden">
+                                            <img src="{{ field.value.url }}" alt="Current Course Image" class="w-16 h-10 object-cover rounded-md border border-gray-700 shrink-0">
+                                            <div class="truncate">
+                                                <p class="text-xs font-medium text-gray-300">Current Image</p>
+                                                <a href="{{ field.value.url }}" target="_blank" class="text-[11px] text-indigo-400 hover:underline truncate block">
+                                                    View full size
+                                                </a>
+                                            </div>
+                                        </div>
+
+                                        <!-- Custom Styled Clear Checkbox (if field is not required) -->
+                                        {% if not field.field.required %}
+                                            <label for="{{ field.name }}-clear_id" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 text-xs font-medium cursor-pointer transition-colors select-none shrink-0">
+                                                <input type="checkbox" name="{{ field.name }}-clear" id="{{ field.name }}-clear_id" class="rounded bg-[#151718] border-red-500/40 text-red-500 focus:ring-0 cursor-pointer">
+                                                <span>Remove Image</span>
+                                            </label>
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+
+                                <!-- Clean File Input without the ugly default 'Currently:' text -->
+                                <div>
+                                    {% if field.value %}
+                                        <span class="block text-xs text-gray-400 mb-2">Upload a new image to replace the current one:</span>
+                                    {% endif %}
+                                    <input type="file" name="{{ field.html_name }}" id="{{ field.id_for_label }}" accept="image/*"
+                                        class="w-full bg-[#1e2022] border border-[#3c4043] text-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-500 transition-colors file:mr-4 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer">
+                                </div>
+                            </div>
+
+                        {% else %}
+                            {% render_field field class="w-full bg-[#151718] border border-[#3c4043] text-gray-200 placeholder-gray-500 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500" %}
+                    {% endif %}
                     
                     {% if field.help_text %}
                         <p class="text-xs text-gray-500 mt-1.5">{{ field.help_text }}</p>

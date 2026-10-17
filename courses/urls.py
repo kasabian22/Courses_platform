@@ -7,20 +7,30 @@ urlpatterns = [
     path('add-course/', views.add_course, name='add_course'),
     path('course/<slug:slug>/', views.course_detail, name='course_detail'),
     path('course/<slug:slug>/edit-course/', views.edit_course, name='edit_course'),
+    path('course/<slug:slug>/delete-course/', views.delete_course, name='delete_course'),
+    
     path('course/<slug:slug>/add-module/', views.add_module, name='add_module'),
     path('course/<slug:course_slug>/<int:module_id>/edit-module/', views.edit_module, name='edit_module'),
     path('course/<slug:course_slug>/<int:module_id>/delete-module/', views.delete_module, name='delete_module'),
     path('course/<slug:course_slug>/<int:module_id>/view-module/', views.view_module, name='view_module'),
     path('course/<slug:course_slug>/<int:module_id>/complete-module/', views.complete_module, name='complete_module'),
+    
     path('course/<slug:slug>/enroll-course/', views.enroll_course, name='enroll_course'),
     path('course/<slug:slug>/unenroll-course/', views.unenroll_course, name='unenroll_course'),
+    
     path('course/<slug:slug>/module/<int:module_id>/content/<str:model_name>/create/', views.content_create_update, name='content_create_update'),
-    path('course/<slug:slug>/delete-course/', views.delete_course, name='delete_course'),
+    path('course/<slug:slug>/module/<int:module_id>/content/<str:model_name>/<int:id>/edit/', views.content_create_update, name='content_create_update'),
+    path('course/<slug:course_slug>/<int:module_id>/content/<int:content_id>/delete/', views.delete_content, name='delete_content'),
+
+    
     path('course/<slug:slug>/review-course/', views.review_course, name='review_course'),
     path('course/<slug:slug>/edit-review/', views.edit_review, name='edit_review'),
     path('course/<slug:slug>/delete-review/', views.delete_review, name='delete_review'),
+    
     path('category/<slug:subject_slug>/', views.category_courses, name='category_courses'),
+    
     path('search/', views.search_courses, name='search_courses'),
+    
     path('course/<slug:slug>/toggle-wishlist/', views.toggle_wishlist, name='toggle_wishlist'),
     path('wishlist/', views.view_wishlist, name='view_wishlist'),
 ]

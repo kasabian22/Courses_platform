@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.shortcuts import redirect, render, get_object_or_404
 from .forms import CourseForm, TextForm, FileForm, VideoForm, ImageForm, ModuleForm, ReviewForm
 from .models import Content, Enrollment, Module, Progress, Review, Subject, Course
@@ -90,35 +91,74 @@ def search_courses(request):
 
 @login_required
 @permission_required('courses.add_content', raise_exception=True)
-def content_create_update(request, slug, module_id, model_name):
-    modules = {'text': TextForm, 'video': VideoForm, 'image': ImageForm, 'file': FileForm}
+def content_create_update(request, slug, module_id, model_name, id=None):
+    forms_map = {
+        'text': TextForm, 
+        'video': VideoForm, 
+        'image': ImageForm, 
+        'file': FileForm
+    }
+    
+    # Ensure the module belongs to a course owned by the current user
     module = get_object_or_404(Module, id=module_id, course__owner=request.user, course__slug=slug)
-    if model_name in modules:
-        form = modules[model_name]()
-        if request.method == 'POST':
-            form = modules[model_name](request.POST, request.FILES)
-            if form.is_valid():
-                item = form.save(commit=False)
-                item.owner = request.user
-                item.save()
-                # ---------------
+    
+    if model_name not in forms_map:
+        return HttpResponseBadRequest()
+
+    form_class = forms_map[model_name]
+    
+    # Dynamically fetch the model class (Text, Video, Image, or File) to get the existing item if updating
+    model_class = apps.get_model(app_label='courses', model_name=model_name)
+    obj = None
+    
+    if id:
+        # Fetch the existing item owned by the instructor for updating
+        obj = get_object_or_404(model_class, id=id, owner=request.user)
+
+    if request.method == 'POST':
+        # Pass 'instance=obj' so Django updates the existing item if 'obj' is not None
+        form = form_class(request.POST, request.FILES, instance=obj)
+        if form.is_valid():
+            item = form.save(commit=False)
+            item.owner = request.user
+            item.save()
+            
+            # Only create a new Content link if we are creating a new item (not updating)
+            if not id:
                 Content.objects.create(
                     module=module,
                     item=item
                 )
-                return redirect("courses:course_detail", slug=module.course.slug)
-                # ----------------
-
+            # Redirect back to the module view so the instructor sees the new/updated content immediately
+            return redirect("courses:view_module", slug=module.course.slug, module_id=module.id)
     else:
-        return HttpResponseBadRequest()
+        # Pre-fill the form with the existing item's data if editing
+        form = form_class(instance=obj)
 
-
-    return render(request, "courses/add_content.html",{
+    return render(request, "courses/add_content.html", {
         "form": form,
         "model_name": model_name,
-        'module': module
+        "module": module,
+        "object": obj,  # Useful if you want to show "Edit" vs "Add" in add_content.html
     })
 
+
+@login_required
+def delete_content(request, course_slug, module_id, content_id):
+    # Ensure the content belongs to the specified module and the course is owned by the current user
+    content = get_object_or_404(
+        Content, 
+        id=content_id, 
+        module__id=module_id, 
+        module__course__slug=course_slug, 
+        module__course__owner=request.user
+    )
+    
+    # Delete the actual item (Video, Text, Image, or File) and the Content relation
+    content.item.delete()
+    content.delete()
+    
+    return redirect("courses:view_module", course_slug, module_id)
 
 
 
@@ -247,6 +287,7 @@ def view_module(request, course_slug, module_id):
     module_qs = Module.objects.prefetch_related('contents__item')
     module = get_object_or_404(module_qs, course=course, id=module_id)
 
+
     # Allow access if the user is the course owner OR an enrolled student
     is_owner = (course.owner == request.user)
     is_enrolled = course.students.filter(id=request.user.id).exists()
@@ -285,7 +326,8 @@ def edit_module(request, course_slug, module_id):
                 return redirect('courses:course_detail', slug=course.slug)
     return render(request, 'courses/add_module.html', {
         'form': form,
-        "type": "Edit"
+        "type": "Edit",
+        'course': course
     })
 
 

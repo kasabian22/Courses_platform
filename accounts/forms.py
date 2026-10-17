@@ -1,9 +1,23 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission, User
 from .models import InstructorProfile, StudentProfile, UserProfile
 from django.contrib.auth.forms import AuthenticationForm
 from django.db import transaction
+
+
+def assign_instructor_permissions(user):
+    """Grant course, module, and content management permissions to an instructor."""
+    codenames = [
+        'add_course', 'change_course', 'delete_course',
+        'add_module', 'change_module', 'delete_module',
+        'add_content', 'change_content', 'delete_content',
+    ]
+    permissions = Permission.objects.filter(
+        content_type__app_label='courses',
+        codename__in=codenames
+    )
+    user.user_permissions.add(*permissions)
 
 
 class SignUpForm(UserCreationForm):
@@ -91,7 +105,7 @@ class CustomSignInForm(AuthenticationForm):
 class InstructorProfileForm(forms.ModelForm):
     class Meta:
         model = InstructorProfile
-        fields = ['bio', 'photo', 'contact_email', 'header', 'country', 'education', 'primary_language_spoken', 'linkedin', 'github', 'facebook']
+        fields = ['bio', "full_name", 'photo', 'contact_email', 'header', 'country', 'education', 'primary_language_spoken', 'linkedin', 'github', 'facebook']
 
 
 class StudentProfileForm(forms.ModelForm):
@@ -101,6 +115,14 @@ class StudentProfileForm(forms.ModelForm):
 
 
 class UserUpdateForm(forms.ModelForm):
+    email = forms.EmailField(required=True)
+
     class Meta:
         model = User
         fields = ['username', 'email']
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email', '').strip().lower()
+        if User.objects.filter(email__iexact=email).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("This email is already in use by another account.")
+        return email
