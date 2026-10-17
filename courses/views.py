@@ -92,7 +92,7 @@ def search_courses(request):
 @permission_required('courses.add_content', raise_exception=True)
 def content_create_update(request, slug, module_id, model_name):
     modules = {'text': TextForm, 'video': VideoForm, 'image': ImageForm, 'file': FileForm}
-    module = get_object_or_404(Module, id=module_id, course__owner=request.user)
+    module = get_object_or_404(Module, id=module_id, course__owner=request.user, course__slug=slug)
     if model_name in modules:
         form = modules[model_name]()
         if request.method == 'POST':
@@ -115,7 +115,8 @@ def content_create_update(request, slug, module_id, model_name):
 
     return render(request, "courses/add_content.html",{
         "form": form,
-        "model_name": model_name
+        "model_name": model_name,
+        'module': module
     })
 
 
