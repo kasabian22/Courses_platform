@@ -39,17 +39,28 @@ def category_courses(request, subject_slug):
 
 # you can use id instead of slug.
 def course_detail(request, slug):
-    course = get_object_or_404(Course, slug=slug)
-    reviews = Review.objects.filter(course=course).order_by('-created_at')
-    enrollment = None
+    course = get_object_or_404(
+        Course.objects.select_related('owner', 'owner__instructors_profiles', 'subject').prefetch_related('modules'), 
+        slug=slug
+    )
+    reviews = Review.objects.filter(course=course).select_related(
+        'user', 'user__students_profiles', 'user__instructors_profiles'
+    ).order_by('-created_at')
     
-    # check if the user enrolled
-    if request.user.is_authenticated and course.students.filter(id=request.user.id).exists():
+    enrollment = None
+    has_reviewed = False
+    
+    # check if the user enrolled and if the user has already reviewed the course
+    if request.user.is_authenticated:
         enrollment = Enrollment.objects.filter(user=request.user, course=course).first()
+        if enrollment:
+            has_reviewed = Review.objects.filter(course=course, user=request.user).exists()
+    
     return render(request, 'courses/course_detail.html', {
         'detail': course,
         'enrollment': enrollment,
-        'reviews': reviews
+        'reviews': reviews,
+        'has_reviewed': has_reviewed
     })
 
 
@@ -110,11 +121,11 @@ def content_create_update(request, slug, module_id, model_name):
 
 
 
-# @permission_required('courses.add_course', raise_exception=True)
+@permission_required('courses.add_course', raise_exception=True)
 @login_required(login_url='accounts:sign_up')
 def add_course(request):
     if request.method == 'POST':
-        form = CourseForm(request.POST)
+        form = CourseForm(request.POST, request.FILES)
         if form.is_valid():
             course = form.save(commit=False)
             course.owner = request.user
@@ -129,6 +140,7 @@ def add_course(request):
 
 
 @login_required(login_url='accounts:sign_up')
+@permission_required('courses.edit_course', raise_exception=True)
 def edit_course(request, slug):
     course = get_object_or_404(Course, slug=slug, owner=request.user)
     form = CourseForm(instance=course)
@@ -152,6 +164,12 @@ def delete_course(request, slug):
 @login_required
 def review_course(request, slug):
     course = get_object_or_404(Course, slug=slug)
+    enrollment = course.students.filter(id=request.user.id).exists()
+
+    if not enrollment:
+        messages.error(request, 'You must be enrolled in this course to leave a review.')
+        return redirect('courses:course_detail', slug=course.slug)
+    
     if request.method == 'POST':
         form = ReviewForm(request.POST)
         if form.is_valid():
@@ -159,14 +177,48 @@ def review_course(request, slug):
             review.course = course
             review.user = request.user
             review.save()
+            messages.success(request, 'Your review has been saved successfully!')
             return redirect('courses:course_detail', slug=course.slug)
     else:
         form = ReviewForm()
     
     return render(request, 'courses/review_course.html', {
         'form': form,
-        'course': course
+        'course': course,
+        "type": "Add"
     })
+
+
+def edit_review(request, slug):
+    course = get_object_or_404(Course, slug=slug)
+    review = get_object_or_404(Review, course=course, user=request.user)
+    
+    if request.method == 'POST':
+        form = ReviewForm(request.POST, instance=review)
+        if form.is_valid():
+            form.save()
+            return redirect('courses:course_detail', slug=course.slug)
+    else:
+        form = ReviewForm(instance=review)
+    
+    return render(request, 'courses/review_course.html', {
+        'form': form,
+        'course': course,
+        "type": "Edit"
+    })
+
+
+@require_POST
+@login_required
+def delete_review(request, slug):
+    course = get_object_or_404(Course, slug=slug)
+    review = get_object_or_404(Review, course=course, user=request.user)
+    
+    review.delete()
+    messages.success(request, 'Your review has been deleted successfully!')
+    return redirect('courses:course_detail', slug=course.slug)
+    
+
 
 
 @login_required
@@ -201,6 +253,10 @@ def view_module(request, course_slug, module_id):
     if not (is_owner or is_enrolled):
         return redirect('courses:course_detail', slug=course.slug)
 
+    has_reviewed = False
+    if request.user.is_authenticated and is_enrolled:
+        has_reviewed = Review.objects.filter(course=course, user=request.user).exists()
+
     is_completed = Progress.objects.filter(user=request.user, module=module, is_completed=True).exists()
     previous_module = course.modules.filter(id__lt=module.id).order_by('-id').first()
     next_module = course.modules.filter(id__gt=module.id).order_by('id').first()
@@ -211,9 +267,12 @@ def view_module(request, course_slug, module_id):
         'is_completed': is_completed,
         'previous_module': previous_module,
         'next_module': next_module,
-        'is_enrolled': is_enrolled
+        'is_enrolled': is_enrolled,
+        'has_reviewed': has_reviewed
     })
 
+@login_required
+@permission_required('courses.edit_module', raise_exception=True)
 def edit_module(request, course_slug, module_id):
     course = get_object_or_404(Course, slug=course_slug, owner=request.user)
     module = get_object_or_404(Module, course=course, id=module_id)
@@ -227,6 +286,13 @@ def edit_module(request, course_slug, module_id):
         'form': form,
         "type": "Edit"
     })
+
+
+def delete_module(request, course_slug, module_id):
+    course = get_object_or_404(Course, slug=course_slug, owner=request.user)
+    module = get_object_or_404(Module, course=course, id=module_id)
+    module.delete()
+    return redirect('courses:course_detail', slug=course.slug)
 
 
 @require_POST
@@ -276,10 +342,11 @@ def toggle_wishlist(request, slug):
     if course.wishlist.filter(id=request.user.id).exists():
         course.wishlist.remove(request.user)
         messages.success(request, 'Course removed from wishlist')
+        return redirect('courses:wishlist', slug=course.slug)
     else:
         course.wishlist.add(request.user)
         messages.success(request, 'Course added to wishlist')
-    return redirect('courses:course_detail', slug=course.slug)
+        return redirect('courses:course_detail', slug=course.slug)
 
 @login_required
 def view_wishlist(request):

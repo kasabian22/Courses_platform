@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import Enrollment, Progress, Review, Subject, Course, Module, Content, Video
 
 @admin.register(Subject)
-class Subject(admin.ModelAdmin):
+class SubjectAdmin(admin.ModelAdmin):
     list_display = ['title', 'slug']
     # 'slug' inherits from 'title' automatically.
     prepopulated_fields = {'slug': ('title',)}

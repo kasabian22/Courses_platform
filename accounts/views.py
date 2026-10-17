@@ -7,7 +7,7 @@ from .models import InstructorProfile, StudentProfile, UserProfile
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.views.decorators.http import require_POST
-from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
 
@@ -170,18 +170,21 @@ def public_instructor_profile(request, instructor_id):
     })
 
 # TODO
-# @login_required
-# def change_password(request):
-#     if request.method == 'POST':
-#         # لاحظ أن PasswordChangeForm يأخذ request.user كأول معامل وليس instance=
-#         form = PasswordChangeForm(user=request.user, data=request.POST)
-#         if form.is_valid():
-#             user = form.save()  # هنا يقوم بتشفير الباسورد الجديد وحفظه بأمان
-            
-#             # هذا السطر يحافظ على بقاء المستخدم مسجلاً للدخول بعد تغيير الباسورد
-#             update_session_auth_hash(request, user)
-#             return redirect('accounts:view_profile')
-#     else:
-#         form = PasswordChangeForm(user=request.user)
+@login_required
+def change_password(request):
+    # Check if the user already has a password (normal signup) or not (Google/Social signup)
+    FormClass = PasswordChangeForm if request.user.has_usable_password() else SetPasswordForm
 
-#     return render(request, 'accounts/change_password.html', {'form': form})
+    if request.method == 'POST':
+        # first parameter must be the user instance.
+        form = FormClass(user=request.user, data=request.POST)
+        if form.is_valid():
+            user = form.save()
+            # Keep the user logged in after password change
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Your password has been updated successfully!')
+            return redirect('accounts:view_profile')
+    else:
+        form = FormClass(user=request.user)
+
+    return render(request, 'accounts/change_password.html', {'form': form})

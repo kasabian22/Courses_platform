@@ -32,25 +32,34 @@ class Course(models.Model):
     title = models.CharField(max_length=250)
     slug = models.SlugField(max_length=250, unique=True, blank=True, null=True)
     overview = QuillField(help_text="Write the discription of the course here")
+    header = models.CharField(max_length=250, blank=True, null=True, help_text="Write the header of the course here")
     date_created = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=2, choices=Status.choices, default=Status.AVAILABLE)
     students = models.ManyToManyField(User, through='Enrollment', related_name='enrolled_courses', blank=True)
     wishlist = models.ManyToManyField(User, related_name='wishlist', blank=True)
     level = models.CharField(max_length=50, choices=[('beginner', 'Beginner'), ('intermediate', 'Intermediate'), ('advanced', 'Advanced')], default='beginner')
-    time_to_complete = models.DurationField(help_text="Enter the time required to complete the course", null=True, blank=True)
+    time_to_complete = models.DurationField(help_text="Enter the course duration in HH:MM:SS format (e.g., 02:30:00 for 2 and a half hours)", null=True, blank=True)
     reviews = models.ManyToManyField(User, through='Review', related_name='course_reviews', blank=True)
-    language = models.CharField(max_length=50, choices=LANGUAGES, default='english')
+    language = models.CharField(max_length=50, choices=LANGUAGES, default='en', help_text="Select the language of the course")
+    image = models.ImageField(upload_to='course_images/', null=True, blank=True, help_text="Upload an image for the course")
     
     @property
     def students_count(self):
+        # Use annotated value if available to avoid N+1 queries
+        if hasattr(self, 'enrolled_students_count'):
+            return self.enrolled_students_count
         return self.students.count()
     
     @property
     def reviews_count(self):
+        if hasattr(self, 'annotated_reviews_count'):
+            return self.annotated_reviews_count
         return self.review_details.count()
    
     @property
     def average_rating(self):
+        if hasattr(self, 'annotated_avg_rating'):
+            return round(self.annotated_avg_rating, 1) if self.annotated_avg_rating is not None else 0.0
         avg = self.review_details.aggregate(Avg('rating'))['rating__avg']
         
         if avg is not None:
@@ -67,6 +76,9 @@ class Course(models.Model):
 
     class Meta:
         ordering = ['-date_created']
+        indexes = [
+            models.Index(fields=['status', '-date_created']),
+        ]
 
     def __str__(self):
         return self.title
@@ -95,7 +107,9 @@ class Module(models.Model):
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     def __str__(self):
-        return self.title 
+        return self.title
+    class Meta: 
+        ordering = ['id']
 
 
 
@@ -106,6 +120,8 @@ class Content(models.Model):
     object_id = models.PositiveIntegerField()
 
     item = GenericForeignKey('content_type', 'object_id')
+    class Meta: 
+        ordering = ['id']
 
 
 class Enrollment(models.Model):

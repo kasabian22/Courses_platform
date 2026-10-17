@@ -85,7 +85,7 @@
                                         </h3>
                                         {% include 'courses/partials/course_owner.html' with course=course %}
                                         <p class="mt-3 mb-5 text-sm text-gray-400 line-clamp-2">
-                                            {{ course.overview.plain }}
+                                            {{ course.header|default:"No header provided for this course." }}
                                         </p>
                                     </div>
 

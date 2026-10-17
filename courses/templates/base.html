@@ -145,6 +145,29 @@
 
     
     <main class="flex-grow">
+        {% if messages %}
+            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-3">
+                {% for message in messages %}
+                    <div class="flex items-center justify-between p-4 rounded-xl border text-sm font-medium shadow-sm
+                                {% if message.tags == 'error' %}
+                                    bg-red-900/20 border-red-800/50 text-red-300
+                                {% else %}
+                                    bg-emerald-900/20 border-emerald-800/50 text-emerald-300
+                                {% endif %}">
+                        <div class="flex items-center gap-2.5">
+                            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span>{{ message }}</span>
+                        </div>
+                        <button type="button" onclick="this.parentElement.remove()" class="text-gray-400 hover:text-white">
+                            &times;
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    
         {% block content %}
         {% endblock content %}
     </main>

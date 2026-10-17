@@ -2,61 +2,131 @@
 {% load static %}
 
 {% block title %}
-    View Module
+    {{ module.title }} | {{ course.title }}
 {% endblock title %}
     
 {% block content %}
-
-    <!-- Changed bg-gray-50 to bg-gray-900 to match the dark theme shown in the screenshot -->
-    <div class="min-h-screen bg-gray-900 py-10 px-4 sm:px-6 lg:px-8">
+<div class="min-h-screen bg-[#1e2022] py-10 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto">
         
-        <!-- Wrapper to center the content -->
-        <div class="max-w-5xl mx-auto">
-            
-            <!-- Breadcrumbs Navigation: Updated text colors for better visibility in dark mode -->
-            <nav class="flex items-center text-sm font-medium text-gray-400 mb-6">
-                <!-- Link back to the course details -->
-                <a href="{% url 'courses:course_detail' course.slug %}" class="hover:text-indigo-400 transition-colors duration-200">
-                    {{ course.title }}
-                </a>
-                
-                <!-- Separator Icon -->
-                <svg class="w-5 h-5 mx-2 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-                </svg>
-                
-                <!-- Current Module Name -->
-                <span class="text-gray-200">{{ module.title }}</span>
-            </nav>
+        <!-- Breadcrumbs Navigation -->
+        <nav class="flex items-center text-sm font-medium text-gray-400 mb-6">
+            <a href="{% url 'courses:course_detail' course.slug %}" class="hover:text-indigo-400 transition-colors duration-200">
+                {{ course.title }}
+            </a>
+            <svg class="w-5 h-5 mx-2 text-gray-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span class="text-gray-200 truncate">{{ module.title }}</span>
+        </nav>
 
-            <!-- Main Heading: Changed text-gray-900 to text-white -->
-            <h1 class="text-3xl font-bold text-white mb-8">
-                {{ module.title }}
-            </h1>
+        <!-- Main Module Header Card -->
+        <div class="bg-[#1c1d22] border border-[#3c4043] rounded-2xl p-6 sm:p-8 shadow-lg mb-8">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <span class="inline-block px-3 py-1 mb-2 text-xs font-semibold rounded-full bg-indigo-900/40 text-indigo-300 border border-indigo-800/50">
+                        Module Content
+                    </span>
+                    <h1 class="text-2xl sm:text-3xl font-bold text-white">
+                        {{ module.title }}
+                    </h1>
+                </div>
+                <div class="text-sm text-gray-400 bg-[#2a2d30] border border-[#3c4043] px-4 py-2 rounded-xl self-start sm:self-center shrink-0">
+                    {{ module.contents.count }} Learning Item{{ module.contents.count|pluralize }}
+                </div>
+            </div>
 
-            <!-- Content Area: Uses flex column to stack items seamlessly -->
-            <div class="max-w-5xl mx-auto mt-8 flex flex-col gap-6 w-full">
+            {% if module.contents.exists %}
+                <!-- Interactive Filter Tabs & Quick Jump Bar -->
+                <div class="mt-6 pt-6 border-t border-[#3c4043] flex flex-col gap-4">
+                    
+                    <!-- Content Type Filter Buttons -->
+                    <div class="flex flex-wrap items-center gap-2" id="content-filters">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-gray-500 mr-2">Filter by type:</span>
+                        <button type="button" onclick="filterContent('all', this)" class="filter-btn active-filter px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition-colors">
+                            All ({{ module.contents.count }})
+                        </button>
+                        <button type="button" onclick="filterContent('video', this)" class="filter-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#2a2d30] text-gray-300 border border-[#3c4043] hover:text-white transition-colors">
+                            Videos
+                        </button>
+                        <button type="button" onclick="filterContent('text', this)" class="filter-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#2a2d30] text-gray-300 border border-[#3c4043] hover:text-white transition-colors">
+                            Readings
+                        </button>
+                        <button type="button" onclick="filterContent('image', this)" class="filter-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#2a2d30] text-gray-300 border border-[#3c4043] hover:text-white transition-colors">
+                            Images
+                        </button>
+                        <button type="button" onclick="filterContent('file', this)" class="filter-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#2a2d30] text-gray-300 border border-[#3c4043] hover:text-white transition-colors">
+                            Files
+                        </button>
+                    </div>
 
-                {% for content in module.contents.all %}
-                    {% if not forloop.first %}
-                        <div class="flex items-center gap-4 py-1" role="separator" aria-orientation="horizontal">
-                            <div class="h-px flex-1 bg-gradient-to-r from-transparent via-gray-700 to-gray-700"></div>
-                            <span class="rounded-full border border-gray-700 bg-[#1c1d22] px-3 py-1 text-xs font-medium tracking-wide text-gray-400">
+                    <!-- Quick Jump Links -->
+                    <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                        <span class="text-xs font-semibold uppercase tracking-wider text-gray-500 mr-2 shrink-0">Jump to:</span>
+                        {% for content in module.contents.all %}
+                            <a href="#part-{{ forloop.counter }}" 
+                               class="shrink-0 px-3 py-1 rounded-lg text-xs font-medium bg-[#151718] hover:bg-[#2a2d30] text-gray-400 hover:text-indigo-400 border border-[#3c4043] transition-colors">
+                                #{{ forloop.counter }} {{ content.item.title|truncatechars:20 }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Content Area -->
+        <div class="flex flex-col gap-8 w-full">
+
+            {% for content in module.contents.all %}
+                <!-- Unified Content Card Wrapper with data-type for JS filtering -->
+                <div id="part-{{ forloop.counter }}" 
+                     data-content-type="{{ content.content_type.model }}" 
+                     class="content-card w-full bg-[#1c1d22] border border-[#3c4043] rounded-2xl overflow-hidden shadow-lg scroll-mt-24">
+                    
+                    <!-- Unified Card Header: Part Badge, Type Badge, and Item Title -->
+                    <div class="bg-[#2a2d30]/60 border-b border-[#3c4043] px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-[#151718] text-gray-300 border border-[#3c4043]">
                                 Part {{ forloop.counter }}
                             </span>
-                            <div class="h-px flex-1 bg-gradient-to-l from-transparent via-gray-700 to-gray-700"></div>
-                        </div>
-                    {% endif %}
 
+                            <!-- Dynamic Type Badge -->
+                            {% if content.content_type.model == 'video' %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-rose-900/30 text-rose-300 border border-rose-800/50">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Video
+                                </span>
+                            {% elif content.content_type.model == 'text' %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-emerald-900/30 text-emerald-300 border border-emerald-800/50">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                                    Reading
+                                </span>
+                            {% elif content.content_type.model == 'image' %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-amber-900/30 text-amber-300 border border-amber-800/50">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                    Illustration
+                                </span>
+                            {% elif content.content_type.model == 'file' %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-semibold bg-indigo-900/40 text-indigo-300 border border-indigo-800/50">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                    Resource
+                                </span>
+                            {% endif %}
+
+                            <h2 class="text-lg font-bold text-white">
+                                {{ content.item.title }}
+                            </h2>
+                        </div>
+                    </div>
+
+                    <!-- Card Body: Specific Rendering per Content Type -->
                     {% if content.content_type.model == 'video' %}
-                        <!-- Responsive video container with 16:9 aspect ratio -->
-                        <div class="w-full aspect-video rounded-xl overflow-hidden shadow-2xl bg-black border border-gray-700">
-                            <!-- Re-applied the youtube_embed_url filter here -->
+                        <div class="w-full aspect-video bg-black">
                             <iframe 
                                 src="{{ content.item.video }}" 
                                 class="w-full h-full"
                                 frameborder="0"
-                                title="YouTube video player" 
+                                title="{{ content.item.title }}" 
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                                 referrerpolicy="strict-origin-when-cross-origin"
                                 allowfullscreen>
@@ -64,37 +134,38 @@
                         </div>
                         
                     {% elif content.content_type.model == 'text' %}
-                        <!-- Text content styling -->
-                        <div class="w-full bg-[#1c1d22] rounded-xl p-6 border border-gray-700 text-gray-200 shadow-lg">
-                            <p>{{ content.item.content }}</p>
+                        <div class="p-6 sm:p-8 text-gray-300 leading-relaxed space-y-4 text-base">
+                            {{ content.item.content|linebreaks }}
                         </div>
                         
                     {% elif content.content_type.model == 'image' %}
-                        <div class="w-full flex justify-center rounded-xl overflow-hidden bg-[#151718] p-2 sm:p-4 shadow-lg border border-gray-700">
-                            <img src="{{ content.item.image.url }}" alt="{{ content.item.title }}" class="block w-full max-h-[70vh] object-contain rounded-lg">
+                        <div class="bg-[#151718] p-4 sm:p-6 flex flex-col items-center">
+                            <img src="{{ content.item.image.url }}" alt="{{ content.item.title }}" class="block w-full max-h-[70vh] object-contain rounded-xl border border-[#3c4043]">
+                            <div class="mt-4 flex justify-end w-full">
+                                <a href="{{ content.item.image.url }}" target="_blank" rel="noopener noreferrer" 
+                                   class="inline-flex items-center gap-1.5 text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                    Open Full Size Image
+                                </a>
+                            </div>
                         </div>
+
                     {% elif content.content_type.model == 'file' %}
-                        <!-- File content styling: A dedicated card for downloadable files -->
-                        <div class="w-full bg-[#1c1d22] rounded-xl p-6 border border-gray-700 shadow-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                            
-                            <!-- File Icon and Title -->
+                        <div class="p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                             <div class="flex items-center gap-4">
-                                <!-- Document SVG Icon -->
-                                <div class="p-3 bg-indigo-900/30 rounded-lg text-indigo-400 border border-indigo-800/50">
-                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="p-3.5 bg-indigo-900/30 rounded-xl text-indigo-400 border border-indigo-800/50 shrink-0">
+                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                     </svg>
                                 </div>
                                 <div>
-                                    <h4 class="text-lg font-semibold text-white">{{ content.item.title }}</h4>
-                                    <p class="text-sm text-gray-400" dir="ltr">{{ content.item.filename }}</p>
+                                    <p class="text-sm font-medium text-gray-200">Attached Resource File</p>
+                                    <p class="text-xs text-gray-400 mt-0.5" dir="ltr">{{ content.item.filename }}</p>
                                 </div>
                             </div>
 
-                            <!-- Download Action Button -->
                             <a href="{{ content.item.file.url }}" download target="_blank"
-                               class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors shadow-md">
-                                <!-- Download SVG Icon -->
+                               class="w-full sm:w-auto justify-center inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition-colors shadow-md">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                                 </svg>
@@ -102,84 +173,110 @@
                             </a>
                         </div>
                     {% endif %}
-                {% endfor %}
 
-                <!-- Module Overview Card -->
-                <div class="w-full bg-[#1c1d22] border border-gray-700 rounded-xl p-6 shadow-lg mt-2">
-                    <h3 class="text-lg font-semibold text-white mb-2">Module Overview</h3>
-                    <p class="text-gray-400 text-sm mb-6">This the Django part of the course.</p>
+                </div>
+            {% empty %}
+                <!-- Empty State when module has no contents -->
+                <div class="bg-[#1c1d22] border border-dashed border-[#3c4043] rounded-2xl p-12 text-center">
+                    <p class="text-gray-400 text-base">No learning content has been added to this module yet.</p>
+                </div>
+            {% endfor %}
 
-                    <!-- Navigation and Action Buttons (Previous, Completed, Next) -->
-                    <!-- Changed justify-end to flex-wrap and gap to ensure they align nicely on all screens -->
-                    <div class="flex flex-wrap items-center justify-end gap-3 border-b border-gray-700 pb-6 mb-6">
-                        
-                        <!-- 1. Previous Button -->
-                        {% if previous_module %}
-                            <a href="{% url 'courses:view_module' course.slug previous_module.id %}" 
-                            class="px-5 py-2.5 bg-gray-800 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center shadow-sm">
-                                &larr; Previous
-                            </a>
-                        {% endif %}
+            <!-- Module Overview & Navigation Card -->
+            <div class="w-full bg-[#1c1d22] border border-[#3c4043] rounded-2xl p-6 sm:p-8 shadow-lg mt-2">
+                <h3 class="text-lg font-semibold text-white mb-2">Module Overview</h3>
+                <p class="text-gray-400 text-sm mb-6 leading-relaxed">
+                    {{ module.description|default:"No description provided for this module." }}
+                </p>
 
-                        <!-- 2. Complete / Completed Button Logic -->
-                        {% if request.user.is_authenticated and is_enrolled and request.user != course.owner %}
-                            {% if is_completed %}
-                                <!-- Completed state -->
-                                <button disabled class="px-5 py-2.5 bg-green-600/20 text-green-500 border border-green-600/30 rounded-lg text-sm font-medium cursor-default flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                    Completed
-                                </button>
-                            {% else %}
-                                <!-- Mark as complete form -->
-                                <form method="post" action="{% url 'courses:complete_module' course.slug module.id %}" class="m-0">
-                                    {% csrf_token %}
-                                    <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm font-medium transition-colors shadow-sm">
-                                        Complete Module
-                                    </button>
-                                </form>
-                            {% endif %}
-                        {% endif %}
-
-                        <!-- 3. Next Button -->
-                        {% if is_completed and next_module %}
-                            <a href="{% url 'courses:view_module' course.slug next_module.id %}" 
-                            class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center shadow-sm">
-                                Next Module &rarr;
-                            </a>
-                        {% elif next_module  and request.user == course.owner %}
-                            <a href="{% url 'courses:view_module' course.slug next_module.id %}" 
-                            class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors flex items-center shadow-sm">
-                                Next Module &rarr;
-                            </a>
-                        {% endif %}
-                    </div>
-
-                    <!-- Review Prompt Banner (Inside the card, but separated by the border we added above) -->
-                    {% if request.user.is_authenticated and is_enrolled %}
-                        <div class="bg-[#2a2d30] border border-[#3c4043] rounded-xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-                            
-                            <!-- Text content -->
-                            <div class="text-center sm:text-left">
-                                <h4 class="text-base font-bold text-gray-100">Enjoying the course?</h4>
-                                <p class="text-sm text-gray-400 mt-1">
-                                    Your feedback helps other students discover this course and helps the instructor improve.
-                                </p>
-                            </div>
-                            
-                            <!-- Action Button -->
-                            <a href="{% url 'courses:review_course' course.slug %}" 
-                            class="whitespace-nowrap px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-[#2a2d30]">
-                                Write a Review
-                            </a>
-                        </div>
+                <!-- Navigation and Action Buttons (Previous, Completed, Next) -->
+                <div class="flex flex-wrap items-center justify-end gap-3 border-b border-[#3c4043] pb-6 mb-6">
+                    
+                    <!-- 1. Previous Button -->
+                    {% if previous_module %}
+                        <a href="{% url 'courses:view_module' course.slug previous_module.id %}" 
+                           class="px-5 py-2.5 bg-[#2a2d30] hover:bg-[#3c4043] border border-[#3c4043] text-white rounded-xl text-sm font-medium transition-colors flex items-center shadow-sm">
+                            &larr; Previous
+                        </a>
                     {% endif %}
 
-                </div> 
+                    <!-- 2. Complete / Completed Button Logic -->
+                    {% if request.user.is_authenticated and is_enrolled and request.user != course.owner %}
+                        {% if is_completed %}
+                            <button disabled class="px-5 py-2.5 bg-green-600/20 text-green-400 border border-green-600/30 rounded-xl text-sm font-medium cursor-default flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                Completed
+                            </button>
+                        {% else %}
+                            <form method="post" action="{% url 'courses:complete_module' course.slug module.id %}" class="m-0">
+                                {% csrf_token %}
+                                <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium transition-colors shadow-sm">
+                                    Complete Module
+                                </button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+
+                    <!-- 3. Next Button -->
+                    {% if is_completed and next_module %}
+                        <a href="{% url 'courses:view_module' course.slug next_module.id %}" 
+                           class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-medium transition-colors flex items-center shadow-sm">
+                            Next Module &rarr;
+                        </a>
+                    {% elif next_module and request.user == course.owner %}
+                        <a href="{% url 'courses:view_module' course.slug next_module.id %}" 
+                           class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-medium transition-colors flex items-center shadow-sm">
+                            Next Module &rarr;
+                        </a>
+                    {% endif %}
+                </div>
+
+                <!-- Review Prompt Banner -->
+                {% if request.user.is_authenticated and is_enrolled and not has_reviewed %}
+                    <div class="bg-[#2a2d30] border border-[#3c4043] rounded-xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div class="text-center sm:text-left">
+                            <h4 class="text-base font-bold text-gray-100">Enjoying the course?</h4>
+                            <p class="text-sm text-gray-400 mt-1">
+                                Your feedback helps other students discover this course and helps the instructor improve.
+                            </p>
+                        </div>
+                        <a href="{% url 'courses:review_course' course.slug %}" 
+                           class="whitespace-nowrap px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-[#2a2d30]">
+                            Write a Review
+                        </a>
+                    </div>
+                {% endif %}
 
             </div>
+
         </div>
     </div>
+</div>
 
+<!-- Lightweight Vanilla JS for filtering module contents by type -->
+<script>
+    function filterContent(type, activeBtn) {
+        const cards = document.querySelectorAll('.content-card');
+        const buttons = document.querySelectorAll('.filter-btn');
+
+        // Reset button styles
+        buttons.forEach(btn => {
+            btn.className = 'filter-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-[#2a2d30] text-gray-300 border border-[#3c4043] hover:text-white transition-colors';
+        });
+
+        // Highlight active button
+        activeBtn.className = 'filter-btn active-filter px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition-colors';
+
+        // Show/hide content cards based on selected type
+        cards.forEach(card => {
+            if (type === 'all' || card.getAttribute('data-content-type') === type) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+</script>
 {% endblock content %}

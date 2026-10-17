@@ -5,7 +5,7 @@ from .models import Course, Text, Video, Image, File, Module, Review
 class CourseForm(forms.ModelForm):
     class Meta:
         model = Course
-        fields = ['subject', 'title', 'overview', 'status', 'level', 'language', 'time_to_complete']
+        fields = ['subject', 'title', 'header', 'overview', 'status', 'level', 'language', 'time_to_complete', 'image']
 
 
 class ModuleForm(forms.ModelForm):
@@ -17,22 +17,22 @@ class ModuleForm(forms.ModelForm):
 class TextForm(forms.ModelForm):
     class Meta:
         model = Text
-        fields = ['content']
+        fields = ['title', 'content']
 
 class VideoForm(forms.ModelForm):
     class Meta:
         model = Video
-        fields = ['video']
+        fields = ['title', 'video']
 
 class FileForm(forms.ModelForm):
     class Meta:
         model = File
-        fields = ['file']
+        fields = ['title', 'file']
 
 class ImageForm(forms.ModelForm):
     class Meta:
         model = Image
-        fields = ['image']
+        fields = ['title', 'image']
 
 
 class ReviewForm(forms.ModelForm):
