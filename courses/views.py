@@ -385,7 +385,7 @@ def toggle_wishlist(request, slug):
     if course.wishlist.filter(id=request.user.id).exists():
         course.wishlist.remove(request.user)
         messages.success(request, 'Course removed from wishlist')
-        return redirect('courses:wishlist', slug=course.slug)
+        return redirect('courses:view_wishlist')
     else:
         course.wishlist.add(request.user)
         messages.success(request, 'Course added to wishlist')
