@@ -56,10 +56,6 @@ class BaseProfile(models.Model):
 
 class StudentProfile(BaseProfile):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='students_profiles')
-    is_eligible_for_instructor = models.BooleanField(
-    default=False, 
-    help_text="Designates whether this user is allowed to upgrade to an instructor."
-    )
     def __str__(self):
             return f"{self.user.username}'s Student Profile"
 
@@ -81,4 +77,14 @@ class InstructorProfile(BaseProfile):
         return Review.objects.filter(course__owner=self.user).count()
 
 
-    
+class InstructorRequest(models.Model):
+    user = models.ForeignKey(User, related_name='instructor_requests', on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=[('pending', 'Pending'), ('approved', 'Approved'), ('rejected', 'Rejected')], default='pending')
+    is_seen = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Request by {self.user.username} - Status: {self.status}"

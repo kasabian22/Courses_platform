@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from courses.models import Course
 from .forms import SignUpForm, InstructorProfileForm, StudentProfileForm, UserUpdateForm, CustomSignInForm, assign_instructor_permissions
 from django.contrib.auth import login, logout
-from .models import InstructorProfile, StudentProfile, UserProfile
+from .models import InstructorProfile, InstructorRequest, StudentProfile, UserProfile
 from django.contrib.auth.decorators import login_required
 from django.db.models import Avg, Count
 from django.views.decorators.http import require_POST
@@ -112,9 +112,25 @@ def view_profile(request):
             ).annotate(
                 enrolled_students_count=Count('students', distinct=True)
             )
+
+            user_request = request.user.instructor_requests.first()
+            show_request_banner = False
+
+            if user_request:
+                if user_request.status in ['approved', 'pending']:
+                    show_request_banner = True
+                    
+                elif user_request.status == 'rejected' and not user_request.is_seen:
+                    show_request_banner = True
+                    
+                    user_request.is_seen = True
+                    user_request.save()
+
             return render(request, 'accounts/view_student_profile.html', {
                 'profile': profile,
-                'enrolled_courses': enrolled_courses
+                'enrolled_courses': enrolled_courses,
+                'user_request': user_request,
+                'show_request_banner': show_request_banner,
             })
 
         elif role == "instructor":
@@ -140,14 +156,36 @@ def view_profile(request):
             'profile': profile,
             'courses': courses
             })
-    
+
+
+
+@login_required
+@require_POST
+def send_instructor_request(request):
+    if hasattr(request.user, 'userprofile') and request.user.userprofile.role == 'student':
+        request_exists = InstructorRequest.objects.filter(user=request.user).exists()
+        
+        if not request_exists:
+            InstructorRequest.objects.create(user=request.user)
+            messages.success(request, "Your request to become an instructor has been sent successfully!")
+        else:
+            messages.info(request, "You have already submitted a request.")
+            
+    return redirect('accounts:view_profile')
+    # Returning to the same page from which the student clicked the button
+    # return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
 @require_POST
 @login_required
 @transaction.atomic
 def upgrade_to_instructor(request):
     student_profile = StudentProfile.objects.filter(user=request.user).first()
+    
+    # Check if the user has an approved instructor request instead of the old boolean field
+    approved_request = InstructorRequest.objects.filter(user=request.user, status='approved').first()
 
-    if student_profile and student_profile.is_eligible_for_instructor:
+    if student_profile and approved_request:
         # 1. Update role in UserProfile
         UserProfile.objects.update_or_create(
             user=request.user,
@@ -175,8 +213,12 @@ def upgrade_to_instructor(request):
 
         # 4. Safely delete the old StudentProfile
         student_profile.delete()
-        messages.success(request, "Congratulations! Your account has been upgraded to Instructor.")
+        
+        # 5. Delete the request record or mark it as completed so it doesn't stay in the DB forever
+        approved_request.delete() 
 
+        messages.success(request, "Congratulations! Your account has been upgraded to Instructor.")
+        
     return redirect('accounts:view_profile')
 
 def public_instructor_profile(request, instructor_id):

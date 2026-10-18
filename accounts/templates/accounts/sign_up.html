@@ -101,7 +101,7 @@
             </div>
 
             <!-- Role Selection Field -->
-            <div class="mb-6">
+            {% comment %} <div class="mb-6">
                 <label for="{{ form.role.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
                     I want to join as*
                 </label>
@@ -111,7 +111,7 @@
                         <p class="text-red-400 text-xs font-medium mt-1.5">{{ error }}</p>
                     {% endfor %}
                 {% endif %}
-            </div>
+            </div> {% endcomment %}
 
             <!-- Submit Button -->
             <div class="mb-6">

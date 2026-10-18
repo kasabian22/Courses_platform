@@ -12,5 +12,6 @@ urlpatterns = [
     path('edit-instructor-profile/', views.edit_instructor_profile, name='edit_instructor_profile'),
     path('edit-student-profile/', views.edit_student_profile, name='edit_student_profile'),
     path('upgrade-instructor/', views.upgrade_to_instructor, name='upgrade_instructor'),
+    path('send-instructor-request/', views.send_instructor_request, name='send_instructor_request'),
     path('instructor/<int:instructor_id>/', views.public_instructor_profile, name='public_instructor_profile')
 ]

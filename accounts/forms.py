@@ -28,7 +28,8 @@ class SignUpForm(UserCreationForm):
 
     # the variable name 'email' must be the same as the field item 'email' and so on...
     email = forms.EmailField(required=True)
-    role = forms.ChoiceField(choices=ROLE_CHOICES, required=True)
+
+    # role = forms.ChoiceField(choices=ROLE_CHOICES, required=True)
 
 
     class Meta:
@@ -74,18 +75,25 @@ class SignUpForm(UserCreationForm):
         user = super().save(commit=commit)
 
         if commit:
-            selected_role = self.cleaned_data.get('role')
-
             UserProfile.objects.update_or_create(
                 user=user,
-                defaults={'role': selected_role}
+                defaults={'role': 'student'}
             )
 
+            # Create the corresponding StudentProfile directly
+            StudentProfile.objects.get_or_create(user=user)
+
+            # selected_role = self.cleaned_data.get('role')
+            # UserProfile.objects.update_or_create(
+            #     user=user,
+            #     defaults={'role': selected_role}
+            # )
+
             # this is one of three ways to add profile when the user makes an account, the second way is made with signals in models.py file, the third is to take the same line and use it in views.py.
-            if selected_role == 'student':
-                StudentProfile.objects.get_or_create(user=user)
-            elif selected_role == 'instructor':
-                InstructorProfile.objects.get_or_create(user=user)
+            # if selected_role == 'student':
+            #     StudentProfile.objects.get_or_create(user=user)
+            # elif selected_role == 'instructor':
+            #     InstructorProfile.objects.get_or_create(user=user)
 
         return user
 

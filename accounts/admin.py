@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import InstructorProfile, StudentProfile, UserProfile
+from .models import InstructorProfile, InstructorRequest, StudentProfile, UserProfile
 
 
 @admin.register(InstructorProfile)
@@ -16,11 +16,11 @@ class StudentProfileAdmin(admin.ModelAdmin):
         'user', 'full_name', 'photo', 'bio',
         'country', 'education', 'primary_language_spoken',
         'linkedin', 'github', 'facebook',
-        'is_eligible_for_instructor', 'display_enrolled_courses'
+        'display_enrolled_courses'
     )
     readonly_fields = ('display_enrolled_courses',)
-    list_display = ('user', 'full_name', 'country', 'is_eligible_for_instructor', 'display_enrolled_courses')
-    list_filter = ('is_eligible_for_instructor', 'education', 'country')
+    list_display = ('user', 'full_name', 'country', 'display_enrolled_courses')
+    list_filter = ('education', 'country')
     search_fields = ('user__username', 'full_name', 'user__email')
 
     def get_queryset(self, request):
@@ -41,3 +41,33 @@ class UserProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'role')
     list_filter = ('role',)
     search_fields = ('user__username', 'user__email')
+
+
+
+
+@admin.action(description='Approval of specific requests and account upgrade')
+def approve_requests(modeladmin, request, queryset):
+    for req in queryset:
+        req.status = 'approved'
+        req.is_seen = False  # So that the acceptance message appears to him when he opens the website.
+        req.save()
+        
+        if hasattr(req.user, 'userprofile'):
+            profile = req.user.userprofile
+            profile.role = 'instructor'
+            profile.save()
+
+@admin.action(description='Reject specific requests')
+def reject_requests(modeladmin, request, queryset):
+    queryset.update(status='rejected', is_seen=False)
+
+@admin.register(InstructorRequest)
+class InstructorRequestAdmin(admin.ModelAdmin):
+    list_display = ['user', 'status', 'is_seen', 'created_at']
+    
+    list_filter = ['status', 'is_seen', 'created_at']
+    search_fields = ['user__username', 'user__email']
+    
+    actions = [approve_requests, reject_requests]
+    
+    readonly_fields = ['created_at']
