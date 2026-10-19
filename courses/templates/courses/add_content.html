@@ -22,24 +22,95 @@
             </p>
         </div>
 
+        <!-- Non-Field Errors (e.g., if both or neither video fields are filled) -->
+        {% if form.non_field_errors %}
+            <div class="mb-6 p-4 rounded-xl bg-red-900/20 border border-red-800/50 text-red-400 text-sm">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <!-- Form -->
-        <form method="post" enctype="multipart/form-data" novalidate>
+        <form id="content-upload-form" method="post" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
             
-            {% for field in form %}
+            {% if model_name == 'video' %}
+                <!-- 1. Title Field -->
                 <div class="mb-6">
-                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
-                        {{ field.label }}{% if field.field.required %}*{% endif %}
+                    <label for="{{ form.title.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                        Video Title*
+                    </label> 
+                    {% render_field form.title class="w-full bg-[#151718] border border-[#3c4043] text-gray-200 placeholder-gray-500 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="e.g., Setting up the Development Environment" %}
+                    {% if form.title.errors %}
+                        <p class="text-red-400 text-xs font-medium mt-1.5">{{ form.title.errors.as_text }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- 2. Video Source Switcher Tabs -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                        Video Source*
                     </label>
-                    
-                    {% if field.name == 'image' %}
+                    <div class="grid grid-cols-2 gap-2 p-1 bg-[#151718] border border-[#3c4043] rounded-xl">
+                        <button type="button" id="tab-url-btn" onclick="switchVideoSource('url')"
+                                class="py-2.5 px-4 rounded-lg text-xs font-semibold transition-all bg-indigo-600 text-white">
+                            YouTube Link
+                        </button>
+                        <button type="button" id="tab-upload-btn" onclick="switchVideoSource('upload')"
+                                class="py-2.5 px-4 rounded-lg text-xs font-semibold transition-all text-gray-400 hover:text-white">
+                            Upload File (Max 100MB)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Option A: External Video URL -->
+                <div id="video-url-container" class="mb-6">
+                    <label for="{{ form.video_url.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                        YouTube URL
+                    </label>
+                    {% render_field form.video_url class="w-full bg-[#151718] border border-[#3c4043] text-gray-200 placeholder-gray-500 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="https://www.youtube.com/watch?v=..." %}
+                    {% if form.video_url.errors %}
+                        <p class="text-red-400 text-xs font-medium mt-1.5">{{ form.video_url.errors.as_text }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Option B: Direct File Upload -->
+                <div id="video-upload-container" class="mb-6 hidden">
+                    <label for="{{ form.video_upload.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                        Video File (.mp4 or .webm)
+                    </label>
+                    {% render_field form.video_upload class="w-full bg-[#151718] border border-[#3c4043] text-gray-200 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer" %}
+                    {% if form.video_upload.errors %}
+                        <p class="text-red-400 text-xs font-medium mt-1.5">{{ form.video_upload.errors.as_text }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Upload Progress Bar -->
+                <div id="upload-progress-wrapper" class="mb-6 hidden">
+                    <div class="flex justify-between text-xs font-medium text-gray-300 mb-1.5">
+                        <span id="upload-status-text">Uploading video...</span>
+                        <span id="upload-percentage">0%</span>
+                    </div>
+                    <div class="w-full h-2.5 bg-[#151718] rounded-full overflow-hidden border border-[#3c4043]">
+                        <div id="upload-progress-bar" class="h-full bg-indigo-500 transition-all duration-150" style="width: 0%"></div>
+                    </div>
+                </div>
+
+            {% else %}
+                <!-- Standard Loop for Text, Image, and File Forms -->
+                {% for field in form %}
+                    <div class="mb-6">
+                        <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                            {{ field.label }}{% if field.field.required %}*{% endif %}
+                        </label>
+                        
+                        {% if field.name == 'image' %}
                             <div class="bg-[#151718] border border-[#3c4043] rounded-xl p-4 space-y-4">
-                                
-                                <!-- If the course already has an uploaded image, show a clean preview & delete toggle -->
                                 {% if field.value %}
                                     <div class="flex items-center justify-between bg-[#1e2022] p-3 rounded-lg border border-[#3c4043]/60">
                                         <div class="flex items-center gap-3 overflow-hidden">
-                                            <img src="{{ field.value.url }}" alt="Current Course Image" class="w-16 h-10 object-cover rounded-md border border-gray-700 shrink-0">
+                                            <img src="{{ field.value.url }}" alt="Current Image" class="w-16 h-10 object-cover rounded-md border border-gray-700 shrink-0">
                                             <div class="truncate">
                                                 <p class="text-xs font-medium text-gray-300">Current Image</p>
                                                 <a href="{{ field.value.url }}" target="_blank" class="text-[11px] text-indigo-400 hover:underline truncate block">
@@ -47,39 +118,32 @@
                                                 </a>
                                             </div>
                                         </div>
-
-                                        <!-- Custom Styled Clear Checkbox (if field is not required) -->
                                         {% if not field.field.required %}
                                             <label for="{{ field.name }}-clear_id" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 text-xs font-medium cursor-pointer transition-colors select-none shrink-0">
                                                 <input type="checkbox" name="{{ field.name }}-clear" id="{{ field.name }}-clear_id" class="rounded bg-[#151718] border-red-500/40 text-red-500 focus:ring-0 cursor-pointer">
-                                                <span>Remove Image</span>
+                                                <span>Remove</span>
                                             </label>
                                         {% endif %}
                                     </div>
                                 {% endif %}
-
-                                <!-- Clean File Input without the ugly default 'Currently:' text -->
                                 <div>
-                                    {% if field.value %}
-                                        <span class="block text-xs text-gray-400 mb-2">Upload a new image to replace the current one:</span>
-                                    {% endif %}
                                     <input type="file" name="{{ field.html_name }}" id="{{ field.id_for_label }}" accept="image/*"
                                         class="w-full bg-[#1e2022] border border-[#3c4043] text-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-indigo-500 transition-colors file:mr-4 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer">
                                 </div>
                             </div>
-
                         {% else %}
                             {% render_field field class="w-full bg-[#151718] border border-[#3c4043] text-gray-200 placeholder-gray-500 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500" %}
-                    {% endif %}
-                    
-                    {% if field.help_text %}
-                        <p class="text-xs text-gray-500 mt-1.5">{{ field.help_text }}</p>
-                    {% endif %}
-                    {% if field.errors %}
-                        <p class="text-red-400 text-xs font-medium mt-1.5">{{ field.errors.as_text }}</p>
-                    {% endif %}
-                </div>
-            {% endfor %}
+                        {% endif %}
+                        
+                        {% if field.help_text %}
+                            <p class="text-xs text-gray-500 mt-1.5">{{ field.help_text }}</p>
+                        {% endif %}
+                        {% if field.errors %}
+                            <p class="text-red-400 text-xs font-medium mt-1.5">{{ field.errors.as_text }}</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% endif %}
 
             <!-- Action Buttons -->
             <div class="flex items-center justify-end gap-4 mt-8 pt-6 border-t border-[#3c4043]">
@@ -87,7 +151,7 @@
                    class="px-5 py-2.5 text-sm font-semibold text-gray-300 bg-transparent border border-[#3c4043] rounded-xl hover:bg-[#3c4043] hover:text-white transition-colors">
                     Cancel
                 </a>
-                <button type="submit" 
+                <button id="submit-content-btn" type="submit" 
                         class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition-colors shadow-md">
                     Save {{ model_name|capfirst }}
                 </button>
@@ -96,4 +160,83 @@
 
     </div>
 </div>
+
+
+{% if model_name == 'video' %}
+<script>
+    const urlContainer = document.getElementById('video-url-container');
+    const uploadContainer = document.getElementById('video-upload-container');
+    const tabUrlBtn = document.getElementById('tab-url-btn');
+    const tabUploadBtn = document.getElementById('tab-upload-btn');
+    const urlInput = document.getElementById('{{ form.video_url.id_for_label }}');
+    const uploadInput = document.getElementById('{{ form.video_upload.id_for_label }}');
+
+    function switchVideoSource(source) {
+        if (source === 'url') {
+            urlContainer.classList.remove('hidden');
+            uploadContainer.classList.add('hidden');
+            tabUrlBtn.className = 'py-2.5 px-4 rounded-lg text-xs font-semibold transition-all bg-indigo-600 text-white';
+            tabUploadBtn.className = 'py-2.5 px-4 rounded-lg text-xs font-semibold transition-all text-gray-400 hover:text-white';
+            if (uploadInput) uploadInput.value = '';
+        } else {
+            uploadContainer.classList.remove('hidden');
+            urlContainer.classList.add('hidden');
+            tabUploadBtn.className = 'py-2.5 px-4 rounded-lg text-xs font-semibold transition-all bg-indigo-600 text-white';
+            tabUrlBtn.className = 'py-2.5 px-4 rounded-lg text-xs font-semibold transition-all text-gray-400 hover:text-white';
+            if (urlInput) urlInput.value = '';
+        }
+    }
+
+    // Keep upload tab open if validation failed on video_upload
+    {% if form.video_upload.errors %}
+        switchVideoSource('upload');
+    {% endif %}
+
+    // Live Progress Bar using XMLHttpRequest when uploading a video file
+    const form = document.getElementById('content-upload-form');
+    form.addEventListener('submit', function(e) {
+        if (uploadInput && uploadInput.files.length > 0) {
+            e.preventDefault();
+            const progressWrapper = document.getElementById('upload-progress-wrapper');
+            const progressBar = document.getElementById('upload-progress-bar');
+            const percentageText = document.getElementById('upload-percentage');
+            const submitBtn = document.getElementById('submit-content-btn');
+
+            progressWrapper.classList.remove('hidden');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Uploading...';
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', window.location.href, true);
+
+            xhr.upload.onprogress = function(event) {
+                if (event.lengthComputable) {
+                    const percent = Math.round((event.loaded / event.total) * 100);
+                    progressBar.style.width = percent + '%';
+                    percentageText.textContent = percent + '%';
+                }
+            };
+
+            xhr.onload = function() {
+                if (xhr.status >= 200 && xhr.status < 400) {
+                    // If Django redirected after successful upload, follow the final URL
+                    if (xhr.responseURL && xhr.responseURL !== window.location.href) {
+                        window.location.href = xhr.responseURL;
+                    } else {
+                        // Form had validation errors; replace document with returned HTML
+                        document.open();
+                        document.write(xhr.responseText);
+                        document.close();
+                    }
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Save Video';
+                }
+            };
+
+            xhr.send(new FormData(form));
+        }
+    });
+</script>
+{% endif %}
 {% endblock content %}

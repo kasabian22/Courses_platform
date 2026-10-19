@@ -171,15 +171,20 @@
                     <!-- Card Body: Specific Rendering per Content Type -->
                     {% if content.content_type.model == 'video' %}
                         <div class="w-full aspect-video bg-black">
-                            <iframe 
-                                src="{{ content.item.video }}" 
-                                class="w-full h-full"
-                                frameborder="0"
-                                title="{{ content.item.title }}" 
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                                referrerpolicy="strict-origin-when-cross-origin"
-                                allowfullscreen>
-                            </iframe>
+                            {% if content.item.video_upload %}
+                                <!-- HTML5 Native Video Player for Uploaded Files -->
+                                {% include 'courses/partials/custom_video_player.html' %}
+                            {% elif content.item.video_url %}
+                                <iframe 
+                                    src="{{ content.item.youtube_embed_url }}"
+                                    class="w-full h-full"
+                                    frameborder="0"
+                                    title="{{ content.item.title }}" 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    referrerpolicy="strict-origin-when-cross-origin"
+                                    allowfullscreen>
+                                </iframe>
+                            {% endif %}
                         </div>
                         
                     {% elif content.content_type.model == 'text' %}

@@ -1,5 +1,6 @@
 import os
-
+from urllib.parse import parse_qs, urlsplit
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -29,10 +30,10 @@ class Course(models.Model):
         DRAFT = 'DF', 'Draft'
     owner = models.ForeignKey(User, related_name='courses_created', on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, related_name='courses', on_delete=models.CASCADE)
-    title = models.CharField(max_length=250)
+    title = models.CharField(max_length=250, help_text="Write the title of the course here (only in English)")
     slug = models.SlugField(max_length=250, unique=True, blank=True, null=True)
-    overview = QuillField(help_text="Write the discription of the course here")
-    header = models.CharField(max_length=250, blank=True, null=True, help_text="Write the header of the course here")
+    overview = QuillField(help_text="Write the description of the course here")
+    header = models.CharField(max_length=250, blank=True, null=True, help_text="Write the header that appers below the course title both on the course card, and in the course page (optional)")
     date_created = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=2, choices=Status.choices, default=Status.AVAILABLE)
     students = models.ManyToManyField(User, through='Enrollment', related_name='enrolled_courses', blank=True)
@@ -79,6 +80,12 @@ class Course(models.Model):
         indexes = [
             models.Index(fields=['status', '-date_created']),
         ]
+        constraints = [
+            models.CheckConstraint(
+                condition=~models.Q(slug=""),
+                name="course_slug_not_empty"
+            )
+        ]
 
     def __str__(self):
         return self.title
@@ -94,6 +101,10 @@ class Course(models.Model):
         if not self.slug or self.title != self._initial_title:
             # i didn't use normal slugify, because it will give IntegrityError as soon as someone use the title of a course that it's used before.
             self.slug = generate_unique_slug(self, self.title)
+
+        # Hard guard: Refuse to save to the database if slug is still empty or None
+        if not self.slug or not self.slug.strip():
+            raise ValidationError("Cannot save course: generated slug is empty.")
         super().save(*args, **kwargs)
 
         # Update the tracked title after a successful save
@@ -220,8 +231,36 @@ class Image(ItemBase):
 
 class Video(ItemBase):
     # using URL instead of uplaoding the video itself, means that the instructor uploads the video on another platform (like youtube), and then use the url on our site and we render it using a built-in package in django.
-    video = models.URLField()
+    video_url = models.URLField(null=True, blank=True, help_text="Enter a youtube video URL (optional). If provided, this will be used instead of uploading a video file.")
+    video_upload = models.FileField(upload_to="videos", null=True, blank=True, help_text="Upload a video file (optional). If provided, this will be used instead of the URL.")
 
+    @property
+    def youtube_embed_url(self):
+        if not self.video_url:
+            return ''
+
+        parsed_url = urlsplit(self.video_url)
+        host = (parsed_url.hostname or '').lower()
+        youtube_hosts = {'youtube.com', 'www.youtube.com', 'm.youtube.com'}
+
+        if host == 'youtu.be':
+            video_id = parsed_url.path.strip('/').split('/')[0]
+        elif host in youtube_hosts and parsed_url.path == '/watch':
+            video_id = parse_qs(parsed_url.query).get('v', [''])[0]
+        elif host in youtube_hosts:
+            path_segments = parsed_url.path.strip('/').split('/')
+            if path_segments[0] == 'embed':
+                return self.video_url
+            if len(path_segments) > 1 and path_segments[0] in {'shorts', 'live'}:
+                video_id = path_segments[1]
+            else:
+                return self.video_url
+        else:
+            return self.video_url
+
+        if video_id:
+            return f'https://www.youtube.com/embed/{video_id}'
+        return self.video_url
 
 class Text(ItemBase):
     content = models.TextField()
