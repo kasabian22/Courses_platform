@@ -226,13 +226,20 @@
                                 <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                             </button>
                             
-                            <!-- Dropdown Menu (Hidden by default, shown on group hover) -->
-                            <div class="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                                <div class="py-1">
-                                    <a href="{% url 'courses:content_create_update' detail.slug module.id 'video' %}" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">🎥 Add Video</a>
-                                    <a href="{% url 'courses:content_create_update' detail.slug module.id 'text' %}" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">📝 Add Text</a>
-                                    <a href="{% url 'courses:content_create_update' detail.slug module.id 'image' %}" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">🖼️ Add Image</a>
-                                    <a href="{% url 'courses:content_create_update' detail.slug module.id 'file' %}" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white">📎 Add File</a>
+                            <!-- Dropdown Menu (Using the exact same classes as My Profile dropdown) -->
+                            <div class="absolute right-0 mt-2 w-48 bg-[#2a2d30] border border-[#3c4043] rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden custom-dropdown">
+                                <div class="py-1 bg-transparent">
+                                    <a href="{% url 'courses:content_create_update' detail.slug module.id 'video' %}"
+                                    class="block px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] hover:text-white transition-colors custom-item">🎥 Add Video</a>
+
+                                    <a href="{% url 'courses:content_create_update' detail.slug module.id 'text' %}"
+                                    class="block px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] hover:text-white transition-colors custom-item">📄 Add Text</a>
+
+                                    <a href="{% url 'courses:content_create_update' detail.slug module.id 'image' %}"
+                                    class="block px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] hover:text-white transition-colors custom-item">🖼️ Add Image</a>
+
+                                    <a href="{% url 'courses:content_create_update' detail.slug module.id 'file' %}"
+                                    class="block px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] hover:text-white transition-colors custom-item">📎 Add File</a>
                                 </div>
                             </div>
                         </div>

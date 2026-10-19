@@ -130,7 +130,7 @@ def content_create_update(request, slug, module_id, model_name, id=None):
                     item=item
                 )
             # Redirect back to the module view so the instructor sees the new/updated content immediately
-            return redirect("courses:view_module", slug=module.course.slug, module_id=module.id)
+            return redirect("courses:view_module", course_slug=module.course.slug, module_id=module.id)
     else:
         # Pre-fill the form with the existing item's data if editing
         form = form_class(instance=obj)
@@ -292,7 +292,8 @@ def view_module(request, course_slug, module_id):
     is_owner = (course.owner == request.user)
     is_enrolled = course.students.filter(id=request.user.id).exists()
 
-    if not (is_owner or is_enrolled):
+    if not is_enrolled and not is_owner:
+        messages.error(request, 'You must be enrolled in this course to view its modules.')
         return redirect('courses:course_detail', slug=course.slug)
 
     has_reviewed = False

@@ -1,0 +1,203 @@
+html {
+    scroll-behavior: smooth;
+}
+
+/* Dark Form Default Styles */
+.dark-form label { color: #9ca3af; }
+.dark-form input:not([type="checkbox"]):not([type="radio"]),
+.dark-form select,
+.dark-form textarea {
+    background-color: #151718;
+    border-color: #3c4043;
+    color: #e5e7eb;
+    color-scheme: dark;
+}
+.dark-form input::placeholder,
+.dark-form textarea::placeholder { color: #6b7280; }
+.dark-form input:focus,
+.dark-form select:focus,
+.dark-form textarea:focus {
+    border-color: #6366f1;
+    outline: none;
+}
+.dark-form .helptext,
+.dark-form [class*="help"] { color: #9ca3af; }
+
+/* =========================================================
+   1. Telegram-Style Circular View Transition Animation
+   ========================================================= */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+::view-transition-old(root) { z-index: 1; }
+::view-transition-new(root) { z-index: 9999; }
+
+/* =========================================================
+   2. Complete Day Mode Overrides
+   ========================================================= */
+/* Page Backgrounds */
+html.light-mode body,
+html.light-mode .bg-\[\#1e2022\],
+html.light-mode .bg-\[\#1E2022\],
+html.light-mode .bg-gray-900 {
+    background-color: #f1f5f9 !important;
+    color: #1e293b !important;
+}
+
+/* Fix Course Detail Dark Gradient Hero Banner */
+html.light-mode .from-gray-900 {
+    background-image: linear-gradient(to bottom right, #eef2ff, #e0e7ff) !important;
+    border-color: #cbd5e1 !important;
+}
+
+/* Cards, Navbars & Containers */
+html.light-mode .bg-\[\#181a1b\],
+html.light-mode .bg-\[\#181a1b\]\/90,
+html.light-mode .bg-\[\#1c1d22\],
+html.light-mode .bg-\[\#2a2d30\],
+html.light-mode .bg-\[\#2a2d30\]\/60 {
+    background-color: #ffffff !important;
+}
+
+/* ----------------------------------------------------------------------------------------- */
+/* Fix Course Card Hover State */
+html.light-mode .hover\:bg-\[\#3c4043\]:hover {
+    background-color: #f3f4f6 !important; /* Crisp Gray-100 for hover states */
+}
+
+/* 1. Force pure white background and light border on the dropdown container */
+html.light-mode .custom-dropdown,
+html.light-mode .custom-dropdown > div {
+    background-color: #ffffff !important;
+    border-color: #e5e7eb !important;
+}
+
+/* 2. Reset default background to transparent so items stay white when not hovered */
+html.light-mode a.custom-item {
+    background-color: transparent !important;
+    color: #4b5563 !important;
+}
+
+/* 3. Light gray background and dark text on hover (matches My Profile) */
+html.light-mode a.custom-item:hover {
+    background-color: #f3f4f6 !important;
+    color: #111827 !important;
+}
+/* ----------------------------------------------------------------------------------------- */
+
+/* Fix Floating Review & Bestseller Badges on Course Images */
+html.light-mode [class*="bg-[#1c1d22]/"] {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Inputs, Secondary Buttons & Gray Containers */
+html.light-mode .bg-\[\#151718\],
+html.light-mode .bg-gray-800 {
+    background-color: #f8fafc !important;
+    color: #1e293b !important;
+    border-color: #cbd5e1 !important;
+}
+
+/* Fix Module "View" Button (bg-gray-700) & Fallback Avatars (bg-gray-600) */
+html.light-mode .bg-gray-700,
+html.light-mode .bg-gray-600,
+html.light-mode .bg-gray-500 {
+    background-color: #e2e8f0 !important;
+    color: #0f172a !important;
+}
+html.light-mode .bg-gray-700:hover,
+html.light-mode .bg-gray-800:hover {
+    background-color: #cbd5e1 !important;
+}
+
+/* Fix Tinted Avatars, Role Badges, Stat Icons & Student Buttons */
+html.light-mode [class*="bg-indigo-900"],
+html.light-mode [class*="bg-indigo-950"] {
+    background-color: #e0e7ff !important; /* Crisp Indigo-100 */
+    border-color: #a5b4fc !important;
+}
+html.light-mode .text-indigo-300,
+html.light-mode .text-indigo-400,
+html.light-mode .text-indigo-200\/70 {
+    color: #4338ca !important; /* Deep Indigo-700 for sharp contrast */
+}
+
+html.light-mode [class*="bg-amber-900"] {
+    background-color: #fef3c7 !important; /* Crisp Amber-100 */
+    border-color: #fcd34d !important;
+}
+html.light-mode .text-amber-300,
+html.light-mode .text-amber-400,
+html.light-mode .text-yellow-500 {
+    color: #b45309 !important; /* Deep Amber-700 so stars/numbers pop */
+}
+
+html.light-mode [class*="bg-emerald-900"] {
+    background-color: #d1fae5 !important; /* Emerald-100 */
+    border-color: #6ee7b7 !important;
+}
+html.light-mode .text-emerald-300,
+html.light-mode .text-emerald-400 {
+    color: #047857 !important; /* Deep Emerald-700 */
+}
+
+html.light-mode [class*="bg-blue-900"] {
+    background-color: #dbeafe !important; /* Blue-100 */
+    border-color: #93c5fd !important;
+}
+html.light-mode .text-blue-400,
+html.light-mode .text-blue-300 {
+    color: #1d4ed8 !important; /* Deep Blue-700 */
+}
+
+html.light-mode [class*="bg-rose-900"] {
+    background-color: #ffe4e6 !important;
+    border-color: #fda4af !important;
+}
+html.light-mode .text-rose-300 {
+    color: #be123c !important;
+}
+
+/* Borders */
+html.light-mode .border-\[\#303436\],
+html.light-mode .border-\[\#3c4043\],
+html.light-mode .border-gray-700,
+html.light-mode .border-gray-700\/60,
+html.light-mode .border-gray-800 {
+    border-color: #e2e8f0 !important;
+}
+
+/* Typography */
+html.light-mode .text-white,
+html.light-mode .text-gray-100,
+html.light-mode .text-gray-200 {
+    color: #0f172a !important;
+}
+html.light-mode .text-gray-300,
+html.light-mode .text-gray-400 {
+    color: #475569 !important;
+}
+
+/* Keep White Text Strictly Inside Solid Action Buttons */
+html.light-mode .bg-indigo-600,
+html.light-mode .bg-indigo-600 *,
+html.light-mode .bg-indigo-700,
+html.light-mode .bg-blue-600,
+html.light-mode .bg-red-500 {
+    color: #ffffff !important;
+}
+
+/* Light Mode Forms */
+html.light-mode .dark-form label { color: #334155 !important; }
+html.light-mode .dark-form input:not([type="checkbox"]):not([type="radio"]),
+html.light-mode .dark-form select,
+html.light-mode .dark-form textarea {
+    background-color: #f8fafc !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+    color-scheme: light;
+}
