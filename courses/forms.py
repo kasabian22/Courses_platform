@@ -1,27 +1,49 @@
 import os
 import re
 from django import forms
+from django.utils.text import slugify
+from unidecode import unidecode
+
+from .utils import generate_unique_slug
 from .models import Course, Text, Video, Image, File, Module, Review
 from django.core.exceptions import ValidationError
 
 
 class CourseForm(forms.ModelForm):
+    slug = forms.CharField(
+        required=False,
+        max_length=250,
+        label="Custom URL Slug",
+        help_text="Auto-generated from the title. You can customize it using lowercase English letters, numbers, and hyphens (-)."
+    )
     class Meta:
         model = Course
-        fields = ['subject', 'title', 'header', 'overview', 'status', 'level', 'language', 'time_to_complete', 'image']
+        fields = ['subject', 'title', 'slug', 'header', 'overview', 'status', 'level', 'language', 'time_to_complete', 'image']
 
     def clean_title(self):
-        title = self.cleaned_data.get('title')
-        
-        # 1. Check that all characters are English letters, numbers, or basic punctuation
-        if not re.match(r"^[a-zA-Z0-9\s\-_.,!?()'\"]+$", title):
-            raise ValidationError("The course title must be in English only. Please do not use Arabic or other alphabets.")
-            
-        # 2. Ensure the title contains at least one English letter or number (not just punctuation/spaces)
-        if not re.search(r"[a-zA-Z0-9]", title):
-            raise ValidationError("The course title must contain at least one English letter or number.")
-            
+        title = self.cleaned_data.get('title', '').strip()
+        # Require at least three Arabic letters, English letters, or digits
+        if not re.search(r"[a-zA-Z0-9\u0600-\u06FF]{3,}", title):
+            raise ValidationError("The course title must contain at least three Arabic or English letters or numbers.")
         return title
+
+    def clean_slug(self):
+        raw_slug = self.cleaned_data.get('slug', '').strip()
+        title = self.cleaned_data.get('title', '')
+
+        # If the user typed a custom slug, validate that it can form a clean slug
+        if raw_slug:
+            cleaned = slugify(unidecode(raw_slug))
+            if not cleaned:
+                raise ValidationError("Invalid slug format. Please use English letters, numbers, and hyphens only.")
+            # Guarantee uniqueness in the DB (excluding current course if editing)
+            return generate_unique_slug(self.instance, title=title, custom_slug=cleaned)
+
+        # If left empty, auto-generate from the validated title
+        if title:
+            return generate_unique_slug(self.instance, title=title)
+
+        return raw_slug
 
 
 class ModuleForm(forms.ModelForm):

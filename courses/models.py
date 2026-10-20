@@ -1,4 +1,5 @@
 import os
+import re
 from urllib.parse import parse_qs, urlsplit
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -6,11 +7,12 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.utils.text import slugify
-from .utils import generate_unique_slug
+from .utils import extract_smart_base_slug, generate_unique_slug
 from django_quill.fields import QuillField
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Avg
 from django.conf.global_settings import LANGUAGES
+from unidecode import unidecode
 
 
 class Subject(models.Model):
@@ -30,8 +32,8 @@ class Course(models.Model):
         DRAFT = 'DF', 'Draft'
     owner = models.ForeignKey(User, related_name='courses_created', on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, related_name='courses', on_delete=models.CASCADE)
-    title = models.CharField(max_length=250, help_text="Write the title of the course here (only in English)")
-    slug = models.SlugField(max_length=250, unique=True, blank=True, null=True)
+    title = models.CharField(max_length=250, help_text="Write the title of the course here (Must contain English characters or numbers)")
+    slug = models.SlugField(max_length=250, unique=True, blank=True)
     overview = QuillField(help_text="Write the description of the course here")
     header = models.CharField(max_length=250, blank=True, null=True, help_text="Write the header that appers below the course title both on the course card, and in the course page (optional)")
     date_created = models.DateTimeField(auto_now_add=True)
@@ -94,20 +96,38 @@ class Course(models.Model):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Track the initial title in memory to avoid extra database queries later
+        # The title is stored when the object is created or loaded.
         self._initial_title = self.title
 
+    def clean(self):
+        super().clean()
+        # Ensure title has at least three valid Arabic/English letters or numbers
+        if self.title and not re.search(r"[a-zA-Z0-9\u0600-\u06FF]{3,}", self.title):
+            raise ValidationError({
+                'title': "Course title must contain valid Arabic or English letters or numbers."
+            })
+
+        # Ensure that either the custom slug or the title produces a valid slug
+        valid_slug = slugify(unidecode(self.slug)) if self.slug else extract_smart_base_slug(self.title)
+        if not valid_slug:
+            raise ValidationError({
+                'slug': "Could not generate a valid URL slug. Please enter a valid custom slug using English letters and numbers."
+            })
+
     def save(self, *args, **kwargs):
-        # Generate a new slug if it is empty OR if the title has changed
+        # If slug is empty, or if title changed without a custom slug override, generate a unique one
         if not self.slug or self.title != self._initial_title:
-            # i didn't use normal slugify, because it will give IntegrityError as soon as someone use the title of a course that it's used before.
-            self.slug = generate_unique_slug(self, self.title)
+            self.slug = generate_unique_slug(self, title=self.title)
+        else:
+            # Sanitize and guarantee uniqueness even if a custom slug was provided
+            self.slug = generate_unique_slug(self, title=self.title, custom_slug=self.slug)
 
-        # Hard guard: Refuse to save to the database if slug is still empty or None
+        # Final database guard: never allow an empty slug into PostgreSQL
         if not self.slug or not self.slug.strip():
-            raise ValidationError("Cannot save course: generated slug is empty.")
-        super().save(*args, **kwargs)
+            raise ValidationError("Integrity guard: Course slug cannot be empty.")
 
-        # Update the tracked title after a successful save
+        super().save(*args, **kwargs)
+        # Update the initial title after saving to reflect the current state
         self._initial_title = self.title
 
 

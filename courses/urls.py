@@ -7,6 +7,7 @@ urlpatterns = [
     path('add-course/', views.add_course, name='add_course'),
     path('course/<slug:slug>/', views.course_detail, name='course_detail'),
     path('course/<slug:slug>/edit-course/', views.edit_course, name='edit_course'),
+    path('api/generate-slug-preview/', views.generate_slug_preview, name='generate_slug_preview'),
     path('course/<slug:slug>/delete-course/', views.delete_course, name='delete_course'),
     
     path('course/<slug:slug>/add-module/', views.add_module, name='add_module'),

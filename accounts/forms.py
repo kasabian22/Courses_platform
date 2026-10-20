@@ -29,6 +29,7 @@ class SignUpForm(UserCreationForm):
     # the variable name 'email' must be the same as the field item 'email' and so on...
     email = forms.EmailField(required=True)
 
+    # old version of role field, we now default the role to student, and if the user is an instructor, we will change it in the view after the user is created, by upgrading him.
     # role = forms.ChoiceField(choices=ROLE_CHOICES, required=True)
 
 
@@ -119,7 +120,7 @@ class InstructorProfileForm(forms.ModelForm):
 class StudentProfileForm(forms.ModelForm):
     class Meta:
         model = StudentProfile  
-        fields = ["photo", "bio", "full_name", "country", "education", "primary_language_spoken", "linkedin", "github", "facebook"]
+        fields = ["full_name", "country", "education", "primary_language_spoken", "photo", "bio",  "linkedin", "github", "facebook"]
 
 
 class UserUpdateForm(forms.ModelForm):

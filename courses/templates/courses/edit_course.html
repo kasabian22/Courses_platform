@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
+{% load static %}
 
 {% block title %}
     Edit {{ course.title }}
@@ -98,4 +99,13 @@
 
     </div>
 </div>
+
+
+<script>
+    // Pass dynamic Django context to the external script
+    window.CURRENT_COURSE_ID = "{{ form.instance.pk|default:'' }}";
+    window.SLUG_PREVIEW_URL = "{% url 'courses:generate_slug_preview' %}";
+</script>
+<script src="{% static 'js/course_slug_preview.js' %}"></script>
+
 {% endblock content %}

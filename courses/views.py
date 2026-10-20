@@ -1,10 +1,14 @@
 from django.apps import apps
 from django.shortcuts import redirect, render, get_object_or_404
+from unidecode import unidecode
+
+from .utils import extract_smart_base_slug, generate_unique_slug
 from .forms import CourseForm, TextForm, FileForm, VideoForm, ImageForm, ModuleForm, ReviewForm
 from .models import Content, Enrollment, Module, Progress, Review, Subject, Course
 from django.contrib.auth.decorators import login_required, permission_required
 from django.views.decorators.http import require_POST
-from django.http import HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
+from django.utils.text import slugify
 from django.contrib import messages
 from django.db.models import Count, Prefetch, Q
 
@@ -194,6 +198,50 @@ def edit_course(request, slug):
         'form': form,
         'course': course
     })
+
+
+
+@login_required
+def generate_slug_preview(request):
+    """
+    AJAX endpoint to preview and validate the course slug in real time.
+    """
+    title = request.GET.get('title', '').strip()
+    custom_slug = request.GET.get('custom_slug', '').strip()
+    course_id = request.GET.get('course_id')
+
+    exclude_pk = int(course_id) if course_id and course_id.isdigit() else None
+
+    if custom_slug:
+        base_candidate = slugify(unidecode(custom_slug))
+    else:
+        base_candidate = extract_smart_base_slug(title)
+
+    if not base_candidate:
+        return JsonResponse({
+            'slug': '',
+            'is_valid': False,
+            'was_modified_for_uniqueness': False,
+            'message': 'Enter a valid title or slug'
+        })
+
+    final_slug = generate_unique_slug(
+        Course,
+        title=title,
+        custom_slug=custom_slug,
+        exclude_pk=exclude_pk
+    )
+
+    # Check if a counter (-1, -2) was appended because another course already took the base slug
+    was_modified = (final_slug != base_candidate)
+
+    return JsonResponse({
+        'slug': final_slug,
+        'is_valid': True,
+        'was_modified_for_uniqueness': was_modified,
+        'message': f"Available as: {final_slug}" if was_modified else "Slug is available ✓"
+    })
+
 
 @require_POST
 @login_required
