@@ -71,7 +71,8 @@ class VideoForm(forms.ModelForm):
 
     def clean_video_upload(self):
         video_file = self.cleaned_data.get('video_upload')
-        if video_file:
+        # Only validate size and extension if a new file was actually uploaded in this request
+        if video_file and 'video_upload' in self.changed_data:
             # 1. Validate file extension
             ext = os.path.splitext(video_file.name)[1].lower()
             if ext not in self.ALLOWED_EXTENSIONS:
@@ -111,14 +112,62 @@ class VideoForm(forms.ModelForm):
         return cleaned_data
 
 class FileForm(forms.ModelForm):
+    MAX_VIDEO_SIZE_MB = 25
+    ALLOWED_EXTENSIONS = ['.pdf', '.zip', '.docx', '.pptx']
     class Meta:
         model = File
         fields = ['title', 'file']
+        widgets = {
+            'file': forms.ClearableFileInput(attrs={'accept': 'file/pdf,file/zip,file/docx,file/pptx'}),
+        }
+    
+    def clean_file_upload(self):
+        file = self.cleaned_data.get('file')
+        if file and 'file' in self.changed_data:
+            # 1. Validate file extension
+            ext = os.path.splitext(file.name)[1].lower()
+            if ext not in self.ALLOWED_EXTENSIONS:
+                raise forms.ValidationError(
+                    f"Unsupported file format '{ext}'. Please upload an PDF or ZIP or DOCX or PPTX file."
+                )
+        
+            # 2. Validate file size
+            max_bytes = self.MAX_VIDEO_SIZE_MB * 1024 * 1024
+            if file.size > max_bytes:
+                raise forms.ValidationError(
+                    f"The file is too large ({file.size / (1024 * 1024):.1f} MB). "
+                    f"Maximum allowed size is {self.MAX_VIDEO_SIZE_MB} MB."
+            )
+        return file
 
 class ImageForm(forms.ModelForm):
+    MAX_VIDEO_SIZE_MB = 5
+    ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"]
     class Meta:
         model = Image
         fields = ['title', 'image']
+        widgets = {
+            'image': forms.ClearableFileInput(attrs={'accept': 'image/jpg,image/jpeg,image/png,image/gif,image/webp,image/svg'}),
+        }
+        
+    def clean_image_upload(self):
+        image = self.cleaned_data.get('image')
+        if image and 'image' in self.changed_data:
+            # 1. Validate file extension
+            ext = os.path.splitext(image.name)[1].lower()
+            if ext not in self.ALLOWED_EXTENSIONS:
+                raise forms.ValidationError(
+                    f"Unsupported file format '{ext}'. Please upload an JPG or JPEG or PNG or GIF or WEBP or SVG image."
+                )
+        
+            # 2. Validate file size
+            max_bytes = self.MAX_VIDEO_SIZE_MB * 1024 * 1024
+            if image.size > max_bytes:
+                raise forms.ValidationError(
+                    f"The image is too large ({image.size / (1024 * 1024):.1f} MB). "
+                    f"Maximum allowed size is {self.MAX_VIDEO_SIZE_MB} MB."
+            )
+        return image
 
 
 class ReviewForm(forms.ModelForm):
