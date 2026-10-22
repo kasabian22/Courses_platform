@@ -1,0 +1,53 @@
+{% if page_obj.has_other_pages %}
+<nav aria-label="Pagination" class="mt-12 flex items-center justify-center gap-2 select-none">
+    
+    <!-- Previous Button -->
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+           class="px-4 py-2 rounded-xl border border-[#3c4043] bg-[#2a2d30] text-sm font-medium text-gray-300 hover:bg-[#35393d] hover:text-white hover:border-indigo-500/50 transition-all">
+            &larr; Prev
+        </a>
+    {% else %}
+        <span class="px-4 py-2 rounded-xl border border-[#2a2d30] bg-[#1c1d22] text-sm font-medium text-gray-600 cursor-not-allowed">
+            &larr; Prev
+        </span>
+    {% endif %}
+
+    <!-- Page Numbers (Smart Window around current page) -->
+    <div class="hidden sm:flex items-center gap-1.5">
+        {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+                <!-- Active Page -->
+                <span class="w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-600 text-white text-sm font-bold shadow-md">
+                    {{ num }}
+                </span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <!-- Nearby Pages -->
+                <!-- request.GET.q means the search query parameter, if the user is searching -->
+                <a href="?page={{ num }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+                   class="w-10 h-10 flex items-center justify-center rounded-xl border border-[#3c4043] bg-[#2a2d30] text-sm font-medium text-gray-300 hover:bg-[#35393d] hover:text-white hover:border-indigo-500/50 transition-all">
+                    {{ num }}
+                </a>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- Mobile Indicator (e.g. Page 1 of 5) -->
+    <span class="sm:hidden px-3 py-2 text-sm text-gray-400 font-medium">
+        Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+    </span>
+
+    <!-- Next Button -->
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+           class="px-4 py-2 rounded-xl border border-[#3c4043] bg-[#2a2d30] text-sm font-medium text-gray-300 hover:bg-[#35393d] hover:text-white hover:border-indigo-500/50 transition-all">
+            Next &rarr;
+        </a>
+    {% else %}
+        <span class="px-4 py-2 rounded-xl border border-[#2a2d30] bg-[#1c1d22] text-sm font-medium text-gray-600 cursor-not-allowed">
+            Next &rarr;
+        </span>
+    {% endif %}
+
+</nav>
+{% endif %}

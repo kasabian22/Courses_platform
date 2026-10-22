@@ -15,12 +15,13 @@ urlpatterns = [
     path('course/<slug:course_slug>/<int:module_id>/delete-module/', views.delete_module, name='delete_module'),
     path('course/<slug:course_slug>/<int:module_id>/view-module/', views.view_module, name='view_module'),
     path('course/<slug:course_slug>/<int:module_id>/complete-module/', views.complete_module, name='complete_module'),
+    path('course/<slug:slug>/certificate/', views.course_certificate, name='course_certificate'),
     
     path('course/<slug:slug>/enroll-course/', views.enroll_course, name='enroll_course'),
     path('course/<slug:slug>/unenroll-course/', views.unenroll_course, name='unenroll_course'),
     
-    path('course/<slug:slug>/module/<int:module_id>/content/<str:model_name>/create/', views.content_create_update, name='content_create_update'),
-    path('course/<slug:slug>/module/<int:module_id>/content/<str:model_name>/<int:id>/edit/', views.content_create_update, name='content_create_update'),
+    path('course/<slug:slug>/module/<int:module_id>/content/<str:model_name>/create/', views.content_create_update, name='content_create'),
+    path('course/<slug:slug>/module/<int:module_id>/content/<str:model_name>/<int:id>/edit/', views.content_create_update, name='content_update'),
     path('course/<slug:course_slug>/<int:module_id>/content/<int:content_id>/delete/', views.delete_content, name='delete_content'),
 
     

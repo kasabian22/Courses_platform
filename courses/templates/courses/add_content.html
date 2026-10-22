@@ -2,7 +2,7 @@
 {% load widget_tweaks %}
 
 {% block title %}
-    Add {{ model_name|capfirst }} | {{ module.title }}
+    {% if object %}Edit{% else %}Add New{% endif %} {{ model_name|capfirst }}
 {% endblock title %}
 
 {% block content %}
@@ -15,7 +15,7 @@
                 {{ module.title }}
             </span>
             <h1 class="text-2xl font-bold text-gray-100">
-                Add New {{ model_name|capfirst }}
+                {% if object %}Edit{% else %}Add New{% endif %} {{ model_name|capfirst }}
             </h1>
             <p class="text-sm text-gray-400 mt-1">
                 Fill in the details below to attach this {{ model_name }} to your module.
@@ -147,7 +147,7 @@
 
             <!-- Action Buttons -->
             <div class="flex items-center justify-end gap-4 mt-8 pt-6 border-t border-[#3c4043]">
-                <a href="{% url 'courses:course_detail' module.course.slug %}" 
+                <a href="{% url 'courses:view_module' module.course.slug module.id %}" 
                    class="px-5 py-2.5 text-sm font-semibold text-gray-300 bg-transparent border border-[#3c4043] rounded-xl hover:bg-[#3c4043] hover:text-white transition-colors">
                     Cancel
                 </a>
@@ -188,7 +188,7 @@
     }
 
     // Keep upload tab open if validation failed on video_upload
-    {% if form.video_upload.errors %}
+    {% if form.video_upload.errors or object.video_upload %}
         switchVideoSource('upload');
     {% endif %}
 

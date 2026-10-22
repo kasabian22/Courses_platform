@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let debounceTimer = null;
 
     // Optional: If editing an existing course, lock auto-generation initially so we don't accidentally change published URLs
-    const currentCourseId = "{{ form.instance.pk|default:'' }}";
+    const currentCourseId = window.CURRENT_COURSE_ID || slugInput.dataset.courseId || "";
     if (slugInput.value.trim() !== "") {
         isSlugManuallyEdited = true;
     }
@@ -62,7 +62,7 @@ document.addEventListener("DOMContentLoaded", function () {
         statusText.className = "text-xs font-medium text-gray-400";
 
         // Replace the hardcoded {% url %} string with the global variable
-        const previewUrl = window.SLUG_PREVIEW_URL || '/courses/api/generate-slug-preview/';
+        const previewUrl = window.SLUG_PREVIEW_URL || '/api/generate-slug-preview/';
 
         fetch(`${previewUrl}?${params.toString()}`)
             .then(response => response.json())
@@ -130,9 +130,13 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         debounceTimer = setTimeout(() => {
-            // Validate & transliterate if user typed Arabic inside the slug box, and check uniqueness
-            fetchSmartSlug({ title: titleInput.value, customSlug: formatted, updateInputValue: true });
-        }, 400);
+            const hasArabic = /[\u0600-\u06FF]/.test(formatted);
+            fetchSmartSlug({
+                title: titleInput.value,
+                customSlug: formatted,
+                updateInputValue: hasArabic // Only overwrite input value if transliterating Arabic
+            });
+        }, 500);
     });
 
     // 5. Reset / Auto button click: re-link to Title and regenerate immediately

@@ -24,7 +24,7 @@
                 </a>
             {% else %}
                 <!-- 1. Enroll / Unenroll Button -->
-                {% if request.user not in detail.students.all %}
+                {% if not enrollment %}
                     <form method="post" action="{% url 'courses:enroll_course' detail.slug %}">
                         {% csrf_token %}
                         <button type="submit" class="inline-block bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-indigo-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
@@ -149,6 +149,22 @@
         </div>
 
     </div>
+    {% if request.user.is_authenticated and enrollment.progress_percentage >= 100 %}
+        <div class="mt-4 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+                <h3 class="text-lg font-bold text-emerald-300">Congratulations! Course completed.</h3>
+                <p class="mt-1 text-sm text-gray-300">Your certificate is ready. Open it to view or save the PNG image.</p>
+            </div>
+            <a href="{% url 'courses:course_certificate' detail.slug %}"
+               target="_blank" rel="noopener noreferrer"
+               class="inline-flex shrink-0 items-center gap-2 rounded-lg bg-emerald-600 px-5 py-3 font-semibold text-white shadow-md transition hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-[#1c1d22]">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15V3m0 12 4-4m-4 4-4-4M5 21h14a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2" />
+                </svg>
+                View Certificate
+            </a>
+        </div>
+    {% endif %}
 </div>
 {% endif %}
 <!-- ========================================== -->
@@ -177,7 +193,7 @@
     </div>
 
     <!-- Modules List -->
-    {% if detail.modules.exists %}
+    {% if detail.modules.all %}
     <!-- Container for the list with dark theme styling -->
     <ul class="flex flex-col gap-4">
         {% for module in detail.modules.all %}
@@ -208,15 +224,16 @@
                         </a>
 
                         <!-- Delete Module -->
-                        <a href="{% url 'courses:delete_module' detail.slug module.id %}" 
-                        onclick="return confirm('Are you sure you want to delete this module? This action cannot be undone.');"
-                        class="p-2 text-gray-400 hover:text-red-400 bg-transparent hover:bg-red-500/10 rounded-lg transition" 
-                        title="Delete Module">
-                            <!-- SVG Trash Icon -->
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                            </svg>
-                        </a>
+                        <form method="POST" action="{% url 'courses:delete_module' detail.slug module.id %}" class="m-0 p-0 inline-block"
+                        data-confirm-title="Delete Module"
+                        data-confirm="Are you sure you want to delete '{{ module.title }}'? This action cannot be undone.">
+                            {% csrf_token %}
+                            <button type="submit" class="p-2 text-gray-400 hover:text-red-400 bg-transparent hover:bg-red-500/10 rounded-lg transition cursor-pointer" title="Delete Module">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                </svg>
+                            </button>
+                        </form>
 
                         <!-- Add Content Dropdown (CSS-based) -->
                         <div class="relative group">
@@ -229,16 +246,16 @@
                             <!-- Dropdown Menu (Using the exact same classes as My Profile dropdown) -->
                             <div class="absolute right-0 mt-2 w-48 bg-[#2a2d30] border border-[#3c4043] rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden custom-dropdown">
                                 <div class="py-1 bg-transparent">
-                                    <a href="{% url 'courses:content_create_update' detail.slug module.id 'video' %}"
+                                    <a href="{% url 'courses:content_create' detail.slug module.id 'video' %}"
                                     class="block px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] hover:text-white transition-colors custom-item">🎥 Add Video</a>
 
-                                    <a href="{% url 'courses:content_create_update' detail.slug module.id 'text' %}"
+                                    <a href="{% url 'courses:content_create' detail.slug module.id 'text' %}"
                                     class="block px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] hover:text-white transition-colors custom-item">📄 Add Text</a>
 
-                                    <a href="{% url 'courses:content_create_update' detail.slug module.id 'image' %}"
+                                    <a href="{% url 'courses:content_create' detail.slug module.id 'image' %}"
                                     class="block px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] hover:text-white transition-colors custom-item">🖼️ Add Image</a>
 
-                                    <a href="{% url 'courses:content_create_update' detail.slug module.id 'file' %}"
+                                    <a href="{% url 'courses:content_create' detail.slug module.id 'file' %}"
                                     class="block px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] hover:text-white transition-colors custom-item">📎 Add File</a>
                                 </div>
                             </div>
@@ -262,7 +279,7 @@
 <section class="py-12">
     <div class="container mx-auto">
         <!-- Course Overview -->
-        <div class="grid grid-cols-1 line-clamp-3 gap-12">
+        <div class="grid grid-cols-1 gap-12">
             <div>
                 <h2 class="text-3xl font-semibold mb-4">Course Overview</h2>
                 {% if detail.overview %}
@@ -313,7 +330,7 @@
                         Student Reviews 
                         <!-- Assuming you have a 'reviews' context variable containing the course reviews -->
                         <span class="text-sm font-medium text-gray-400 bg-[#2a2d30] px-3 py-1 rounded-full border border-[#3c4043]">
-                            {{ reviews.count }} Reviews
+                            {{ reviews.paginator.count }} Reviews
                         </span>
                     </h2>
                 </div>
@@ -340,6 +357,8 @@
                                     <!-- Reviewer Avatar (Fallback to first letter if no avatar) -->
                                     {% if review.user.students_profiles.photo %}
                                         <img src="{{ review.user.students_profiles.photo.url }}" alt="{{ review.user.username }}" class="w-10 h-10 rounded-full object-cover">
+                                    {% elif review.user.instructors_profiles.photo %}
+                                        <img src="{{ review.user.instructors_profiles.photo.url }}" alt="{{ review.user.username }}" class="w-10 h-10 rounded-full object-cover">
                                     {% else %}
                                         <div class="w-10 h-10 rounded-full bg-[#1e2022] border border-[#3c4043] text-indigo-400 flex items-center justify-center font-bold">
                                             {{ review.user.username|slice:":1"|upper }}
@@ -379,7 +398,9 @@
                                     </a>
                                     
                                     <!-- Delete Button -->
-                                    <form method="POST" action="{% url 'courses:delete_review' detail.slug %}" class="m-0 p-0 inline-block">
+                                    <form method="POST" action="{% url 'courses:delete_review' detail.slug %}" class="m-0 p-0 inline-block"
+                                      data-confirm-title="Delete Review"
+                                    data-confirm="Are you sure you want to delete your review for this course?">
                                         {% csrf_token %}
                                         <button type="submit" 
                                                 onclick="return confirm('Are you sure you want to delete this review?');"
@@ -392,6 +413,8 @@
                         </div>
                     {% endfor %}
                 </div>
+                <!-- Pagination Controls -->
+                {% include 'courses/partials/pagination.html' with page_obj=reviews %}
             {% else %}
                 <!-- Empty State if no reviews exist -->
                 <div class="bg-[#2a2d30] border border-dashed border-[#3c4043] rounded-2xl p-10 text-center">

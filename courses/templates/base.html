@@ -49,7 +49,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
                         </div>
-                        <input type="text" name="q" placeholder="Search for courses..." 
+                        <input type="text" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Search for courses or instructors or subjects..." 
                             class="block w-full pl-10 pr-3 py-2 border border-gray-700 rounded-full leading-5 bg-[#151718] text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 focus:bg-[#1c1d22] transition-all sm:text-sm">
                     </form>
                 </div>
@@ -258,6 +258,106 @@
         </div>
     </footer>
 
+    <!-- Global Custom Delete Confirmation Modal -->
+    <div id="custom-confirm-modal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-black/60 backdrop-blur-sm opacity-0 transition-opacity duration-200">
+        <div id="custom-confirm-box" class="bg-[#2a2d30] border border-[#3c4043] rounded-2xl max-w-md w-full p-6 shadow-2xl transform scale-95 transition-transform duration-200">
+            
+            <div class="flex items-start gap-4">
+                <!-- Red Warning Icon -->
+                <div class="w-11 h-11 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center shrink-0 text-red-400">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+
+                <div class="flex-1">
+                    <h3 id="confirm-modal-title" class="text-lg font-bold text-white">Confirm Deletion</h3>
+                    <p id="confirm-modal-message" class="text-sm text-gray-400 mt-1 leading-relaxed">
+                        Are you sure you want to delete this item? This action cannot be undone.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Modal Action Buttons -->
+            <div class="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-[#3c4043]">
+                <button type="button" id="confirm-cancel-btn" 
+                        class="px-4 py-2 rounded-xl border border-[#3c4043] bg-transparent text-sm font-semibold text-gray-300 hover:bg-[#3c4043] hover:text-white transition-colors cursor-pointer">
+                    Cancel
+                </button>
+                <button type="button" id="confirm-accept-btn" 
+                        class="px-5 py-2 rounded-xl bg-red-500 hover:bg-red-600 text-sm font-semibold text-white shadow-md transition-colors cursor-pointer">
+                    Yes, Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script to intercept any form or button with data-confirm -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('custom-confirm-modal');
+            const box = document.getElementById('custom-confirm-box');
+            const titleEl = document.getElementById('confirm-modal-title');
+            const messageEl = document.getElementById('confirm-modal-message');
+            const cancelBtn = document.getElementById('confirm-cancel-btn');
+            const acceptBtn = document.getElementById('confirm-accept-btn');
+
+            let pendingForm = null;
+
+            function openConfirmModal(form, message, title) {
+                pendingForm = form;
+                messageEl.textContent = message || 'Are you sure you want to proceed?';
+                titleEl.textContent = title || 'Confirm Deletion';
+
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                requestAnimationFrame(() => {
+                    modal.classList.remove('opacity-0');
+                    box.classList.remove('scale-95');
+                    box.classList.add('scale-100');
+                });
+            }
+
+            function closeConfirmModal() {
+                modal.classList.add('opacity-0');
+                box.classList.remove('scale-100');
+                box.classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.remove('flex');
+                    modal.classList.add('hidden');
+                    pendingForm = null;
+                }, 200);
+            }
+
+            // Listen for form submissions that have data-confirm attribute
+            document.addEventListener('submit', function (e) {
+                const form = e.target.closest('form[data-confirm]');
+                if (form && !form.dataset.confirmed) {
+                    e.preventDefault();
+                    openConfirmModal(form, form.dataset.confirm, form.dataset.confirmTitle);
+                }
+            });
+
+            acceptBtn.addEventListener('click', function () {
+                if (pendingForm) {
+                    pendingForm.dataset.confirmed = "true";
+                    pendingForm.submit();
+                }
+            });
+
+            cancelBtn.addEventListener('click', closeConfirmModal);
+
+            // Close when clicking outside the box or pressing Escape
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) closeConfirmModal();
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+                    closeConfirmModal();
+                }
+            });
+        });
+    </script>
 
 
     <!-- Telegram Circular Ripple Theme Transition Script -->

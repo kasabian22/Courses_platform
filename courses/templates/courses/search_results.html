@@ -24,6 +24,8 @@
                 {% include 'courses/partials/course_card.html' with course=course %}
             {% endfor %}
         </div>
+        <!-- Pagination Controls -->
+      {% include 'courses/partials/pagination.html' with page_obj=courses %}
     {% else %}
         <!-- Empty State (No results found) -->
         {% if query %}

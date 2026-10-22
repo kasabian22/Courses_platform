@@ -45,7 +45,7 @@
     <!-- Courses Section aligned with Navbar max-w-7xl -->
     <section id="courses-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         {% for subject in subjects %}
-            {% if subject.courses.all %}
+            {% if subject.top_courses %}
                 <div class="mb-14">
                     <!-- Subject Header -->
                     <div class="mb-6 flex items-center justify-between border-b border-[#303436] pb-3">
@@ -57,7 +57,7 @@
 
                     <!-- Courses Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {% for course in subject.courses.all|slice:":3" %}
+                        {% for course in subject.top_courses %}
                             {% include 'courses/partials/course_card.html' with course=course %}
                         {% endfor %}
                     </div>

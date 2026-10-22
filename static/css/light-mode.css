@@ -63,8 +63,14 @@ html.light-mode .bg-\[\#2a2d30\]\/60 {
 
 /* ----------------------------------------------------------------------------------------- */
 /* Fix Course Card Hover State */
-html.light-mode .hover\:bg-\[\#3c4043\]:hover {
-    background-color: #f3f4f6 !important; /* Crisp Gray-100 for hover states */
+html.light-mode .hover\:bg-\[\#3c4043\]:hover,
+html.light-mode .hover\:bg-\[\#35393d\]:hover {
+    background-color: #f3f4f6 !important;
+}
+
+html.light-mode .bg-emerald-600,
+html.light-mode .bg-emerald-600 * {
+    color: #ffffff !important;
 }
 
 /* 1. Force pure white background and light border on the dropdown container */
@@ -182,16 +188,26 @@ html.light-mode .text-gray-400 {
     color: #475569 !important;
 }
 
-/* Keep White Text Strictly Inside Solid Action Buttons */
+/* Keep White Text Strictly Inside Solid Action Buttons & Hover States */
 html.light-mode .bg-indigo-600,
 html.light-mode .bg-indigo-600 *,
+html.light-mode .hover\:bg-indigo-600:hover,
+html.light-mode .hover\:bg-indigo-600:hover *,
 html.light-mode .bg-indigo-700,
+html.light-mode .bg-indigo-700 *,
 html.light-mode .bg-blue-600,
-html.light-mode .bg-red-500 {
+html.light-mode .bg-blue-600 *,
+html.light-mode .bg-red-500,
+html.light-mode .bg-red-500 * {
     color: #ffffff !important;
 }
 
 /* Light Mode Forms */
+.dark-form #id_slug,
+html.light-mode .dark-form #id_slug {
+    background-color: transparent !important;
+    border: none !important;
+}
 html.light-mode .dark-form label { color: #334155 !important; }
 html.light-mode .dark-form input:not([type="checkbox"]):not([type="radio"]),
 html.light-mode .dark-form select,

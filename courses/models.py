@@ -1,3 +1,4 @@
+from functools import cached_property
 import os
 import re
 from urllib.parse import parse_qs, urlsplit
@@ -31,7 +32,8 @@ class Course(models.Model):
         AVAILABLE = 'AV', 'Available'
         DRAFT = 'DF', 'Draft'
     owner = models.ForeignKey(User, related_name='courses_created', on_delete=models.CASCADE)
-    subject = models.ForeignKey(Subject, related_name='courses', on_delete=models.CASCADE)
+    # "PROTECT" prevent you from deleting subject with activ courses in it by mistake
+    subject = models.ForeignKey(Subject, related_name='courses', on_delete=models.PROTECT)
     title = models.CharField(max_length=250, help_text="Write the title of the course here (Must contain English characters or numbers)")
     slug = models.SlugField(max_length=250, unique=True, blank=True)
     overview = QuillField(help_text="Write the description of the course here")
@@ -81,6 +83,7 @@ class Course(models.Model):
         ordering = ['-date_created']
         indexes = [
             models.Index(fields=['status', '-date_created']),
+            models.Index(fields=['subject', 'status']),
         ]
         constraints = [
             models.CheckConstraint(
@@ -92,12 +95,10 @@ class Course(models.Model):
     def __str__(self):
         return self.title
 
-    #
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Track the initial title in memory to avoid extra database queries later
-        # The title is stored when the object is created or loaded.
         self._initial_title = self.title
+        self._initial_slug = self.slug
 
     def clean(self):
         super().clean()
@@ -115,20 +116,21 @@ class Course(models.Model):
             })
 
     def save(self, *args, **kwargs):
-        # If slug is empty, or if title changed without a custom slug override, generate a unique one
-        if not self.slug or self.title != self._initial_title:
-            self.slug = generate_unique_slug(self, title=self.title)
-        else:
-            # Sanitize and guarantee uniqueness even if a custom slug was provided
-            self.slug = generate_unique_slug(self, title=self.title, custom_slug=self.slug)
+        # Only auto-regenerate from title if slug is empty, OR if title changed AND user didn't manually change the slug
+        title_changed = (self.pk is not None and self.title != self._initial_title)
+        slug_manually_changed = (self.slug != self._initial_slug)
 
-        # Final database guard: never allow an empty slug into PostgreSQL
+        if not self.slug or (title_changed and not slug_manually_changed):
+            self.slug = generate_unique_slug(Course, title=self.title, exclude_pk=self.pk)
+        else:
+            self.slug = generate_unique_slug(Course, title=self.title, custom_slug=self.slug, exclude_pk=self.pk)
+
         if not self.slug or not self.slug.strip():
             raise ValidationError("Integrity guard: Course slug cannot be empty.")
 
         super().save(*args, **kwargs)
-        # Update the initial title after saving to reflect the current state
         self._initial_title = self.title
+        self._initial_slug = self.slug
 
 
 class Module(models.Model):
@@ -168,7 +170,7 @@ class Enrollment(models.Model):
             )
         ]
 
-    @property
+    @cached_property
     def progress_percentage(self):
         total_modules = self.course.modules.count()
         
@@ -206,7 +208,7 @@ class Review(models.Model):
     course = models.ForeignKey(Course, related_name='review_details', on_delete=models.CASCADE)
     rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     comment = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
 
     class Meta:
         # Enforce database-level uniqueness to prevent a user from reviewing the same course twice

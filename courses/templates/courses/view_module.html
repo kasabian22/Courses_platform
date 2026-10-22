@@ -45,10 +45,10 @@
                             </button>
                             <div class="absolute right-0 mt-2 w-48 bg-[#2a2d30] border border-[#3c4043] rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden">
                                 <div class="py-1">
-                                    <a href="{% url 'courses:content_create_update' course.slug module.id 'video' %}" class="block px-4 py-2.5 text-sm text-gray-300 hover:bg-[#3c4043] hover:text-white transition-colors">🎥 Add Video</a>
-                                    <a href="{% url 'courses:content_create_update' course.slug module.id 'text' %}" class="block px-4 py-2.5 text-sm text-gray-300 hover:bg-[#3c4043] hover:text-white transition-colors">📄 Add Text</a>
-                                    <a href="{% url 'courses:content_create_update' course.slug module.id 'image' %}" class="block px-4 py-2.5 text-sm text-gray-300 hover:bg-[#3c4043] hover:text-white transition-colors">🖼️ Add Image</a>
-                                    <a href="{% url 'courses:content_create_update' course.slug module.id 'file' %}" class="block px-4 py-2.5 text-sm text-gray-300 hover:bg-[#3c4043] hover:text-white transition-colors">📎 Add File</a>
+                                    <a href="{% url 'courses:content_create' course.slug module.id 'video' %}" class="block px-4 py-2.5 text-sm text-gray-300 hover:bg-[#3c4043] hover:text-white transition-colors">🎥 Add Video</a>
+                                    <a href="{% url 'courses:content_create' course.slug module.id 'text' %}" class="block px-4 py-2.5 text-sm text-gray-300 hover:bg-[#3c4043] hover:text-white transition-colors">📄 Add Text</a>
+                                    <a href="{% url 'courses:content_create' course.slug module.id 'image' %}" class="block px-4 py-2.5 text-sm text-gray-300 hover:bg-[#3c4043] hover:text-white transition-colors">🖼️ Add Image</a>
+                                    <a href="{% url 'courses:content_create' course.slug module.id 'file' %}" class="block px-4 py-2.5 text-sm text-gray-300 hover:bg-[#3c4043] hover:text-white transition-colors">📎 Add File</a>
                                 </div>
                             </div>
                         </div>
@@ -142,7 +142,7 @@
                          {% if request.user == course.owner %}
                              <div class="flex items-center gap-2">
                                  <!-- Edit Content Button -->
-                                 <a href="{% url 'courses:content_create_update' course.slug module.id content.content_type.model content.item.id %}" 
+                                 <a href="{% url 'courses:content_update' course.slug module.id content.content_type.model content.item.id %}" 
                                     class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-300 hover:text-white bg-[#151718] hover:bg-[#3c4043] border border-[#3c4043] rounded-lg transition-colors" 
                                     title="Edit Content">
                                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Enrollment, Progress, Review, Subject, Course, Module, Content, Video
+from django.db.models import Avg, Count
 
 @admin.register(Subject)
 class SubjectAdmin(admin.ModelAdmin):
@@ -22,63 +23,30 @@ class ReviewInline(admin.TabularInline):
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    # Display all model fields, properties, and custom M2M methods in the outer table
-    list_display = [
-        'title', 
-        'owner', 
-        'subject', 
-        'status', 
-        'level', 
-        'language', 
-        'time_to_complete', 
-        'bestseller_badge', 
-        'students_count', 
-        'reviews_count', 
-        'average_rating', 
-        'date_created',
-        'display_students',
-        'display_wishlist',
-    ]
-    
-    # Add useful filters on the right sidebar
-    list_filter = ['status', 'level', 'language', 'subject', 'date_created']
-    
-    # Enable search by title, overview, or owner's username
-    search_fields = ['title', 'overview', 'owner__username']
-    
-    # Show auto-generated fields and @property methods inside the Course edit form
-    readonly_fields = [
-        'slug', 
-        'date_created', 
-        'students_count', 
-        'reviews_count', 
-        'average_rating'
-    ]
-    
-    # Nice dual-box selector for the standard ManyToManyField (wishlist)
-    filter_horizontal = ['wishlist']
-    
-    # Attach Modules, Enrollments (students), and Reviews tables inside the Course page
-    inlines = [ModuleInline, EnrollmentInline, ReviewInline]
+    # ... (keep list_display, list_filter, search_fields, readonly_fields, filter_horizontal, inlines as they are)
 
     def get_queryset(self, request):
-        # Optimize database queries by fetching related objects in advance
-        return super().get_queryset(request).select_related('owner', 'subject').prefetch_related('students', 'wishlist', 'review_details')
+        # Optimize queries AND annotate counts/ratings so @property methods don't trigger N+1 queries
+        return super().get_queryset(request).select_related(
+            'owner', 'subject'
+        ).prefetch_related(
+            'students', 'wishlist'
+        ).annotate(
+            enrolled_students_count=Count('students', distinct=True),
+            annotated_reviews_count=Count('review_details', distinct=True),
+            annotated_avg_rating=Avg('review_details__rating')
+        )
 
     def display_students(self, obj):
-        # Format enrolled students' usernames as a comma-separated string
-        students = obj.students.all()
-        if students.exists():
-            return ", ".join([student.username for student in students])
-        return "No students"
+        # Iterate directly over prefetched cache in memory without calling .exists()
+        names = [student.username for student in obj.students.all()]
+        return ", ".join(names) if names else "No students"
     display_students.short_description = 'Enrolled Students'
 
     def display_wishlist(self, obj):
-        # Format wishlisted users' usernames as a comma-separated string
-        users = obj.wishlist.all()
-        if users.exists():
-            return ", ".join([user.username for user in users])
-        return "Empty"
+        # Iterate directly over prefetched cache in memory without calling .exists()
+        names = [user.username for user in obj.wishlist.all()]
+        return ", ".join(names) if names else "Empty"
     display_wishlist.short_description = 'Wishlisted By'
 
 admin.site.register(Module)

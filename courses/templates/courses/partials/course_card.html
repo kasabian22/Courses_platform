@@ -39,7 +39,7 @@
                 <a href="{% url 'courses:edit_course' course.slug %}" class="text-sm font-semibold text-indigo-400 hover:text-indigo-300 transition-colors">
                     Manage Course &rarr;
                 </a>
-                <form method="POST" action="{% url 'courses:delete_course' course.slug %}" class="m-0" onsubmit="return confirm('Are you sure you want to permanently delete this course?');">
+                <form method="POST" action="{% url 'courses:delete_course' course.slug %}" class="m-0" data-confirm-title="Delete Course" data-confirm="Are you sure you want to permanently delete '{{ course.title }}'? All modules and enrollments will be lost.">
                     {% csrf_token %}
                     <button type="submit" class="text-sm font-medium text-red-400 hover:text-red-300 transition-colors flex items-center gap-1 cursor-pointer">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
