@@ -49,7 +49,7 @@ def generate_unique_slug(instance_or_model, title="", custom_slug="", exclude_pk
     else:
         base_slug = extract_smart_base_slug(title)
 
-    # Ultimate fallback if input was only symbols like "???"
+    # Ultimate fallback if input was only symbols like "???" generate random slug
     if not base_slug:
         base_slug = f"course-{uuid.uuid4().hex[:8]}"
 
@@ -65,7 +65,7 @@ def generate_unique_slug(instance_or_model, title="", custom_slug="", exclude_pk
         qs = qs.exclude(pk=exclude_pk)
 
 
-    # Truncate base_slug to 240 chars so appending '-1', '-2' never exceeds max_length=250
+    # Truncate base_slug to 240 chars so appending '-1', '-2' never exceeds max_length=250 of the slug in models.py
     base_slug = base_slug[:240].strip('-')
     
     slug = base_slug
@@ -78,6 +78,8 @@ def generate_unique_slug(instance_or_model, title="", custom_slug="", exclude_pk
     return slug
 
 
+
+# =================================================================================================================== #
 
 def paginate_queryset(request, queryset, per_page=9):
     """
@@ -94,8 +96,7 @@ def paginate_queryset(request, queryset, per_page=9):
 
 
 
-
-# ===================================================================================================================
+# =================================================================================================================== #
 """Utilities for generating personalized course-completion certificate PNGs.
 
 Requires Pillow. For Arabic names/course titles, use a TrueType font with Arabic
@@ -139,6 +140,12 @@ def shape_arabic(text: str) -> str:
         return get_display(arabic_reshaper.reshape(text))
     except ImportError:
         return text
+
+
+def _display_name(user):
+    """Prefer the user's full name; fall back to username."""
+    full_name = (user.get_full_name() or "").strip()
+    return full_name or getattr(user, "username", "Student") or "Student"
 
 
 def _font_candidates(bold: bool = False) -> list[str]:

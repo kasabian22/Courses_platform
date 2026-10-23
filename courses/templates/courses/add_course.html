@@ -17,13 +17,14 @@
         </div>
 
         <!-- Added enctype="multipart/form-data" so course images upload properly -->
+        <!-- We don't specefy action attribute here because the default of the browser is to submit the form to the exact same URL that served the current page. -->
         <form method="post" enctype="multipart/form-data" class="dark-form" novalidate>
             {% csrf_token %}
             {{ form.media }}
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {% for field in form %}
-                    <!-- Make title, header, image, and overview span full width (2 columns) -->
+                    <!-- Make title, slug, header, image, and overview span full width (2 columns) -->
                     <div class="{% if field.name in 'title,slug,header,image,overview' %}sm:col-span-2{% endif %}">
                         <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
                             {{ field.label }}{% if field.field.required %}*{% endif %}

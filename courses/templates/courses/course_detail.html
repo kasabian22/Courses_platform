@@ -2,37 +2,36 @@
 {% load course_tags %}
 
 {% block title %}
-    {{ detail.title }}
+    {{ course.title }}
 {% endblock title %}
     
 {% block content %}
 <!-- Course Details Header Section -->
-<!-- Changed from blue-to-purple gradient to a dark theme gradient to match your app's UI -->
 <section class="py-16 bg-gradient-to-br from-gray-900 to-gray-800 text-white border-b border-gray-700">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center max-w-4xl">
-        <h1 class="text-4xl font-extrabold mb-4">{{ detail.title }}</h1>
-        {% if detail.header %}
-            <p class="text-xl text-gray-400 mb-8">{{ detail.header }}</p>
+        <h1 class="text-4xl font-extrabold mb-4">{{ course.title }}</h1>
+        {% if course.header %}
+            <p class="text-xl text-gray-400 mb-8">{{ course.header }}</p>
         {% endif %}
         
         <!-- Action Buttons Section -->
         <div class="flex items-center justify-center gap-4 mt-8">
-            {% if request.user == detail.owner %}
-                <a href="{% url 'courses:edit_course' detail.slug %}" 
+            {% if request.user == course.owner %}
+                <a href="{% url 'courses:edit_course' course.slug %}" 
                    class="inline-block bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-indigo-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                     Edit Course
                 </a>
             {% else %}
                 <!-- 1. Enroll / Unenroll Button -->
                 {% if not enrollment %}
-                    <form method="post" action="{% url 'courses:enroll_course' detail.slug %}">
+                    <form method="post" action="{% url 'courses:enroll_course' course.slug %}">
                         {% csrf_token %}
                         <button type="submit" class="inline-block bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-indigo-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                             Enroll Now
                         </button>
                     </form>
                 {% else %}
-                    <form method="post" action="{% url 'courses:unenroll_course' detail.slug %}">
+                    <form method="post" action="{% url 'courses:unenroll_course' course.slug %}">
                         {% csrf_token %}
                         <button type="submit" class="inline-block bg-gray-500 text-white font-semibold py-3 px-8 rounded-lg hover:bg-gray-600 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                             Unenroll
@@ -44,17 +43,16 @@
             <!-- 2. Wishlist Toggle Button (The Heart Icon) -->
             <!-- Ensure user is logged in to show the button -->
             {% if request.user.is_authenticated %}
-                <!-- Note: Replace 'courses:toggle_wishlist' with the actual name you gave in your urls.py -->
-                <form method="post" action="{% url 'courses:toggle_wishlist' detail.slug %}" class="inline-block">
+                <form method="post" action="{% url 'courses:toggle_wishlist' course.slug %}" class="inline-block">
                     {% csrf_token %}
                     <button type="submit" 
                             class="p-3 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition group focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-md"
-                            title="{% if request.user in detail.wishlist.all %}Remove from Wishlist{% else %}Add to Wishlist{% endif %}">
+                            title="{% if request.user in course.wishlist.all %}Remove from Wishlist{% else %}Add to Wishlist{% endif %}">
                         
                         <!-- The SVG Heart -->
                         <!-- The logic here checks if the current user is in the wishlist relationship you created in step 1 -->
                         <svg class="w-6 h-6 transition-colors duration-200 
-                                  {% if request.user in detail.wishlist.all %}
+                                  {% if request.user in course.wishlist.all %}
                                       text-red-500 fill-current 
                                   {% else %}
                                       text-gray-400 group-hover:text-red-400
@@ -76,15 +74,17 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
         <div class="lg:col-span-2 bg-[#1c1d22] border border-gray-700/60 rounded-xl p-5">
             <p class="text-sm text-gray-400 mb-1">Language</p>
-            <p class="text-lg font-semibold text-white">{{ detail.get_language_display }}</p>
+            <!-- get_<field>_display() method used for each model field that has choices configured. It translates the value stored in the database into its human-readable label. 
+            the example here is: ("en", "English") -->
+            <p class="text-lg font-semibold text-white">{{ course.get_language_display }}</p>
         </div>
         <div class="lg:col-span-2 bg-[#1c1d22] border border-gray-700/60 rounded-xl p-5">
             <p class="text-sm text-gray-400 mb-1">Time to complete</p>
-            <p class="text-lg font-semibold text-white">{{ detail.time_to_complete|format_duration|default:"Not specified" }}</p>
+            <p class="text-lg font-semibold text-white">{{ course.time_to_complete|format_duration|default:"Not specified" }}</p>
         </div>
         <div class="lg:col-span-2 bg-[#1c1d22] border border-gray-700/60 rounded-xl p-5">
             <p class="text-sm text-gray-400 mb-1">Level</p>
-            <p class="text-lg font-semibold text-white">{{ detail.get_level_display }}</p>
+            <p class="text-lg font-semibold text-white">{{ course.get_level_display }}</p>
         </div>
         <div class="sm:col-span-1 lg:col-span-3 bg-[#1c1d22] border border-gray-700/60 rounded-xl p-5 flex items-center gap-3">
             <span class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-400" aria-hidden="true">
@@ -155,7 +155,7 @@
                 <h3 class="text-lg font-bold text-emerald-300">Congratulations! Course completed.</h3>
                 <p class="mt-1 text-sm text-gray-300">Your certificate is ready. Open it to view or save the PNG image.</p>
             </div>
-            <a href="{% url 'courses:course_certificate' detail.slug %}"
+            <a href="{% url 'courses:course_certificate' course.slug %}"
                target="_blank" rel="noopener noreferrer"
                class="inline-flex shrink-0 items-center gap-2 rounded-lg bg-emerald-600 px-5 py-3 font-semibold text-white shadow-md transition hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2 focus:ring-offset-[#1c1d22]">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -180,10 +180,10 @@
             <p class="text-gray-400">Explore the modules included in this course.</p>
         </div>
         
-        {% if perms.courses.add_module and request.user == detail.owner %}
+        {% if perms.courses.add_module and request.user == course.owner %}
             <!-- Add Module Button aligned to the right of the header -->
             <div>
-                <a href="{% url 'courses:add_module' detail.slug %}" 
+                <a href="{% url 'courses:add_module' course.slug %}" 
                    class="inline-flex items-center bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-indigo-700 transition shadow-md">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
                     Add Module
@@ -193,10 +193,10 @@
     </div>
 
     <!-- Modules List -->
-    {% if detail.modules.all %}
+    {% if course.modules.all %}
     <!-- Container for the list with dark theme styling -->
     <ul class="flex flex-col gap-4">
-        {% for module in detail.modules.all %}
+        {% for module in course.modules.all %}
             <!-- Individual Module Card -->
             <li class="bg-[#1c1d22] border border-gray-700 rounded-xl px-6 py-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:border-gray-600 transition duration-200 shadow-md">
                 
@@ -210,21 +210,21 @@
                 <div class="flex items-center gap-3">
                     
                     <!-- View Module (Primary Action) -->
-                    <a href="{% url 'courses:view_module' detail.slug module.id %}" 
+                    <a href="{% url 'courses:view_module' course.slug module.id %}" 
                        class="text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition">
                         View
                     </a>
 
-                    {% if perms.courses.add_module and request.user == detail.owner %}
+                    {% if perms.courses.add_module and request.user == course.owner %}
                         <!-- Edit Module -->
-                        <a href="{% url 'courses:edit_module' detail.slug module.id %}" 
+                        <a href="{% url 'courses:edit_module' course.slug module.id %}" 
                            class="p-2 text-gray-400 hover:text-white bg-transparent hover:bg-gray-700 rounded-lg transition" title="Edit Details">
                             <!-- SVG Edit Icon -->
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                         </a>
 
                         <!-- Delete Module -->
-                        <form method="POST" action="{% url 'courses:delete_module' detail.slug module.id %}" class="m-0 p-0 inline-block"
+                        <form method="POST" action="{% url 'courses:delete_module' course.slug module.id %}" class="m-0 p-0 inline-block"
                         data-confirm-title="Delete Module"
                         data-confirm="Are you sure you want to delete '{{ module.title }}'? This action cannot be undone.">
                             {% csrf_token %}
@@ -246,16 +246,16 @@
                             <!-- Dropdown Menu (Using the exact same classes as My Profile dropdown) -->
                             <div class="absolute right-0 mt-2 w-48 bg-[#2a2d30] border border-[#3c4043] rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden custom-dropdown">
                                 <div class="py-1 bg-transparent">
-                                    <a href="{% url 'courses:content_create' detail.slug module.id 'video' %}"
+                                    <a href="{% url 'courses:content_create' course.slug module.id 'video' %}"
                                     class="block px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] hover:text-white transition-colors custom-item">🎥 Add Video</a>
 
-                                    <a href="{% url 'courses:content_create' detail.slug module.id 'text' %}"
+                                    <a href="{% url 'courses:content_create' course.slug module.id 'text' %}"
                                     class="block px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] hover:text-white transition-colors custom-item">📄 Add Text</a>
 
-                                    <a href="{% url 'courses:content_create' detail.slug module.id 'image' %}"
+                                    <a href="{% url 'courses:content_create' course.slug module.id 'image' %}"
                                     class="block px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] hover:text-white transition-colors custom-item">🖼️ Add Image</a>
 
-                                    <a href="{% url 'courses:content_create' detail.slug module.id 'file' %}"
+                                    <a href="{% url 'courses:content_create' course.slug module.id 'file' %}"
                                     class="block px-4 py-2 text-sm text-gray-300 hover:bg-[#3c4043] hover:text-white transition-colors custom-item">📎 Add File</a>
                                 </div>
                             </div>
@@ -282,9 +282,9 @@
         <div class="grid grid-cols-1 gap-12">
             <div>
                 <h2 class="text-3xl font-semibold mb-4">Course Overview</h2>
-                {% if detail.overview %}
+                {% if course.overview %}
                     <div class="prose prose-slate max-w-none mt-4 text-gray-300">
-                        {{ detail.overview.html|safe }}
+                        {{ course.overview.html|safe }}
                     </div>
                 {% else %}
                     <p class="text-gray-400">No overview available for this course.</p>
@@ -294,24 +294,24 @@
 
         <!-- Instructor Section -->
         <div class="mt-12 bg-[#1c1d22] border border-gray-700 p-8 rounded-2xl shadow-lg">
-            <h2 class="text-3xl font-semibold text-white mb-4">Instructor: <a href="{% url 'accounts:public_instructor_profile' detail.owner.id %}" class="hover:text-indigo-400 hover:underline transition-colors">{{ detail.owner|title }}</a></h2>
+            <h2 class="text-3xl font-semibold text-white mb-4">Instructor: <a href="{% url 'accounts:public_instructor_profile' course.owner.id %}" class="hover:text-indigo-400 hover:underline transition-colors">{{ course.owner|title }}</a></h2>
             <div class="flex items-center">
-                {% if detail.owner.instructors_profiles.photo %}
-                    <img src="{{ detail.owner.instructors_profiles.photo.url }}" alt="{{ detail.owner.username }}" class="w-16 h-16 rounded-full object-cover mr-4">
+                {% if course.owner.instructors_profiles.photo %}
+                    <img src="{{ course.owner.instructors_profiles.photo.url }}" alt="{{ course.owner.username }}" class="w-16 h-16 rounded-full object-cover mr-4">
                 {% else %}
                     <div class="w-16 h-16 rounded-full bg-gray-600 flex items-center justify-center text-white font-bold mr-4">
-                        {{ detail.owner.username|slice:":1"|upper }}
+                        {{ course.owner.username|slice:":1"|upper }}
                     </div>
                 {% endif %}
                 <div>
                     <p class="text-gray-300 mb-2">
-                        {% if detail.owner.instructors_profiles.bio %}
-                            {{ detail.owner.instructors_profiles.bio }}
+                        {% if course.owner.instructors_profiles.bio %}
+                            {{ course.owner.instructors_profiles.bio }}
                         {% else %}
                             This instructor has not provided a bio yet.
                         {% endif %}
                     </p>
-                    <a href="{% url 'accounts:public_instructor_profile' detail.owner.id %}" class="text-indigo-400 hover:text-indigo-300 hover:underline transition-colors">View Instructor Profile</a>
+                    <a href="{% url 'accounts:public_instructor_profile' course.owner.id %}" class="text-indigo-400 hover:text-indigo-300 hover:underline transition-colors">View Instructor Profile</a>
                 </div>
             </div>
         </div>
@@ -337,7 +337,7 @@
 
                 <!-- Call to Action for Enrolled Students (Only show if authenticated and enrolled) -->
                 {% if request.user.is_authenticated and enrollment and not has_reviewed %}
-                    <a href="{% url 'courses:review_course' detail.slug %}" 
+                    <a href="{% url 'courses:review_course' course.slug %}" 
                     class="px-5 py-2.5 bg-[#2a2d30] hover:bg-[#3c4043] border border-[#3c4043] text-gray-200 text-sm font-semibold rounded-lg transition-colors focus:outline-none">
                         Write a Review
                     </a>
@@ -392,13 +392,13 @@
                             {% if request.user == review.user %}
                                 <div class="mt-4 flex items-center gap-3">
                                     <!-- Edit Button -->
-                                    <a href="{% url 'courses:edit_review' detail.slug %}" 
+                                    <a href="{% url 'courses:edit_review' course.slug %}" 
                                     class="text-sm font-medium text-white bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-lg transition">
                                         Edit
                                     </a>
                                     
                                     <!-- Delete Button -->
-                                    <form method="POST" action="{% url 'courses:delete_review' detail.slug %}" class="m-0 p-0 inline-block"
+                                    <form method="POST" action="{% url 'courses:delete_review' course.slug %}" class="m-0 p-0 inline-block"
                                       data-confirm-title="Delete Review"
                                     data-confirm="Are you sure you want to delete your review for this course?">
                                         {% csrf_token %}

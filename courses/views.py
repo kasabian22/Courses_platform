@@ -1,16 +1,16 @@
 from django.apps import apps
 from django.shortcuts import redirect, render, get_object_or_404
 from unidecode import unidecode
-from django.core.paginator import Paginator
-from .utils import extract_smart_base_slug, generate_unique_slug, paginate_queryset, certificate_number, generate_certificate_png
+from .utils import extract_smart_base_slug, generate_unique_slug, paginate_queryset, certificate_number, generate_certificate_png, _display_name
 from .forms import CourseForm, TextForm, FileForm, VideoForm, ImageForm, ModuleForm, ReviewForm
 from .models import Content, Enrollment, Module, Progress, Review, Subject, Course
 from django.contrib.auth.decorators import login_required, permission_required
 from django.views.decorators.http import require_POST
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
 from django.utils.text import slugify
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.contrib import messages
-from django.db.models import Avg, Count, Max, Prefetch, Q
+from django.db.models import Avg, Count, Max, Q
 from decimal import Decimal, InvalidOperation
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
@@ -27,8 +27,11 @@ def subject_courses_list(request):
             status=Course.Status.AVAILABLE
         # "select_related" is used to fetch the related "owner" object in the same query (SQL join between tables), which reduces the number of queries to the database and improves performance.
         # "select_related" works only with ForeignKey and OneToOneField fields
+        # we used owner__instruct... because we display instructor full_name or username on the course card
         ).select_related(
-            'owner', 'owner__instructors_profiles'
+            'owner__instructors_profiles'
+        # "annotate" used with functions that are used in the templates, it makes using functions more effictive.
+        # you can use "annotated functions" in order_by, models.py, and templates, but best practice in templates to use a @property that checks the value of the annotated function, and makes the same thing, just in case something go wrong.
         ).annotate(
             enrolled_students_count=Count('students', distinct=True),
             annotated_avg_rating=Avg('review_details__rating'),
@@ -36,7 +39,9 @@ def subject_courses_list(request):
         ).order_by(
             '-enrolled_students_count', # first: prioritize courses with more enrolled students
             '-annotated_avg_rating'   # second: prioritize courses with higher average ratings
-        )[:3]  
+        )[:3] 
+    
+    # before loading a subject, check if it have courses in it
     subjects = [s for s in subjects if s.top_courses]
     return render(request, 'courses/subject_course_list.html', {
         'subjects': subjects
@@ -48,7 +53,7 @@ def search_courses(request):
     query = request.GET.get('q', '')
     
     courses_qs = Course.objects.filter(status=Course.Status.AVAILABLE).select_related(
-        'owner', 'owner__instructors_profiles'
+        'owner__instructors_profiles'
     ).annotate(
         enrolled_students_count=Count('students', distinct=True),
         annotated_avg_rating=Avg('review_details__rating'),
@@ -67,18 +72,21 @@ def search_courses(request):
             Q(owner__username__icontains=query)
         ).distinct() 
 
-    courses_page = paginate_queryset(request, courses_qs, per_page=9)
+        # pagination
+        courses_page = paginate_queryset(request, courses_qs, per_page=9)
 
-    return render(request, 'courses/search_results.html', {
-        'query': query,
-        'courses': courses_page
-    })
+        return render(request, 'courses/search_results.html', {
+            'query': query,
+            'courses': courses_page
+        })
+    else:
+        return redirect('courses:subject_courses_list')
 
 def category_courses(request, subject_slug):
     subject = get_object_or_404(Subject, slug=subject_slug)
     
     courses_qs = Course.objects.filter(subject=subject, status=Course.Status.AVAILABLE).select_related(
-        'owner', 'owner__instructors_profiles'
+        'owner__instructors_profiles'
     ).annotate(
         enrolled_students_count=Count('students', distinct=True),
         annotated_avg_rating=Avg('review_details__rating'),
@@ -100,7 +108,7 @@ def category_courses(request, subject_slug):
 def course_detail(request, slug):
     course = get_object_or_404(
         Course.objects.select_related(
-            'owner', 'owner__instructors_profiles', 'subject'
+            'owner__instructors_profiles', 'subject'
             # "prefetch_related" is used to fetch all the related "modules" objects in a separate query, but still in a single database hit, which reduces the number of queries to the database and improves performance.
             ).prefetch_related('modules'), 
         slug=slug
@@ -124,7 +132,7 @@ def course_detail(request, slug):
 
     
     return render(request, 'courses/course_detail.html', {
-        'detail': course,
+        'course': course,
         'enrollment': enrollment,
         'reviews': reviews_page,
         'has_reviewed': has_reviewed
@@ -140,10 +148,14 @@ def add_course(request):
     if request.method == 'POST':
         form = CourseForm(request.POST, request.FILES)
         if form.is_valid():
+            # Create model instance in memory, DO NOT save to DB yet
             course = form.save(commit=False)
+            # Attach the authenticated user from the session
+            # We fill this field manually because it's requered in the models.py, and we don't allow the user to fill it in forms.py for security resasons.
+            # The rule is: Never let the user submit data that the server already knows.
             course.owner = request.user
             course.save()
-            return redirect('courses:subject_courses_list')
+            return redirect('accounts:view_profile')
     else:
         form = CourseForm()
 
@@ -181,11 +193,14 @@ def generate_slug_preview(request):
 
     exclude_pk = int(course_id) if course_id and course_id.isdigit() else None
 
+    # if the user writes a custom slug
     if custom_slug:
         base_candidate = slugify(unidecode(custom_slug))
     else:
+        # if not, make the slug from the title
         base_candidate = extract_smart_base_slug(title)
 
+    # this handles cases where neither input produces a usable slug. for example, if the text is empty or contains only characters that are removed during slug generation. In that case, the view returns a JSON response indicating the slug is invalid, with an explanatory message, and stops before checking for uniqueness.
     if not base_candidate:
         return JsonResponse({
             'slug': '',
@@ -204,6 +219,7 @@ def generate_slug_preview(request):
     # Check if a counter (-1, -2) was appended because another course already took the base slug
     was_modified = (final_slug != base_candidate)
 
+    # this is hendled after by the javascript code, and based on it, it updates the slug preview without reloading the page.
     return JsonResponse({
         'slug': final_slug,
         'is_valid': True,
@@ -214,6 +230,7 @@ def generate_slug_preview(request):
 
 @require_POST
 @login_required
+@permission_required('courses.delete_course', raise_exception=True)
 def delete_course(request, slug):
     course = get_object_or_404(Course, slug=slug, owner=request.user)
     course.delete()
@@ -230,7 +247,6 @@ def enroll_course(request, slug):
     if not course.students.filter(id=request.user.id).exists():
         course.students.add(request.user)
         messages.success(request, 'You have successfully enrolled in this course')
-        return redirect('courses:course_detail', slug=course.slug)
     else:
         messages.info(request, 'You are already enrolled in this course.')
     
@@ -243,7 +259,6 @@ def unenroll_course(request, slug):
     if course.students.filter(id=request.user.id).exists():
         course.students.remove(request.user)
         messages.success(request, 'You have successfully unenrolled out of this course')
-        return redirect('courses:course_detail', slug=course.slug)
     else:
         messages.info(request, 'You were not enrolled in this course.')
     
@@ -260,16 +275,20 @@ def toggle_wishlist(request, slug):
     if course.wishlist.filter(id=request.user.id).exists():
         course.wishlist.remove(request.user)
         messages.success(request, 'Course removed from wishlist')
-        return redirect('courses:view_wishlist')
     else:
         course.wishlist.add(request.user)
         messages.success(request, 'Course added to wishlist')
-        return redirect('courses:course_detail', slug=course.slug)
+
+    # Redirect back to referring page (the page the user deleted or added the course to the wishlist), or fall back to course_detail if referer is missing
+    referer = request.META.get('HTTP_REFERER')
+    if referer and url_has_allowed_host_and_scheme(referer, allowed_hosts={request.get_host()}):
+        return redirect(referer)
+    return redirect('courses:course_detail', slug=course.slug)
 
 @login_required
 def view_wishlist(request):
     wishlist_qs = request.user.wishlist.select_related(
-        'owner', 'owner__instructors_profiles'
+        'owner__instructors_profiles'
     ).annotate(
         enrolled_students_count=Count('students', distinct=True),
         annotated_avg_rating=Avg('review_details__rating'),
@@ -298,7 +317,7 @@ def add_module(request, slug):
     else:
         form = ModuleForm()
 
-    return render(request, 'courses/add_module.html', {
+    return render(request, 'courses/add_edit_module.html', {
         'form': form,
         'course': course,
         'type': 'Add'
@@ -324,7 +343,11 @@ def view_module(request, course_slug, module_id):
         has_reviewed = Review.objects.filter(course=course, user=request.user).exists()
 
     is_completed = Progress.objects.filter(user=request.user, module=module, is_completed=True).exists()
+
+    # __lt means "Less Than" (<). That means finds all modules with an id lower than the current module's id. then order them highest to lowest to take the highest, which is the previos module
     previous_module = course.modules.filter(id__lt=module.id).order_by('-id').first()
+    
+    # __gt means "Greater Than" (>)
     next_module = course.modules.filter(id__gt=module.id).order_by('id').first()
 
     return render(request, "courses/view_module.html", {
@@ -350,28 +373,28 @@ def edit_module(request, course_slug, module_id):
                 return redirect('courses:course_detail', slug=course.slug)
     else:
         form = ModuleForm(instance=module)
-    return render(request, 'courses/add_module.html', {
+    return render(request, 'courses/add_edit_module.html', {
         'form': form,
         "type": "Edit",
         'course': course
     })
 
-
 @login_required
 @require_POST
+@permission_required('courses.delete_module', raise_exception=True)
 def delete_module(request, course_slug, module_id):
     course = get_object_or_404(Course, slug=course_slug, owner=request.user)
     module = get_object_or_404(Module, course=course, id=module_id)
     module.delete()
     return redirect('courses:course_detail', slug=course.slug)
 
-
 @login_required
 @require_POST
 def complete_module(request, course_slug, module_id):
     module = get_object_or_404(Module, id=module_id, course__slug=course_slug)
     is_enrolled = module.course.students.filter(id=request.user.id).exists()
-    
+
+    # update_or_create guarantees that whether the record is newly created or was already there (because is_completed is False by default), is_completed is guaranteed to be set to True.
     if is_enrolled:
         Progress.objects.update_or_create(
             user=request.user,
@@ -380,15 +403,7 @@ def complete_module(request, course_slug, module_id):
         )
     return redirect('courses:view_module', module_id=module_id, course_slug=course_slug)
 
-
-def _display_name(user):
-    """Prefer the user's full name; fall back to username."""
-    full_name = (user.get_full_name() or "").strip()
-    return full_name or getattr(user, "username", "Student") or "Student"
-
-
 @login_required
-
 def course_certificate(request, slug):
     """Show the certificate image only to an enrolled learner at 100% progress."""
     course = get_object_or_404(Course.objects.select_related('owner'), slug=slug)
@@ -404,18 +419,21 @@ def course_certificate(request, slug):
     except (InvalidOperation, TypeError, ValueError):
         progress = Decimal("0")
 
-    # Server-side validation is essential; hiding the button in HTML alone is
-    # not security, because a user can type the certificate URL manually.
+    # Server-side validation is essential; hiding the button in HTML alone is not security, because a user can type the certificate URL manually.
     if progress < Decimal("100"):
         raise PermissionDenied("You must complete 100% of this course to access its certificate.")
 
     owner = course.owner
 
+    # Determines the Issue Date
+    # Queries Progress records for this user and course to find the latest timestamp (Max('completed_at')) when they completed their final module, because every module of the course have progress itself, so we bring the latest so we know when he completed the course
     last_completed = Progress.objects.filter(
         user=request.user,
         module__course=course,
         is_completed=True
     ).aggregate(last_date=Max('completed_at'))['last_date']
+    
+    # Uses that date as the official issued_date. If not found, it falls back to today's date.
     issued_date = last_completed.date() if last_completed else timezone.localdate()
 
     certificate_png = generate_certificate_png(
@@ -446,20 +464,22 @@ def content_create_update(request, slug, module_id, model_name, id=None):
         'file': FileForm
     }
     
-    # Ensure the module belongs to a course owned by the current user
-    module = get_object_or_404(Module, id=module_id, course__owner=request.user, course__slug=slug)
-    
     if model_name not in forms_map:
         return HttpResponseBadRequest()
 
+    # Ensure the module belongs to a course owned by the current user
+    module = get_object_or_404(Module, id=module_id, course__owner=request.user, course__slug=slug)
+    
     form_class = forms_map[model_name]
+    
+    # if we create
+    obj = None
     
     # Dynamically fetch the model class (Text, Video, Image, or File) to get the existing item if updating
     model_class = apps.get_model(app_label='courses', model_name=model_name)
-    obj = None
-    
+
+    # if the request is an edit request.
     if id:
-        # Fetch the existing item owned by the instructor for updating
         obj = get_object_or_404(model_class, id=id, owner=request.user)
 
     if request.method == 'POST':
@@ -476,7 +496,6 @@ def content_create_update(request, slug, module_id, model_name, id=None):
                     module=module,
                     item=item
                 )
-            # Redirect back to the module view so the instructor sees the new/updated content immediately
             return redirect("courses:view_module", course_slug=module.course.slug, module_id=module.id)
     else:
         # Pre-fill the form with the existing item's data if editing

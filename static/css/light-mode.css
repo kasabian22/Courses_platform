@@ -347,3 +347,39 @@ html.light-mode [data-video-player] [data-seek],
 html.light-mode [data-video-player] [data-volume] {
     accent-color: #795bff;
 }
+
+
+/* =========================================================
+   Subject Category Bar in Light Mode
+   ========================================================= */
+html.light-mode .subject-category-bar {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+}
+
+html.light-mode #subject-nav a:not(.bg-indigo-600) {
+    background-color: #f1f5f9 !important;
+    color: #334155 !important;
+    border-color: #e2e8f0 !important;
+}
+
+html.light-mode #subject-nav a:not(.bg-indigo-600):hover {
+    background-color: #e2e8f0 !important;
+    color: #0f172a !important;
+    border-color: #cbd5e1 !important;
+}
+
+html.light-mode #subject-scroll-left,
+html.light-mode #subject-scroll-right {
+    background-color: #ffffff !important;
+    color: #475569 !important;
+    border-color: #e2e8f0 !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
+}
+
+html.light-mode #subject-scroll-left:hover,
+html.light-mode #subject-scroll-right:hover {
+    background-color: #6366f1 !important;
+    color: #ffffff !important;
+    border-color: #6366f1 !important;
+}

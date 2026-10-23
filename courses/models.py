@@ -17,8 +17,21 @@ from unidecode import unidecode
 
 
 class Subject(models.Model):
-    title = models.CharField(max_length=250)
-    slug = models.SlugField(max_length=250, unique=True)
+    class Subjects(models.TextChoices):
+        WEB_DEV = 'web-development', 'Web Development'
+        MOBILE_DEV = 'mobile-development', 'Mobile Development'
+        DATA_SCIENCE = 'data-science', 'Data Science & Analytics'
+        AI_ML = 'ai-machine-learning', 'AI & Machine Learning'
+        DEVOPS_CLOUD = 'devops-cloud', 'DevOps & Cloud Computing'
+        CYBERSECURITY = 'cybersecurity', 'Cybersecurity & Ethical Hacking'
+        DATABASE_MGMT = 'databases', 'Database Administration & SQL'
+        GAME_DEV = 'game-development', 'Game Development'
+        SOFTWARE_ENG = 'software-engineering', 'Software Engineering & Architecture'
+        UI_UX = 'ui-ux-design', 'UI / UX Design'
+        OTHER = 'other', 'Other'
+
+    title = models.CharField(max_length=250, choices=Subjects.choices, unique=True)
+    slug = models.SlugField(max_length=250, unique=True, blank=True)
     description = models.TextField(blank=True, default='')
 
     class Meta:
@@ -27,26 +40,32 @@ class Subject(models.Model):
     def __str__(self):
         return self.title
 
+    def save(self, *args, **kwargs):
+        # auto-generate slug from the title
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
+
 class Course(models.Model):
     class Status(models.TextChoices):
         AVAILABLE = 'AV', 'Available'
         DRAFT = 'DF', 'Draft'
-    owner = models.ForeignKey(User, related_name='courses_created', on_delete=models.CASCADE)
+    owner            = models.ForeignKey(User, related_name='courses_created', on_delete=models.CASCADE)
     # "PROTECT" prevent you from deleting subject with activ courses in it by mistake
-    subject = models.ForeignKey(Subject, related_name='courses', on_delete=models.PROTECT)
-    title = models.CharField(max_length=250, help_text="Write the title of the course here (Must contain English characters or numbers)")
-    slug = models.SlugField(max_length=250, unique=True, blank=True)
-    overview = QuillField(help_text="Write the description of the course here")
-    header = models.CharField(max_length=250, blank=True, null=True, help_text="Write the header that appers below the course title both on the course card, and in the course page (optional)")
-    date_created = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=2, choices=Status.choices, default=Status.AVAILABLE)
-    students = models.ManyToManyField(User, through='Enrollment', related_name='enrolled_courses', blank=True)
-    wishlist = models.ManyToManyField(User, related_name='wishlist', blank=True)
-    level = models.CharField(max_length=50, choices=[('beginner', 'Beginner'), ('intermediate', 'Intermediate'), ('advanced', 'Advanced')], default='beginner')
+    subject          = models.ForeignKey(Subject, related_name='courses', on_delete=models.PROTECT)
+    title            = models.CharField(max_length=250, help_text="Write the title of the course here (Must contain English characters or numbers)")
+    slug             = models.SlugField(max_length=250, unique=True, blank=True)
+    overview         = QuillField(help_text="Write the description of the course here")
+    header           = models.CharField(max_length=250, blank=True, null=True, help_text="Write the header that appers below the course title both on the course card, and in the course page (optional)")
+    date_created     = models.DateTimeField(auto_now_add=True)
+    status           = models.CharField(max_length=2, choices=Status.choices, default=Status.AVAILABLE)
+    students         = models.ManyToManyField(User, through='Enrollment', related_name='enrolled_courses', blank=True)
+    wishlist         = models.ManyToManyField(User, related_name='wishlist', blank=True)
+    level            = models.CharField(max_length=50, choices=[('beginner', 'Beginner'), ('intermediate', 'Intermediate'), ('advanced', 'Advanced')], default='beginner')
     time_to_complete = models.DurationField(help_text="Enter the course duration in HH:MM:SS format (e.g., 02:30:00 for 2 and a half hours)", null=True, blank=True)
-    reviews = models.ManyToManyField(User, through='Review', related_name='course_reviews', blank=True)
-    language = models.CharField(max_length=50, choices=LANGUAGES, default='en', help_text="Select the language of the course")
-    image = models.ImageField(upload_to='course_images/', null=True, blank=True, help_text="Upload an image for the course (Recommended aspect ratio: 16:9)")
+    reviews          = models.ManyToManyField(User, through='Review', related_name='course_reviews', blank=True)
+    language         = models.CharField(max_length=50, choices=LANGUAGES, default='en', help_text="Select the language of the course")
+    image            = models.ImageField(upload_to='course_images/', null=True, blank=True, help_text="Upload an image for the course (Recommended aspect ratio: 16:9)")
     
     @property
     def students_count(self):
@@ -77,12 +96,15 @@ class Course(models.Model):
         # Returns True automatically if students count is 2 or more, otherwise False
         return self.students_count >= 2
     
-
-
     class Meta:
         ordering = ['-date_created']
         indexes = [
+            # With an index: The database creates a small, pre-sorted index (like the index at the back of a book). Instead of reading the whole book, the database jumps straight to the exact page in a fraction of a millisecond (O(logN)).
+            # A Composite Index indexes two columns together into a single lookup structure.
+            # we use this because in almost every view on the site, we show Available courses ordered newest first.
             models.Index(fields=['status', '-date_created']),
+            
+            # Every time someone visits the home page or clicks a subject in the navbar, the database is asked: "Find courses that belong to this subject AND have status='AV'."
             models.Index(fields=['subject', 'status']),
         ]
         constraints = [
@@ -102,8 +124,8 @@ class Course(models.Model):
 
     def clean(self):
         super().clean()
-        # Ensure title has at least three valid Arabic/English letters or numbers
-        if self.title and not re.search(r"[a-zA-Z0-9\u0600-\u06FF]{3,}", self.title):
+        # Ensure title has at least three valid Arabic/English or any language letters or numbers
+        if self.title and not re.search(r"[^\W_]{3,}", self.title):
             raise ValidationError({
                 'title': "Course title must contain valid Arabic or English letters or numbers."
             })
@@ -194,14 +216,23 @@ class Progress(models.Model):
     module = models.ForeignKey(Module, related_name='students_completed_modules', on_delete=models.CASCADE)
     is_completed = models.BooleanField(default=False)
     completed_at = models.DateTimeField(auto_now=True)
+    
     class Meta:
+        verbose_name = 'Progress'
+        verbose_name_plural = 'Progress'  # Prevents Django from showing "Progresss" (with 3 s's) in the sidebar!
+        
         # Enforce database-level uniqueness to prevent a user from enrolling in the same course twice
+        # This database rule ensures that a user can only ever have ONE progress record per module.
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'module'], 
                 name='unique_user_content_progress'
             )
         ]
+    def __str__(self):
+        status = "Completed" if self.is_completed else "In Progress"
+        return f"{self.user.username} - {self.module.title} [{status}]"
+    
     
 class Review(models.Model):
     user = models.ForeignKey(User, related_name='reviews', on_delete=models.CASCADE)
