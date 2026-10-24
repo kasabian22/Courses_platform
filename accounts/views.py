@@ -6,12 +6,14 @@ from .forms import SignUpForm, InstructorProfileForm, StudentProfileForm, UserUp
 from django.contrib.auth import login, logout
 from .models import InstructorProfile, InstructorRequest, StudentProfile, UserProfile
 from django.contrib.auth.decorators import login_required
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count, Min
 from django.views.decorators.http import require_POST
 from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
 
+
+# region ======================================================    Authorization    ==============================================================
 
 def sign_up(request):
     if request.user.is_authenticated:
@@ -54,48 +56,30 @@ def sign_out(request):
     logout(request)
     return redirect('accounts:sign_in')
 
-@login_required
-def edit_instructor_profile(request):
-    profile, _ = InstructorProfile.objects.get_or_create(user=request.user)
-    if request.method == 'POST':
-        p_form = InstructorProfileForm(request.POST, request.FILES, instance=profile)
-        u_form = UserUpdateForm(request.POST, instance=request.user)
-        if p_form.is_valid() and u_form.is_valid():
-            p_form.save()
-            u_form.save()
-            messages.success(request, 'Your profile has been updated successfully!')
-            return redirect('accounts:view_profile')
-    else:
-        p_form = InstructorProfileForm(instance=profile)
-        u_form = UserUpdateForm(instance=request.user)
-
-    return render(request, 'accounts/edit_profile.html', {
-        'p_form': p_form,
-        'u_form': u_form,
-    })
-
 
 @login_required
-def edit_student_profile(request):
-    profile, _ = StudentProfile.objects.get_or_create(user=request.user)
+def change_password(request):
+    # Check if the user already has a password (normal signup) or not (Google/Social signup)
+    FormClass = PasswordChangeForm if request.user.has_usable_password() else SetPasswordForm
+
     if request.method == 'POST':
-        p_form = StudentProfileForm(request.POST, request.FILES, instance=profile)
-        u_form = UserUpdateForm(request.POST, instance=request.user)
-        if p_form.is_valid() and u_form.is_valid():
-            p_form.save()
-            u_form.save()
-            messages.success(request, 'Your profile has been updated successfully!')
+        # first parameter must be the user instance.
+        form = FormClass(user=request.user, data=request.POST)
+        if form.is_valid():
+            user = form.save()
+            # Keep the user logged in after password change
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Your password has been updated successfully!')
             return redirect('accounts:view_profile')
     else:
-        p_form = StudentProfileForm(instance=profile)
-        u_form = UserUpdateForm(instance=request.user)
+        form = FormClass(user=request.user)
 
-    return render(request, 'accounts/edit_profile.html', {
-        'p_form': p_form,
-        'u_form': u_form,
-    })
+    return render(request, 'accounts/change_password.html', {'form': form})
 
 
+# endregion ===================================================================================================================
+
+# region ======================================================       Profile       ==============================================================
 
 @login_required
 def view_profile(request):
@@ -108,9 +92,14 @@ def view_profile(request):
         if role == "student":
             profile, _ = StudentProfile.objects.get_or_create(user=request.user)
             enrolled_courses = Course.objects.filter(students=request.user).select_related(
-                'owner', 'owner__instructors_profiles'
+                'owner__instructors_profiles'
             ).annotate(
-                enrolled_students_count=Count('students', distinct=True)
+                enrolled_students_count=Count('students', distinct=True),
+                annotated_avg_rating=Avg('review_details__rating'),
+                annotated_reviews_count=Count('review_details', distinct=True),
+                enrollment_date=Min('students_enrolled__enrolled_at')
+            ).order_by(
+                'enrollment_date'
             )
 
             user_request = request.user.instructor_requests.first()
@@ -136,10 +125,15 @@ def view_profile(request):
         elif role == "instructor":
             profile, _ = InstructorProfile.objects.get_or_create(user=request.user)
             courses = Course.objects.filter(owner=request.user).select_related(
-                'owner', 'owner__instructors_profiles'
+                'owner__instructors_profiles'
             ).annotate(
-                enrolled_students_count=Count('students', distinct=True)
+                enrolled_students_count=Count('students', distinct=True),
+                annotated_avg_rating=Avg('review_details__rating'),
+                annotated_reviews_count=Count('review_details', distinct=True)
+            ).order_by(
+                'id'
             )
+
             return render(request, 'accounts/view_instructor_profile.html', {
                 'profile': profile,
                 'courses': courses
@@ -148,7 +142,7 @@ def view_profile(request):
     else:
         profile, _ = InstructorProfile.objects.get_or_create(user=request.user)
         courses = Course.objects.filter(owner=request.user).select_related(
-            'owner', 'owner__instructors_profiles'
+            'owner__instructors_profiles'
         ).annotate(
             enrolled_students_count=Count('students', distinct=True)
         )
@@ -158,7 +152,64 @@ def view_profile(request):
             })
 
 
+def public_instructor_profile(request, instructor_id):
+    instructor_profile = get_object_or_404(
+        InstructorProfile.objects.select_related('user'),
+        user__id=instructor_id
+    )
 
+    courses = Course.objects.filter(
+        owner=instructor_profile.user,
+        status=Course.Status.AVAILABLE
+    ).select_related('owner__instructors_profiles').annotate(
+        enrolled_students_count=Count('students', distinct=True),
+        annotated_reviews_count=Count('review_details', distinct=True),
+        annotated_avg_rating=Avg('review_details__rating')
+    )
+
+    return render(request, 'accounts/public_instructor_profile.html', {
+        'profile': instructor_profile,
+        'courses': courses
+    })
+
+
+
+@login_required
+@transaction.atomic
+def edit_profile(request):
+    user_profile, _ = UserProfile.objects.get_or_create(
+        user=request.user,
+        defaults={'role': 'student'}
+    )
+    is_instructor = request.user.is_staff or request.user.is_superuser or user_profile.role == 'instructor'
+    # Dynamically select the profile model and form based on user role
+    if is_instructor:
+        profile, _ = InstructorProfile.objects.get_or_create(user=request.user)
+        ProfileFormClass = InstructorProfileForm
+    else:
+        profile, _ = StudentProfile.objects.get_or_create(user=request.user)
+        ProfileFormClass = StudentProfileForm
+    if request.method == 'POST':
+        p_form = ProfileFormClass(request.POST, request.FILES, instance=profile)
+        u_form = UserUpdateForm(request.POST, instance=request.user)
+        if p_form.is_valid() and u_form.is_valid():
+            p_form.save()
+            u_form.save()
+            messages.success(request, 'Your profile has been updated successfully!')
+            return redirect('accounts:view_profile')
+    else:
+        p_form = ProfileFormClass(instance=profile)
+        u_form = UserUpdateForm(instance=request.user)
+    return render(request, 'accounts/edit_profile.html', {
+        'p_form': p_form,
+        'u_form': u_form,
+    })
+
+
+
+# endregion ===============================================================================================================
+
+# region ======================================================   Upgrade profile  ==============================================================
 @login_required
 @require_POST
 def send_instructor_request(request):
@@ -221,42 +272,6 @@ def upgrade_to_instructor(request):
         
     return redirect('accounts:view_profile')
 
-def public_instructor_profile(request, instructor_id):
-    instructor_profile = get_object_or_404(
-        InstructorProfile.objects.select_related('user'),
-        user__id=instructor_id
-    )
 
-    courses = Course.objects.filter(
-        owner=instructor_profile.user,
-        status=Course.Status.AVAILABLE
-    ).select_related('subject').annotate(
-        enrolled_students_count=Count('students', distinct=True),
-        annotated_reviews_count=Count('review_details', distinct=True),
-        annotated_avg_rating=Avg('review_details__rating')
-    )
+# endregion
 
-    return render(request, 'accounts/public_instructor_profile.html', {
-        'profile': instructor_profile,
-        'courses': courses
-    })
-
-# TODO
-@login_required
-def change_password(request):
-    # Check if the user already has a password (normal signup) or not (Google/Social signup)
-    FormClass = PasswordChangeForm if request.user.has_usable_password() else SetPasswordForm
-
-    if request.method == 'POST':
-        # first parameter must be the user instance.
-        form = FormClass(user=request.user, data=request.POST)
-        if form.is_valid():
-            user = form.save()
-            # Keep the user logged in after password change
-            update_session_auth_hash(request, user)
-            messages.success(request, 'Your password has been updated successfully!')
-            return redirect('accounts:view_profile')
-    else:
-        form = FormClass(user=request.user)
-
-    return render(request, 'accounts/change_password.html', {'form': form})

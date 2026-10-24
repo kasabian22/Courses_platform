@@ -308,11 +308,9 @@ def toggle_wishlist(request, slug):
         course.wishlist.add(request.user)
         messages.success(request, 'Course added to wishlist')
 
-    # Redirect back to referring page (the page the user deleted or added the course to the wishlist), or fall back to course_detail if referer is missing
-    referer = request.META.get('HTTP_REFERER')
-    if referer and url_has_allowed_host_and_scheme(referer, allowed_hosts={request.get_host()}):
-        return redirect(referer)
-    return redirect('courses:course_detail', slug=course.slug)
+    # Redirect back to referring page (the page the user deleted or added the course to the wishlist)
+    return redirect(request.META.get('HTTP_REFERER', '/'))
+    
 
 @login_required
 def view_wishlist(request):

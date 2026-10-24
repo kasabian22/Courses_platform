@@ -291,8 +291,8 @@ document.querySelectorAll('[data-video-player]').forEach((player) => {
         centerPlay.classList.toggle('hidden', playing);
 
         const label = playing
-            ? 'إيقاف الفيديو مؤقتًا'
-            : 'تشغيل الفيديو';
+        ? 'Pause video'
+        : 'Play video';
 
         playButton.setAttribute('aria-label', label);
         centerPlay.setAttribute('aria-label', label);
@@ -352,11 +352,11 @@ document.querySelectorAll('[data-video-player]').forEach((player) => {
     // Toggle the time display when clicked.
     const updateTimeToggleLabel = () => {
         const label = showRemainingTime
-            ? 'عرض الوقت المنقضي'
-            : 'عرض الوقت المتبقي';
+        ? 'Show elapsed time'
+        : 'Show remaining time';
 
         timeToggle.setAttribute('aria-label', label);
-        timeToggle.title = 'التبديل بين الوقت المنقضي والمتبقي';
+        timeToggle.title = 'Switch between elapsed and remaining time';
     };
 
     timeToggle.addEventListener('click', () => {
@@ -450,7 +450,7 @@ document.querySelectorAll('[data-video-player]').forEach((player) => {
 
         muteButton?.setAttribute(
             'aria-label',
-            muted ? 'تشغيل الصوت' : 'كتم الصوت'
+            muted ? 'Turn on sound' : 'Mute sound'
         );
 
         if (volume && !volume.matches(':active')) {
@@ -497,7 +497,7 @@ document.querySelectorAll('[data-video-player]').forEach((player) => {
             speedButton.textContent = `${rate}×`;
             speedButton.setAttribute(
                 'aria-label',
-                `سرعة التشغيل ${rate}×`
+                `Video playback speed ${rate}×`
             );
         }
 
@@ -566,8 +566,8 @@ document.querySelectorAll('[data-video-player]').forEach((player) => {
         fullscreenButton?.setAttribute(
             'aria-label',
             document.fullscreenElement === player
-                ? 'الخروج من ملء الشاشة'
-                : 'عرض بملء الشاشة'
+                ? 'Exit full screen'
+                : 'Full-screen view'
         );
     });
 

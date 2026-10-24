@@ -22,9 +22,9 @@ class CourseForm(forms.ModelForm):
 
     def clean_title(self):
         title = self.cleaned_data.get('title', '').strip()
-        # Require at least three Arabic letters, English letters, or digits
-        if not re.search(r"[a-zA-Z0-9\u0600-\u06FF]{3,}", title):
-            raise ValidationError("The course title must contain at least three Arabic or English letters or numbers.")
+        # Require at least three Arabic letters, English or any other language letters, or digits
+        if not re.search(r"[^\W_]{3,}", title):
+            raise ValidationError("The course title must contain at least three Arabic or English or any other language letters or numbers.")
         return title
 
     def clean_slug(self):
