@@ -124,13 +124,11 @@ class Course(models.Model):
 
     def clean(self):
         super().clean()
-        # Ensure title has at least three valid Arabic/English or any language letters or numbers
         if self.title and not re.search(r"[^\W_]{3,}", self.title):
             raise ValidationError({
-                'title': "Course title must contain valid Arabic or English letters or numbers."
+                'title': "Course title must contain at least three letters or numbers."
             })
 
-        # Ensure that either the custom slug or the title produces a valid slug
         valid_slug = slugify(unidecode(self.slug)) if self.slug else extract_smart_base_slug(self.title)
         if not valid_slug:
             raise ValidationError({

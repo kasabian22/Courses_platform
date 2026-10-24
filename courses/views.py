@@ -1,3 +1,5 @@
+import re
+
 from django.apps import apps
 from django.shortcuts import redirect, render, get_object_or_404
 from unidecode import unidecode
@@ -190,25 +192,40 @@ def generate_slug_preview(request):
     title = request.GET.get('title', '').strip()
     custom_slug = request.GET.get('custom_slug', '').strip()
     course_id = request.GET.get('course_id')
-
     exclude_pk = int(course_id) if course_id and course_id.isdigit() else None
-
-    # if the user writes a custom slug
+    # Case A: User typed a Custom Slug
     if custom_slug:
         base_candidate = slugify(unidecode(custom_slug))
+        if not base_candidate:
+            return JsonResponse({
+                'slug': '',
+                'is_valid': False,
+                'message': '⚠ Custom slug must contain valid letters or numbers (e.g., "python-intro").'
+            })
+    # Case B: Auto-generating from Title
     else:
-        # if not, make the slug from the title
+        # Match the Course.clean() validation rule: at least 3 letters/numbers
+        if title and not re.search(r"[^\W_]{3,}", title):
+            return JsonResponse({
+                'slug': '',
+                'is_valid': False,
+                'message': '⚠ Title must contain at least 3 letters or numbers to generate a URL.'
+            })
         base_candidate = extract_smart_base_slug(title)
-
+        
     # this handles cases where neither input produces a usable slug. for example, if the text is empty or contains only characters that are removed during slug generation. In that case, the view returns a JSON response indicating the slug is invalid, with an explanatory message, and stops before checking for uniqueness.
     if not base_candidate:
         return JsonResponse({
             'slug': '',
             'is_valid': False,
-            'was_modified_for_uniqueness': False,
-            'message': 'Enter a valid title or slug'
+            'message': '⚠ Cannot create a URL from this title. Try adding letters or numbers.'
         })
 
+    # 2. Check if the candidate exceeds the 240-character limit
+    was_truncated = len(base_candidate) > 240
+    truncated_base = base_candidate[:240].strip('-')
+
+    # Generate the unique slug
     final_slug = generate_unique_slug(
         Course,
         title=title,
@@ -219,13 +236,25 @@ def generate_slug_preview(request):
     # Check if a counter (-1, -2) was appended because another course already took the base slug
     was_modified = (final_slug != base_candidate)
 
-    # this is hendled after by the javascript code, and based on it, it updates the slug preview without reloading the page.
+    # 4. Formulate the exact, accurate message
+    if was_truncated and was_modified:
+        message = f'Note: Slug exceeded 240 characters and the name was already taken. Adjusted to "{final_slug}"'
+    elif was_truncated:
+        message = f'Note: Slug was too long and was automatically shortened to 240 characters: "{final_slug}"'
+    elif was_modified:
+        message = f'Note: Base slug was already taken. Adjusted to "{final_slug}"'
+    else:
+        message = f'✓ URL will be: /course/{final_slug}/'
+
+    # this is hendled after by the javascript code, and based on it, it updates the slug preview without reloading the page
     return JsonResponse({
         'slug': final_slug,
         'is_valid': True,
         'was_modified_for_uniqueness': was_modified,
-        'message': f"Available as: {final_slug}" if was_modified else "Slug is available ✓"
+        'message': message
     })
+
+
 
 
 @require_POST

@@ -68,14 +68,24 @@ def generate_unique_slug(instance_or_model, title="", custom_slug="", exclude_pk
     # Truncate base_slug to 240 chars so appending '-1', '-2' never exceeds max_length=250 of the slug in models.py
     base_slug = base_slug[:240].strip('-')
     
-    slug = base_slug
+
+    # Fetch all matching slugs in one single SQL query
+    existing_slugs = set(
+    qs.filter(slug__startswith=base_slug).values_list('slug', flat=True)
+    )
+    if base_slug not in existing_slugs:
+        return base_slug
+    
     counter = 1
-
-    while qs.filter(slug=slug).exists():
-        slug = f"{base_slug}-{counter}"
+    while f"{base_slug}-{counter}" in existing_slugs:
         counter += 1
+    
+    return f"{base_slug}-{counter}"
 
-    return slug
+    # while qs.filter(slug=slug).exists():
+    #     slug = f"{base_slug}-{counter}"
+    #     counter += 1
+
 
 
 

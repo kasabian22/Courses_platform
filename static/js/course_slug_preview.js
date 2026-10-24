@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // Track whether the instructor manually edited the slug field
     let isSlugManuallyEdited = false;
     let debounceTimer = null;
+    let activeAbortController = null;
+    const MAX_SLUG_LIMIT = 240; // Max allowed slug length to ensure uniqueness suffix fits within 250 chars
 
     // Optional: If editing an existing course, lock auto-generation initially so we don't accidentally change published URLs
     const currentCourseId = window.CURRENT_COURSE_ID || slugInput.dataset.courseId || "";
@@ -36,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Status message badge below the input
     const statusText = document.createElement("div");
-    statusText.className = "text-xs font-medium min-h-[1.25rem] transition-all text-gray-400";
+    statusText.className = "text-xs font-medium min-h-[1.25rem] transition-all text-gray-400 break-all";
 
     // Configure the main slug input
     slugInput.parentNode.insertBefore(wrapper, slugInput);
@@ -59,82 +61,115 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
         statusText.textContent = "Checking availability...";
-        statusText.className = "text-xs font-medium text-gray-400";
+        statusText.className = "text-xs font-medium text-gray-400 break-all";
+
+        // Cancel any previous in-flight request before starting a new one
+        if (activeAbortController) {
+            activeAbortController.abort();
+        }
+        activeAbortController = new AbortController();
 
         // Replace the hardcoded {% url %} string with the global variable
         const previewUrl = window.SLUG_PREVIEW_URL || '/api/generate-slug-preview/';
 
-        fetch(`${previewUrl}?${params.toString()}`)
-            .then(response => response.json())
-            .then(data => {
-                if (!data.is_valid) {
-                    if (updateInputValue) slugInput.value = "";
-                    statusText.textContent = data.message;
-                    statusText.className = "text-xs font-medium text-amber-400";
-                    return;
-                }
-
-                if (updateInputValue) {
-                    slugInput.value = data.slug;
-                }
-
-                if (data.was_modified_for_uniqueness) {
-                    statusText.textContent = `Note: Base slug was already taken. Adjusted to "${data.slug}"`;
-                    statusText.className = "text-xs font-medium text-amber-400";
-                } else {
-                    statusText.textContent = `✓ URL will be: /course/${data.slug}/`;
-                    statusText.className = "text-xs font-medium text-emerald-400";
-                }
-            })
-            .catch(() => {
-                statusText.textContent = "";
-            });
+        fetch(`${previewUrl}?${params.toString()}`, { signal: activeAbortController.signal })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.is_valid) {
+                if (updateInputValue) slugInput.value = "";
+                statusText.textContent = data.message;
+                statusText.className = "text-xs font-medium text-amber-400 flex items-center gap-1 break-all";
+                
+                // Highlight input box with warning border
+                inputGroup.classList.add("border-amber-500/80", "ring-1", "ring-amber-500/50");
+                inputGroup.classList.remove("border-[#3c4043]");
+                return;
+            }
+            // Reset warning border
+            inputGroup.classList.remove("border-amber-500/80", "ring-1", "ring-amber-500/50");
+            inputGroup.classList.add("border-[#3c4043]");
+            if (updateInputValue) {
+                slugInput.value = data.slug;
+            }
+            if (data.was_modified_for_uniqueness) {
+                statusText.textContent = data.message;
+                statusText.className = "text-xs font-medium text-amber-400 break-all";
+            } else {
+                statusText.textContent = data.message;
+                statusText.className = "text-xs font-medium text-emerald-400 break-all";
+            }
+        })
+        .catch((err) => {
+            if (err.name === "AbortError") return; // Ignore intentional aborts
+            statusText.textContent = "";
+        });
     }
 
     // 3. Listen to Title input (with 350ms Debounce)
     titleInput.addEventListener("input", function () {
         if (isSlugManuallyEdited) return;
-
+    
         clearTimeout(debounceTimer);
         const currentTitle = this.value.trim();
-
+    
         if (!currentTitle) {
             slugInput.value = "";
             statusText.textContent = "";
+            inputGroup.classList.remove("border-amber-500/80", "ring-1", "ring-amber-500/50");
+            inputGroup.classList.add("border-[#3c4043]");
             return;
         }
-
+    
+        // Instant live check: if less than 3 characters, warn immediately without waiting for server
+        if (currentTitle.replace(/[^\w\u0600-\u06FF]/g, '').length < 3) {
+            slugInput.value = "";
+            statusText.textContent = "⚠ Title must have at least 3 letters/numbers to create a URL.";
+            statusText.className = "text-xs font-medium text-amber-400 break-all";
+            inputGroup.classList.add("border-amber-500/80");
+            return;
+        }
+    
         debounceTimer = setTimeout(() => {
             fetchSmartSlug({ title: currentTitle, updateInputValue: true });
-        }, 1000);
+        }, 500); // Fast 500ms response
     });
 
     // 4. Listen to manual typing inside Custom URL Slug (enforce slug format live)
     slugInput.addEventListener("input", function () {
         isSlugManuallyEdited = true;
-
-        // Live formatting: lowercase, spaces to hyphens, strip invalid characters except Arabic/English/numbers/hyphens
+    
         let formatted = this.value
             .toLowerCase()
             .replace(/\s+/g, "-")
             .replace(/[^a-z0-9\u0600-\u06FF\-]/g, "")
             .replace(/\-+/g, "-");
-
+    
         this.value = formatted;
-
         clearTimeout(debounceTimer);
-        if (!formatted) {
-            statusText.textContent = "Leave empty to auto-generate from title.";
-            statusText.className = "text-xs font-medium text-gray-400";
+
+        // Check if custom slug exceeds maximum character limit
+        if (formatted.length > MAX_SLUG_LIMIT) {
+            statusText.textContent = `⚠ This slug is too long (${formatted.length}/${MAX_SLUG_LIMIT} characters). Please write a slug that doesn't exceed the limit.`;
+            statusText.className = "text-xs font-medium text-amber-400 break-all";
+            inputGroup.classList.add("border-amber-500/80", "ring-1", "ring-amber-500/50");
+            inputGroup.classList.remove("border-[#3c4043]");
             return;
         }
-
+    
+        // If the user only typed symbols like "???" which got stripped to empty or "-"
+        if (!formatted || formatted === "-") {
+            statusText.textContent = "⚠ Custom slug must contain English letters or numbers.";
+            statusText.className = "text-xs font-medium text-amber-400 break-all";
+            inputGroup.classList.add("border-amber-500/80");
+            return;
+        }
+    
         debounceTimer = setTimeout(() => {
             const hasArabic = /[\u0600-\u06FF]/.test(formatted);
             fetchSmartSlug({
                 title: titleInput.value,
                 customSlug: formatted,
-                updateInputValue: hasArabic // Only overwrite input value if transliterating Arabic
+                updateInputValue: hasArabic
             });
         }, 500);
     });
@@ -142,6 +177,8 @@ document.addEventListener("DOMContentLoaded", function () {
     // 5. Reset / Auto button click: re-link to Title and regenerate immediately
     resetBtn.addEventListener("click", function () {
         isSlugManuallyEdited = false;
+        inputGroup.classList.remove("border-amber-500/80", "ring-1", "ring-amber-500/50");
+        inputGroup.classList.add("border-[#3c4043]");
         if (titleInput.value.trim()) {
             fetchSmartSlug({ title: titleInput.value.trim(), updateInputValue: true });
         } else {
