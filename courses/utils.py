@@ -71,7 +71,9 @@ def generate_unique_slug(instance_or_model, title="", custom_slug="", exclude_pk
 
     # Fetch all matching slugs in one single SQL query
     existing_slugs = set(
-    qs.filter(slug__startswith=base_slug).values_list('slug', flat=True)
+        qs.filter(
+            models.Q(slug=base_slug) | models.Q(slug__regex=rf'^{re.escape(base_slug)}-\d+$')
+        ).values_list('slug', flat=True)
     )
     if base_slug not in existing_slugs:
         return base_slug
@@ -116,17 +118,13 @@ Set COURSE_CERTIFICATE_FONT to the path of a regular TrueType font if needed.
 
 # from __future__ import annotations
 
-import hashlib
 import os
 import re
 from datetime import date
 from io import BytesIO
 from pathlib import Path
-from typing import Iterable
 from django.utils.crypto import salted_hmac
 from PIL import Image, ImageDraw, ImageFont, features
-import arabic_reshaper
-from bidi.algorithm import get_display
 
 WIDTH, HEIGHT = 1600, 1131  # Approximate A4 landscape ratio at high resolution.
 NAVY = "#152A43"
@@ -165,7 +163,7 @@ def _font_candidates(bold: bool = False) -> list[str]:
         candidates.append(configured)
 
     if os.name == "nt":
-        windows = os.environ.get("WINDIR", r"C:\\Windows")
+        windows = os.environ.get("WINDIR", r"C:\Windows")
         names = ["arialbd.ttf", "tahomabd.ttf", "calibrib.ttf"] if bold else ["arial.ttf", "tahoma.ttf", "calibri.ttf"]
         candidates.extend(str(Path(windows) / "Fonts" / name) for name in names)
     else:

@@ -112,16 +112,16 @@ class VideoForm(forms.ModelForm):
         return cleaned_data
 
 class FileForm(forms.ModelForm):
-    MAX_VIDEO_SIZE_MB = 25
+    MAX_FILE_SIZE_MB = 25
     ALLOWED_EXTENSIONS = ['.pdf', '.zip', '.docx', '.pptx']
     class Meta:
         model = File
         fields = ['title', 'file']
         widgets = {
-            'file': forms.ClearableFileInput(attrs={'accept': 'file/pdf,file/zip,file/docx,file/pptx'}),
+            'file': forms.ClearableFileInput(attrs={'accept': '.pdf, .zip, .docx, .pptx'}),
         }
     
-    def clean_file_upload(self):
+    def clean_file(self):
         file = self.cleaned_data.get('file')
         if file and 'file' in self.changed_data:
             # 1. Validate file extension
@@ -132,25 +132,25 @@ class FileForm(forms.ModelForm):
                 )
         
             # 2. Validate file size
-            max_bytes = self.MAX_VIDEO_SIZE_MB * 1024 * 1024
+            max_bytes = self.MAX_FILE_SIZE_MB * 1024 * 1024
             if file.size > max_bytes:
                 raise forms.ValidationError(
                     f"The file is too large ({file.size / (1024 * 1024):.1f} MB). "
-                    f"Maximum allowed size is {self.MAX_VIDEO_SIZE_MB} MB."
+                    f"Maximum allowed size is {self.MAX_FILE_SIZE_MB} MB."
             )
         return file
 
 class ImageForm(forms.ModelForm):
-    MAX_VIDEO_SIZE_MB = 5
+    MAX_IMAGE_SIZE_MB = 5
     ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"]
     class Meta:
         model = Image
         fields = ['title', 'image']
         widgets = {
-            'image': forms.ClearableFileInput(attrs={'accept': 'image/jpg,image/jpeg,image/png,image/gif,image/webp,image/svg'}),
+            'image': forms.ClearableFileInput(attrs={'accept': 'image/*'}),
         }
         
-    def clean_image_upload(self):
+    def clean_image(self):
         image = self.cleaned_data.get('image')
         if image and 'image' in self.changed_data:
             # 1. Validate file extension
@@ -161,11 +161,11 @@ class ImageForm(forms.ModelForm):
                 )
         
             # 2. Validate file size
-            max_bytes = self.MAX_VIDEO_SIZE_MB * 1024 * 1024
+            max_bytes = self.MAX_IMAGE_SIZE_MB * 1024 * 1024
             if image.size > max_bytes:
                 raise forms.ValidationError(
                     f"The image is too large ({image.size / (1024 * 1024):.1f} MB). "
-                    f"Maximum allowed size is {self.MAX_VIDEO_SIZE_MB} MB."
+                    f"Maximum allowed size is {self.MAX_IMAGE_SIZE_MB} MB."
             )
         return image
 

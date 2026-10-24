@@ -117,10 +117,12 @@ class Course(models.Model):
     def __str__(self):
         return self.title
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._initial_title = self.title
-        self._initial_slug = self.slug
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        instance = super().from_db(db, field_names, values)
+        instance._initial_title = instance.title
+        instance._initial_slug = instance.slug
+        return instance
 
     def clean(self):
         super().clean()
@@ -137,8 +139,8 @@ class Course(models.Model):
 
     def save(self, *args, **kwargs):
         # Only auto-regenerate from title if slug is empty, OR if title changed AND user didn't manually change the slug
-        title_changed = (self.pk is not None and self.title != self._initial_title)
-        slug_manually_changed = (self.slug != self._initial_slug)
+        title_changed = (self.pk is not None and self.title != getattr(self, '_initial_title', ''))
+        slug_manually_changed = (self.slug != getattr(self, '_initial_slug', ''))
 
         if not self.slug or (title_changed and not slug_manually_changed):
             self.slug = generate_unique_slug(Course, title=self.title, exclude_pk=self.pk)

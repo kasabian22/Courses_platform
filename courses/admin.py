@@ -22,7 +22,11 @@ class ReviewInline(admin.TabularInline):
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    # ... (keep list_display, list_filter, search_fields, readonly_fields, filter_horizontal, inlines as they are)
+    list_display = ['title', 'owner', 'subject', 'status', 'display_students', 'display_wishlist', 'date_created']
+    list_filter = ['status', 'subject', 'level', 'date_created']
+    search_fields = ['title', 'owner__username', 'subject__title']
+    filter_horizontal = ['wishlist']
+    inlines = [ModuleInline, EnrollmentInline, ReviewInline]
 
     def get_queryset(self, request):
         # Optimize queries AND annotate counts/ratings so @property methods don't trigger N+1 queries

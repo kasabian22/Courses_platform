@@ -5,6 +5,7 @@ register = template.Library()
 
 @register.filter
 def format_duration(value):
+    """The format_duration filter converts raw time objects into clean, readable labels(from 2:30:00 to 2h 30m)"""
     # Check if the value is actually a timedelta object
     if not isinstance(value, datetime.timedelta):
         return value

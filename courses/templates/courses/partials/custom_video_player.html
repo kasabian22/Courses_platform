@@ -215,6 +215,8 @@
 <script>
     
 document.querySelectorAll('[data-video-player]').forEach((player) => {
+    if (player.dataset.playerInitialized) return;
+    player.dataset.playerInitialized = 'true';
     const video = player.querySelector('[data-video]');
     const centerPlay = player.querySelector('[data-center-play]');
     const playButton = player.querySelector('[data-play]');

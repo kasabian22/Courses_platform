@@ -21,7 +21,14 @@
                 Organize your course into structured learning units.
             </p>
         </div>
-
+        
+        {% if form.non_field_errors %}
+            <div class="mb-6 p-4 rounded-xl bg-red-900/20 border border-red-800/50 text-red-400 text-sm">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
         <!-- Form -->
         <form method="post" novalidate>
             {% csrf_token %}

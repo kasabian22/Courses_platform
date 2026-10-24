@@ -17,14 +17,21 @@
             </span>
             <h1 class="text-2xl font-bold text-gray-100">Edit Course: {{ course.title }}</h1>
         </div>
-
+        
+        {% if form.non_field_errors %}
+            <div class="mb-6 p-4 rounded-xl bg-red-900/20 border border-red-800/50 text-red-400 text-sm">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
         <form method="post" enctype="multipart/form-data" class="dark-form" novalidate>
             {% csrf_token %}
             {{ form.media }}
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {% for field in form %}
-                    <div class="{% if field.name in 'title,header,image,overview' %}sm:col-span-2{% endif %}">
+                    <div class="{% if field.name in 'title,slug,header,image,overview' %}sm:col-span-2{% endif %}">
                         <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
                             {{ field.label }}{% if field.field.required %}*{% endif %}
                         </label>
@@ -86,7 +93,7 @@
 
             <!-- Action Buttons -->
             <div class="flex items-center justify-end gap-4 mt-8 pt-6 border-t border-[#3c4043]">
-                <a href="{% url 'accounts:view_profile' %}" 
+                <a href="{% url 'accounts:course_detail' course.slug %}" 
                    class="px-5 py-2.5 text-sm font-semibold text-gray-300 bg-transparent border border-[#3c4043] rounded-xl hover:bg-[#3c4043] hover:text-white transition-colors">
                     Cancel
                 </a>

@@ -18,6 +18,13 @@
 
         <!-- Added enctype="multipart/form-data" so course images upload properly -->
         <!-- We don't specefy action attribute here because the default of the browser is to submit the form to the exact same URL that served the current page. -->
+        {% if form.non_field_errors %}
+            <div class="mb-6 p-4 rounded-xl bg-red-900/20 border border-red-800/50 text-red-400 text-sm">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
         <form method="post" enctype="multipart/form-data" class="dark-form" novalidate>
             {% csrf_token %}
             {{ form.media }}

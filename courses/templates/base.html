@@ -117,6 +117,18 @@
                         </svg>
                     </button>
 
+                    <!-- Mobile Hamburger Button -->
+                    <button id="mobile-menu-btn" type="button" 
+                            class="sm:hidden p-2 rounded-xl bg-[#2a2d30] border border-[#3c4043] text-gray-300 hover:text-white hover:border-indigo-500/50 focus:outline-none transition-all duration-200 shadow-sm"
+                            aria-label="Toggle mobile navigation menu" aria-expanded="false">
+                        <svg id="mobile-menu-icon-open" class="w-5 h-5 block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg id="mobile-menu-icon-close" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+
                     <!-- User Authentication Section -->
                     {% if request.user.is_authenticated %}
                         <div class="relative group">
@@ -155,6 +167,49 @@
                     {% endif %}
 
                 </div>
+            </div>
+        </div>
+        <!-- Mobile Dropdown Navigation Menu -->
+        <div id="mobile-menu" class="sm:hidden hidden border-t border-[#303436] bg-[#181a1b] px-4 pt-4 pb-6 space-y-4">
+            <!-- Mobile Search Bar -->
+            <form action="{% url 'courses:search_courses' %}" method="GET" class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-4 w-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <input type="text" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Search courses, instructors..." 
+                    class="block w-full pl-9 pr-3 py-2 text-sm border border-gray-700 rounded-xl bg-[#151718] text-gray-300 placeholder-gray-500 focus:outline-none focus:border-indigo-500">
+            </form>
+
+            <!-- Mobile Navigation Links -->
+            <div class="space-y-1">
+                <a href="{% url 'courses:subject_courses_list' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-[#2a2d30] transition-colors">
+                    <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    Browse Courses
+                </a>
+                <a href="{% url 'courses:view_wishlist' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-[#2a2d30] transition-colors">
+                    <svg class="w-5 h-5 text-red-500 fill-current" viewBox="0 0 24 24"><path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                    Wishlist
+                </a>
+                {% if request.user.is_authenticated %}
+                    <a href="{% url 'accounts:view_profile' %}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-300 hover:text-white hover:bg-[#2a2d30] transition-colors">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        My Profile ({{ request.user.username }})
+                    </a>
+                    <form method="post" action="{% url 'accounts:sign_out' %}" class="block w-full pt-1">
+                        {% csrf_token %}
+                        <button type="submit" class="flex w-full items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                            Sign out
+                        </button>
+                    </form>
+                {% else %}
+                    <div class="pt-2 flex flex-col gap-2">
+                        <a href="{% url 'accounts:sign_in' %}" class="w-full text-center px-4 py-2 text-sm font-medium text-gray-300 bg-[#2a2d30] border border-[#3c4043] rounded-xl hover:text-white transition-colors">Log in</a>
+                        <a href="{% url 'accounts:sign_up' %}" class="w-full text-center px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-sm">Sign up</a>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </nav>
@@ -256,7 +311,7 @@
                                 toast.remove();
                             }, 500);
                         });
-                    }, 4000); // 4000 ملي ثانية = 4 ثواني
+                    }, 8000); // 4000 ملي ثانية = 4 ثواني
                 });
             </script>
         {% endif %}
@@ -286,9 +341,9 @@
                 <div>
                     <h3 class="text-lg font-semibold text-white mb-4">Quick Links</h3>
                     <ul class="space-y-2 text-sm">
-                        <li><a href="#" class="hover:text-indigo-400 transition-colors duration-200">Browse Courses</a></li>
+                        <li><a href="{% url 'courses:subject_courses_list' %}" class="hover:text-indigo-400 transition-colors duration-200">Browse Courses</a></li>
                         <li><a href="#" class="hover:text-indigo-400 transition-colors duration-200">All Categories</a></li>
-                        <li><a href="#" class="hover:text-indigo-400 transition-colors duration-200">Become an Instructor</a></li>
+                        <li><a href="{% url 'accounts:view_profile' %}" class="hover:text-indigo-400 transition-colors duration-200">Become an Instructor</a></li>
                         <li><a href="#" class="hover:text-indigo-400 transition-colors duration-200">About Us</a></li>
                     </ul>
                 </div>
@@ -515,6 +570,28 @@
                         subjectNav.scrollBy({ left: e.deltaY * 2, behavior: 'smooth' });
                     }
                 }, { passive: false });
+            }
+        });
+    </script>
+    <script>
+        // Mobile Menu Toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const iconOpen = document.getElementById('mobile-menu-icon-open');
+            const iconClose = document.getElementById('mobile-menu-icon-close');
+
+            if (mobileBtn && mobileMenu) {
+                mobileBtn.addEventListener('click', function() {
+                    const isHidden = mobileMenu.classList.toggle('hidden');
+                    mobileBtn.setAttribute('aria-expanded', !isHidden);
+                    if (iconOpen && iconClose) {
+                        iconOpen.classList.toggle('hidden', !isHidden);
+                        iconOpen.classList.toggle('block', isHidden);
+                        iconClose.classList.toggle('hidden', isHidden);
+                        iconClose.classList.toggle('block', !isHidden);
+                    }
+                });
             }
         });
     </script>

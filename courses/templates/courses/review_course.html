@@ -14,12 +14,21 @@
         
         <!-- Header Section -->
         <div class="mb-8 text-center">
-            <h2 class="text-2xl font-bold text-gray-100">Leave a Review</h2>
+            <h2 class="text-2xl font-bold text-gray-100">
+                {% if type == 'Edit' %}Edit Your Review{% else %}Leave a Review{% endif %}
+            </h2>
             <p class="text-sm text-gray-400 mt-2">
                 Your thoughts on <span class="font-semibold text-indigo-400">{{ course.title }}</span>
             </p>
         </div>
 
+        {% if form.non_field_errors %}
+            <div class="mb-6 p-4 rounded-xl bg-red-900/20 border border-red-800/50 text-red-400 text-sm">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
         <!-- Review Form -->
         <form method="POST">
             {% csrf_token %}
@@ -62,7 +71,7 @@
                 <!-- Submit Button -->
                 <button type="submit" 
                 class="w-1/2 px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-[#2a2d30]">
-                    {{ type }} Review
+                    {% if type == 'Edit' %}Update Review{% else %}Submit Review{% endif %}
                 </button>
             </div>
         </form>

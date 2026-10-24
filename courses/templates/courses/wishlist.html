@@ -20,7 +20,7 @@
         <!-- Counter Badge -->
         <div class="mt-4 md:mt-0">
             <span class="bg-indigo-900/50 text-indigo-400 border border-indigo-700/50 py-1 px-4 rounded-full text-sm font-medium">
-                {{ wishlist|length }} Saved Courses
+                {{ wishlist.paginator.count }} Saved Course{{ wishlist.paginator.count|pluralize }}
             </span>
         </div>
     </div>
@@ -32,6 +32,8 @@
                 {% include 'courses/partials/course_card.html' with course=course card_type="wishlist" %}
             {% endfor %}
         </div>
+        <!-- Pagination Controls -->
+        {% include 'courses/partials/pagination.html' with page_obj=wishlist %}
     {% else %}
         <!-- Empty State Styling -->
         <div class="text-center py-20 bg-[#1c1d22] rounded-xl border border-gray-700/50 shadow-inner max-w-3xl mx-auto">

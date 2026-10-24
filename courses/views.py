@@ -12,7 +12,7 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbid
 from django.utils.text import slugify
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.contrib import messages
-from django.db.models import Avg, Count, Max, Q
+from django.db.models import Avg, Count, Max, Q, Prefetch
 from decimal import Decimal, InvalidOperation
 from django.core.exceptions import PermissionDenied
 from django.utils import timezone
@@ -20,28 +20,45 @@ from django.utils import timezone
 # region ----------------------------------------------- Courses Pages -----------------------------------------------------------------
 
 def subject_courses_list(request):
-    subjects = Subject.objects.all()
 
-    for subject in subjects:
-        # ".top_courses" this is called Dynamic Attribute, means we are adding a new attribute to the subject object on the fly, which is not defined in the model.
-        subject.top_courses = Course.objects.filter(
-            subject=subject, 
-            status=Course.Status.AVAILABLE
-        # "select_related" is used to fetch the related "owner" object in the same query (SQL join between tables), which reduces the number of queries to the database and improves performance.
-        # "select_related" works only with ForeignKey and OneToOneField fields
-        # we used owner__instruct... because we display instructor full_name or username on the course card
-        ).select_related(
+    # the more efficient way:
+    courses_prefetch = Prefetch(
+        'courses',
+        queryset=Course.objects.filter(status=Course.Status.AVAILABLE).select_related(
             'owner__instructors_profiles'
-        # "annotate" used with functions that are used in the templates, it makes using functions more effictive.
-        # you can use "annotated functions" in order_by, models.py, and templates, but best practice in templates to use a @property that checks the value of the annotated function, and makes the same thing, just in case something go wrong.
         ).annotate(
             enrolled_students_count=Count('students', distinct=True),
             annotated_avg_rating=Avg('review_details__rating'),
             annotated_reviews_count=Count('review_details', distinct=True)
-        ).order_by(
-            '-enrolled_students_count', # first: prioritize courses with more enrolled students
-            '-annotated_avg_rating'   # second: prioritize courses with higher average ratings
-        )[:3] 
+        ).order_by('-enrolled_students_count', '-annotated_avg_rating'),
+        to_attr='available_courses'
+    )
+    subjects = Subject.objects.prefetch_related(courses_prefetch)
+    for subject in subjects:
+        subject.top_courses = subject.available_courses[:3]
+
+    # Second method to solve the problem:
+    # subjects = Subject.objects.all()
+    # for subject in subjects:
+        # ".top_courses" this is called Dynamic Attribute, means we are adding a new attribute to the subject object on the fly, which is not defined in the model.
+        # subject.top_courses = Course.objects.filter(
+        #     subject=subject, 
+        #     status=Course.Status.AVAILABLE
+        # "select_related" is used to fetch the related "owner" object in the same query (SQL join between tables), which reduces the number of queries to the database and improves performance.
+        # "select_related" works only with ForeignKey and OneToOneField fields
+        # we used owner__instruct... because we display instructor full_name or username on the course card
+        # ).select_related(
+            # 'owner__instructors_profiles'
+        # "annotate" used with functions that are used in the templates, it makes using functions more effictive.
+        # you can use "annotated functions" in order_by, models.py, and templates, but best practice in templates to use a @property that checks the value of the annotated function, and makes the same thing, just in case something go wrong.
+        # ).annotate(
+        #     enrolled_students_count=Count('students', distinct=True),
+        #     annotated_avg_rating=Avg('review_details__rating'),
+        #     annotated_reviews_count=Count('review_details', distinct=True)
+        # ).order_by(
+        #     '-enrolled_students_count', # first: prioritize courses with more enrolled students
+        #     '-annotated_avg_rating'   # second: prioritize courses with higher average ratings
+        # )[:3] 
     
     # before loading a subject, check if it have courses in it
     subjects = [s for s in subjects if s.top_courses]
@@ -110,9 +127,13 @@ def category_courses(request, subject_slug):
 def course_detail(request, slug):
     course = get_object_or_404(
         Course.objects.select_related(
-            'owner__instructors_profiles', 'subject'
-            # "prefetch_related" is used to fetch all the related "modules" objects in a separate query, but still in a single database hit, which reduces the number of queries to the database and improves performance.
-            ).prefetch_related('modules'), 
+        'owner__instructors_profiles', 'subject'
+        # "prefetch_related" is used to fetch all the related "modules" objects in a separate query, but still in a single database hit, which reduces the number of queries to the database and improves performance.
+        ).prefetch_related('modules').annotate(
+        enrolled_students_count=Count('students', distinct=True),
+        annotated_avg_rating=Avg('review_details__rating'),
+        annotated_reviews_count=Count('review_details', distinct=True)
+    ),
         slug=slug
     )
     
@@ -167,7 +188,7 @@ def add_course(request):
 
 
 @login_required
-@permission_required('courses.edit_course', raise_exception=True)
+@permission_required('courses.change_course', raise_exception=True)
 def edit_course(request, slug):
     course = get_object_or_404(Course, slug=slug, owner=request.user)
     
@@ -234,7 +255,7 @@ def generate_slug_preview(request):
     )
 
     # Check if a counter (-1, -2) was appended because another course already took the base slug
-    was_modified = (final_slug != base_candidate)
+    was_modified = (final_slug != truncated_base)
 
     # 4. Formulate the exact, accurate message
     if was_truncated and was_modified:
@@ -272,12 +293,18 @@ def delete_course(request, slug):
 @require_POST
 @login_required
 def enroll_course(request, slug):
-    course = get_object_or_404(Course, slug=slug)
+    course = get_object_or_404(Course, slug=slug, status=Course.Status.AVAILABLE)
+    if course.owner == request.user:
+        messages.error(request, 'You cannot enroll in your own course.')
+        return redirect('courses:course_detail', slug=course.slug)
+    
     if not course.students.filter(id=request.user.id).exists():
         course.students.add(request.user)
         messages.success(request, 'You have successfully enrolled in this course')
     else:
         messages.info(request, 'You are already enrolled in this course.')
+
+
     
     return redirect('courses:course_detail', slug=course.slug)
 
@@ -309,7 +336,10 @@ def toggle_wishlist(request, slug):
         messages.success(request, 'Course added to wishlist')
 
     # Redirect back to referring page (the page the user deleted or added the course to the wishlist)
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+    referer = request.META.get('HTTP_REFERER')
+    if referer and url_has_allowed_host_and_scheme(referer, allowed_hosts={request.get_host()}):
+        return redirect(referer) 
+    return redirect('courses:subject_courses_list')
     
 
 @login_required
@@ -352,7 +382,10 @@ def add_module(request, slug):
 
 @login_required
 def view_module(request, course_slug, module_id):
-    course = get_object_or_404(Course, slug=course_slug)
+    course = get_object_or_404(
+        Course.objects.prefetch_related('modules'),
+        slug=course_slug
+    )
     module_qs = Module.objects.prefetch_related('contents__item')
     module = get_object_or_404(module_qs, course=course, id=module_id)
 
@@ -366,10 +399,12 @@ def view_module(request, course_slug, module_id):
         return redirect('courses:course_detail', slug=course.slug)
 
     has_reviewed = False
-    if request.user.is_authenticated and is_enrolled:
+    if is_enrolled:
         has_reviewed = Review.objects.filter(course=course, user=request.user).exists()
 
-    is_completed = Progress.objects.filter(user=request.user, module=module, is_completed=True).exists()
+    is_completed = False
+    if request.user != course.owner:
+        is_completed = Progress.objects.filter(user=request.user, module=module, is_completed=True).exists()
 
     # __lt means "Less Than" (<). That means finds all modules with an id lower than the current module's id. then order them highest to lowest to take the highest, which is the previos module
     previous_module = course.modules.filter(id__lt=module.id).order_by('-id').first()
@@ -388,7 +423,7 @@ def view_module(request, course_slug, module_id):
     })
 
 @login_required
-@permission_required('courses.edit_module', raise_exception=True)
+@permission_required('courses.change_module', raise_exception=True)
 def edit_module(request, course_slug, module_id):
     course = get_object_or_404(Course, slug=course_slug, owner=request.user)
     module = get_object_or_404(Module, course=course, id=module_id)
@@ -549,7 +584,8 @@ def delete_content(request, course_slug, module_id, content_id):
     )
     
     # Delete the actual item (Video, Text, Image, or File) and the Content relation
-    content.item.delete()
+    if content.item:
+        content.item.delete()
     content.delete()
     
     return redirect("courses:view_module", course_slug, module_id)
@@ -569,7 +605,7 @@ def review_course(request, slug):
 
     if Review.objects.filter(course=course, user=request.user).exists():
         messages.info(request, 'You have already reviewed this course.')
-        return redirect('courses: edit_review', slug=course.slug)
+        return redirect('courses:edit_review', slug=course.slug)
     
     if request.method == 'POST':
         form = ReviewForm(request.POST)
