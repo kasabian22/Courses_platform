@@ -266,10 +266,10 @@
     
     <main class="flex-grow">
         {% if messages %}
-            <!-- غيرنا المكان لأسفل يمين الشاشة عشان ميغطيش على الـ Navbar -->
+            <!-- Positioned at bottom-right so it does not overlap the navbar -->
             <div id="toast-container" class="fixed bottom-8 right-8 z-50 flex flex-col gap-3 pointer-events-none">
                 {% for message in messages %}
-                    <!-- ضفنا كلاسات للأنيميشن (opacity و translate) -->
+                    <!-- Animation classes for opacity and translate -->
                     <div class="toast-message px-5 py-3 rounded-xl shadow-2xl border text-sm font-medium flex items-center gap-3 transition-all duration-500 transform translate-y-0 opacity-100 pointer-events-auto
                         {% if message.tags == 'error' %}
                             bg-red-900/90 text-red-100 border-red-500/50 backdrop-blur-sm
@@ -296,22 +296,22 @@
                 {% endfor %}
             </div>
         
-            <!-- سكريبت بسيط لإخفاء الرسالة بعد 4 ثواني -->
+            <!-- Script to auto-dismiss toasts -->
             <script>
                 document.addEventListener("DOMContentLoaded", function() {
                     setTimeout(function() {
                         const toasts = document.querySelectorAll('.toast-message');
                         toasts.forEach(toast => {
-                            // إضافة تأثير الاختفاء والنزول لتحت
+                            // Add fade-out and slide-down transition classes
                             toast.classList.remove('opacity-100', 'translate-y-0');
                             toast.classList.add('opacity-0', 'translate-y-4');
                             
-                            // مسح العنصر تماماً من المتصفح بعد انتهاء الأنيميشن
+                            // Remove element completely from DOM after animation completes
                             setTimeout(() => {
                                 toast.remove();
                             }, 500);
                         });
-                    }, 8000); // 4000 ملي ثانية = 4 ثواني
+                    }, 8000); // Auto-dismiss after 8000ms
                 });
             </script>
         {% endif %}

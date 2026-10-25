@@ -23,8 +23,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('courses.urls', namespace='courses')),
     path('accounts/', include('accounts.urls', namespace='accounts')),
-    path('accounts/', include('allauth.urls')),
+    path('accounts/social/', include('allauth.urls')),
 ]
-# إضافة روابط الميديا فقط في وضع التطوير (DEBUG = True)
+# Serve media files during development only (DEBUG = True)
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    

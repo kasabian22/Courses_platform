@@ -1,209 +1,80 @@
 <!-- Custom Video Player -->
-<div
-    data-video-player
-    class="relative isolate w-full overflow-hidden rounded-2xl border border-white/10 bg-[#101114] shadow-xl shadow-black/20"
->
-    <div
-        data-player-stage
-        class="relative aspect-video bg-black"
-    >
-        <video
-            data-video
-            src="{{ content.item.video_upload.url }}"
-            preload="metadata"
-            playsinline
-            class="h-full w-full cursor-pointer bg-black object-contain"
-        >
+<div data-video-player tabindex="0" class="relative isolate w-full overflow-hidden rounded-2xl border border-white/10 bg-[#101114] shadow-xl shadow-black/20 focus:outline-none">
+    <div data-player-stage class="relative aspect-video bg-black">
+        <video data-video src="{{ content.item.video_upload.url }}" preload="metadata" playsinline class="h-full w-full cursor-pointer bg-black object-contain">
             Your browser does not support the HTML5 video tag.
         </video>
 
         <!-- Center Play Button -->
-        <button
-            type="button"
-            data-center-play
-            aria-label="Play video"
-            class="absolute left-1/2 top-1/2 z-10 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-violet-600 text-white shadow-lg shadow-violet-950/40 transition hover:scale-110 hover:bg-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-400"
-        >
-            <svg viewBox="0 0 24 24" fill="currentColor"
-                 class="ml-1 h-7 w-7" aria-hidden="true">
+        <button type="button" data-center-play aria-label="Play video" class="absolute left-1/2 top-1/2 z-10 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-violet-600 text-white shadow-lg shadow-violet-950/40 transition hover:scale-110 hover:bg-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-400">
+            <svg viewBox="0 0 24 24" fill="currentColor" class="ml-1 h-7 w-7" aria-hidden="true">
                 <path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86a1 1 0 0 0-1.5.86Z"/>
             </svg>
         </button>
 
         <!-- Custom Controls -->
-        <div
-            class="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black via-black/80 to-transparent"
-        >
-        
-        <!-- Progress Bar with Hover Time Preview -->
-        <div
-            data-timeline
-            class="relative px-4 pb-2 pt-7 sm:px-5"
-        >
-            <span
-                data-seek-tooltip
-                class="pointer-events-none absolute left-0 top-1 z-30 hidden -translate-x-1/2 rounded-md border border-white/10 bg-[#28282D] px-2 py-1 text-[11px] font-medium tabular-nums text-white shadow-lg"
-            >
-                0:00
-            </span>
-        
-            <input
-                data-seek
-                type="range"
-                min="0"
-                max="100"
-                value="0"
-                step="0.1"
-                aria-label="Video position"
-                class="h-1.5 w-full cursor-pointer appearance-none rounded-full accent-violet-500"
-            />
-        </div>
-        
+        <div data-controls-bar class="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-black via-black/80 to-transparent transition-opacity duration-300">
+            <!-- Progress Bar with Hover Time Preview -->
+            <div data-timeline class="relative px-4 pb-2 pt-7 sm:px-5">
+                <span data-seek-tooltip class="pointer-events-none absolute left-0 top-1 z-30 hidden -translate-x-1/2 rounded-md border border-white/10 bg-[#28282D] px-2 py-1 text-[11px] font-medium tabular-nums text-white shadow-lg">0:00</span>
+                <input data-seek type="range" min="0" max="100" value="0" step="0.1" aria-label="Video position" class="h-1.5 w-full cursor-pointer appearance-none rounded-full accent-violet-500"/>
+            </div>
 
             <!-- Buttons and Time -->
             <div class="flex items-center gap-3 px-3 pb-3 sm:gap-4 sm:px-5 sm:pb-4">
                 <!-- Play / Pause -->
-                <button
-                    type="button"
-                    data-play
-                    aria-label="Play video"
-                    class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-violet-400"
-                >
-                    <svg data-icon-play viewBox="0 0 24 24"
-                         fill="currentColor" class="h-5 w-5" aria-hidden="true">
-                        <path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86a1 1 0 0 0-1.5.86Z"/>
-                    </svg>
-
-                    <svg data-icon-pause viewBox="0 0 24 24"
-                         fill="currentColor" class="hidden h-5 w-5" aria-hidden="true">
-                        <path d="M7 4h3v16H7zM14 4h3v16h-3z"/>
-                    </svg>
+                <button type="button" data-play aria-label="Play video" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-white transition hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-violet-400">
+                    <svg data-icon-play viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5" aria-hidden="true"><path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86a1 1 0 0 0-1.5.86Z"/></svg>
+                    <svg data-icon-pause viewBox="0 0 24 24" fill="currentColor" class="hidden h-5 w-5" aria-hidden="true"><path d="M7 4h3v16H7zM14 4h3v16h-3z"/></svg>
                 </button>
 
-                
                 <!-- Elapsed / Remaining Time Toggle -->
-                <button
-                    type="button"
-                    data-time-toggle
-                    aria-label="Show remaining time"
-                    title="Toggle elapsed and remaining time"
-                    class="flex items-center gap-1 whitespace-nowrap rounded-md px-1 py-1 text-xs font-medium tabular-nums text-gray-300 transition hover:text-white focus:outline-none focus:ring-2 focus:ring-violet-400 sm:text-sm"
-                >
+                <button type="button" data-time-toggle aria-label="Show remaining time" title="Toggle elapsed and remaining time" class="flex items-center gap-1 whitespace-nowrap rounded-md px-1 py-1 text-xs font-medium tabular-nums text-gray-300 transition hover:text-white focus:outline-none focus:ring-2 focus:ring-violet-400 sm:text-sm">
                     <span data-current-time>0:00</span>
                     <span class="text-gray-500">/</span>
                     <span data-duration>0:00</span>
                 </button>
 
-
                 <div class="ml-auto flex items-center gap-1 sm:gap-2">
                     <!-- Mute -->
-                    <button
-                        type="button"
-                        data-mute
-                        aria-label="Mute sound"
-                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-gray-300 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-violet-400"
-                    >
-                        <svg data-icon-sound viewBox="0 0 24 24"
-                             fill="none" stroke="currentColor" stroke-width="1.8"
-                             stroke-linecap="round" stroke-linejoin="round"
-                             class="h-5 w-5" aria-hidden="true">
-                            <path d="M11 5 6 9H3v6h3l5 4z"/>
-                            <path d="M15.5 8.5a5 5 0 0 1 0 7"/>
-                            <path d="M19 5a10 10 0 0 1 0 14"/>
+                    <button type="button" data-mute aria-label="Mute sound" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-gray-300 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-violet-400">
+                        <svg data-icon-sound viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5" aria-hidden="true">
+                            <path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a10 10 0 0 1 0 14"/>
                         </svg>
-
-                        <svg data-icon-muted viewBox="0 0 24 24"
-                             fill="none" stroke="currentColor" stroke-width="1.8"
-                             stroke-linecap="round" stroke-linejoin="round"
-                             class="hidden h-5 w-5" aria-hidden="true">
-                            <path d="M11 5 6 9H3v6h3l5 4z"/>
-                            <path d="m16 9 5 6m0-6-5 6"/>
+                        <svg data-icon-muted viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="hidden h-5 w-5" aria-hidden="true">
+                            <path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 5 6m0-6-5 6"/>
                         </svg>
                     </button>
 
                     <!-- Volume Slider -->
-                    <input
-                        data-volume
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.05"
-                        value="1"
-                        aria-label="Volume level"
-                        class="hidden w-20 cursor-pointer accent-violet-500 sm:block"
-                    />
-                    
+                    <input data-volume type="range" min="0" max="1" step="0.05" value="1" aria-label="Volume level" class="hidden w-20 cursor-pointer accent-violet-500 sm:block"/>
 
-                    
                     <!-- Playback Speed Dropdown -->
                     <div data-speed-control class="relative z-30">
-                        <button
-                            type="button"
-                            data-speed-button
-                            aria-label="Playback speed 1×"
-                            aria-expanded="false"
-                            aria-haspopup="true"
-                            class="flex h-9 min-w-10 items-center justify-center rounded-lg px-2 text-xs font-semibold tabular-nums text-gray-300 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-violet-400"
-                        >
-                            1×
-                        </button>
-
-                        <div
-                            data-speed-menu
-                            class="absolute bottom-full right-0 mb-2 hidden min-w-28 overflow-hidden rounded-xl border border-white/10 bg-[#25262A] p-1 shadow-2xl"
-                        >
-                            <button type="button" data-speed="0.25"
-                                class="block w-full rounded-lg px-3 py-2 text-start text-xs font-medium text-gray-200 transition hover:bg-white/10">
-                                0.25×
-                            </button>
-                            <button type="button" data-speed="0.5"
-                                class="block w-full rounded-lg px-3 py-2 text-start text-xs font-medium text-gray-200 transition hover:bg-white/10">
-                                0.5×
-                            </button>
-                            <button type="button" data-speed="0.75"
-                                class="block w-full rounded-lg px-3 py-2 text-start text-xs font-medium text-gray-200 transition hover:bg-white/10">
-                                0.75×
-                            </button>
-                            <button type="button" data-speed="1"
-                                aria-pressed="true"
-                                class="block w-full rounded-lg bg-violet-600/20 px-3 py-2 text-start text-xs font-medium text-violet-200 transition hover:bg-white/10">
-                                default (1×)
-                            </button>
-                            <button type="button" data-speed="1.25"
-                                class="block w-full rounded-lg px-3 py-2 text-start text-xs font-medium text-gray-200 transition hover:bg-white/10">
-                                1.25×
-                            </button>
-                            <button type="button" data-speed="1.5"
-                                class="block w-full rounded-lg px-3 py-2 text-start text-xs font-medium text-gray-200 transition hover:bg-white/10">
-                                1.5×
-                            </button>
-                            <button type="button" data-speed="1.75"
-                                class="block w-full rounded-lg px-3 py-2 text-start text-xs font-medium text-gray-200 transition hover:bg-white/10">
-                                1.75×
-                            </button>
-                            <button type="button" data-speed="2"
-                                class="block w-full rounded-lg px-3 py-2 text-start text-xs font-medium text-gray-200 transition hover:bg-white/10">
-                                2×
-                            </button>
+                        <button type="button" data-speed-button aria-label="Playback speed 1×" aria-expanded="false" aria-haspopup="true" class="flex h-9 min-w-10 items-center justify-center rounded-lg px-2 text-xs font-semibold tabular-nums text-gray-300 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-violet-400">1×</button>
+                        <div data-speed-menu class="absolute bottom-full right-0 mb-2 hidden min-w-28 overflow-hidden rounded-xl border border-white/10 bg-[#25262A] p-1 shadow-2xl">
+                            <button type="button" data-speed="0.25" class="block w-full rounded-lg px-3 py-2 text-start text-xs font-medium text-gray-200 transition hover:bg-white/10">0.25×</button>
+                            <button type="button" data-speed="0.5" class="block w-full rounded-lg px-3 py-2 text-start text-xs font-medium text-gray-200 transition hover:bg-white/10">0.5×</button>
+                            <button type="button" data-speed="0.75" class="block w-full rounded-lg px-3 py-2 text-start text-xs font-medium text-gray-200 transition hover:bg-white/10">0.75×</button>
+                            <button type="button" data-speed="1" aria-pressed="true" class="block w-full rounded-lg bg-violet-600/20 px-3 py-2 text-start text-xs font-medium text-violet-200 transition hover:bg-white/10">default (1×)</button>
+                            <button type="button" data-speed="1.25" class="block w-full rounded-lg px-3 py-2 text-start text-xs font-medium text-gray-200 transition hover:bg-white/10">1.25×</button>
+                            <button type="button" data-speed="1.5" class="block w-full rounded-lg px-3 py-2 text-start text-xs font-medium text-gray-200 transition hover:bg-white/10">1.5×</button>
+                            <button type="button" data-speed="1.75" class="block w-full rounded-lg px-3 py-2 text-start text-xs font-medium text-gray-200 transition hover:bg-white/10">1.75×</button>
+                            <button type="button" data-speed="2" class="block w-full rounded-lg px-3 py-2 text-start text-xs font-medium text-gray-200 transition hover:bg-white/10">2×</button>
                         </div>
                     </div>
 
+                    <!-- Picture-in-Picture -->
+                    <button type="button" data-pip aria-label="Picture in picture" title="Picture in picture" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-gray-300 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-violet-400">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5" aria-hidden="true">
+                            <rect x="2" y="4" width="20" height="16" rx="2"/><rect x="12" y="11" width="8" height="7" rx="1" fill="currentColor" fill-opacity="0.3"/>
+                        </svg>
+                    </button>
 
                     <!-- Fullscreen -->
-                    <button
-                        type="button"
-                        data-fullscreen
-                        aria-label="Full-screen view"
-                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-gray-300 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-violet-400"
-                    >
-                        <svg viewBox="0 0 24 24" fill="none"
-                             stroke="currentColor" stroke-width="1.8"
-                             stroke-linecap="round" stroke-linejoin="round"
-                             class="h-5 w-5" aria-hidden="true">
-                            <path d="M8 3H5a2 2 0 0 0-2 2v3"/>
-                            <path d="M16 3h3a2 2 0 0 1 2 2v3"/>
-                            <path d="M3 16v3a2 2 0 0 0 2 2h3"/>
-                            <path d="M21 16v3a2 2 0 0 1-2 2h-3"/>
+                    <button type="button" data-fullscreen aria-label="Full-screen view" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-gray-300 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-violet-400">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5" aria-hidden="true">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M21 16v3a2 2 0 0 1-2 2h-3"/>
                         </svg>
                     </button>
                 </div>
@@ -213,73 +84,53 @@
 </div>
 
 <script>
-    
 document.querySelectorAll('[data-video-player]').forEach((player) => {
     if (player.dataset.playerInitialized) return;
     player.dataset.playerInitialized = 'true';
-    const video = player.querySelector('[data-video]');
-    const centerPlay = player.querySelector('[data-center-play]');
-    const playButton = player.querySelector('[data-play]');
-    const playIcon = player.querySelector('[data-icon-play]');
-    const pauseIcon = player.querySelector('[data-icon-pause]');
 
-    const timeline = player.querySelector('[data-timeline]');
-    const seek = player.querySelector('[data-seek]');
-    const seekTooltip = player.querySelector('[data-seek-tooltip]');
+    const q = (sel) => player.querySelector(sel);
+    const video = q('[data-video]'), centerPlay = q('[data-center-play]'), playButton = q('[data-play]');
+    const playIcon = q('[data-icon-play]'), pauseIcon = q('[data-icon-pause]'), controlsBar = q('[data-controls-bar]');
+    const timeline = q('[data-timeline]'), seek = q('[data-seek]'), seekTooltip = q('[data-seek-tooltip]');
+    const timeToggle = q('[data-time-toggle]'), currentTime = q('[data-current-time]'), duration = q('[data-duration]');
+    const muteButton = q('[data-mute]'), soundIcon = q('[data-icon-sound]'), mutedIcon = q('[data-icon-muted]'), volume = q('[data-volume]');
+    const pipButton = q('[data-pip]'), fullscreenButton = q('[data-fullscreen]');
+    const speedControl = q('[data-speed-control]'), speedButton = q('[data-speed-button]'), speedMenu = q('[data-speed-menu]');
 
-    const timeToggle = player.querySelector('[data-time-toggle]');
-    const currentTime = player.querySelector('[data-current-time]');
-    const duration = player.querySelector('[data-duration]');
+    if (!video || !centerPlay || !playButton || !timeline || !seek || !seekTooltip || !timeToggle || !currentTime || !duration) return;
 
-    const muteButton = player.querySelector('[data-mute]');
-    const soundIcon = player.querySelector('[data-icon-sound]');
-    const mutedIcon = player.querySelector('[data-icon-muted]');
-    const volume = player.querySelector('[data-volume]');
+    let showRemainingTime = false, controlsTimeout = null;
 
-    const fullscreenButton = player.querySelector('[data-fullscreen]');
-
-    const speedControl = player.querySelector('[data-speed-control]');
-    const speedButton = player.querySelector('[data-speed-button]');
-    const speedMenu = player.querySelector('[data-speed-menu]');
-
-    if (
-        !video || !centerPlay || !playButton ||
-        !timeline || !seek || !seekTooltip ||
-        !timeToggle || !currentTime || !duration
-    ) {
-        return;
-    }
-
-    let showRemainingTime = false;
-
-    // Format seconds as M:SS or H:MM:SS.
-    const formatTime = (seconds) => {
-        if (!Number.isFinite(seconds) || seconds < 0) {
-            return '0:00';
+    // Controls Auto-Hide
+    const hideControls = () => {
+        if (!video.paused && !video.ended && speedMenu?.classList.contains('hidden') !== false && !seek.matches(':active') && !volume?.matches(':active')) {
+            controlsBar?.classList.add('opacity-0', 'pointer-events-none');
+            player.classList.add('cursor-none');
         }
-
-        const total = Math.floor(seconds);
-        const hours = Math.floor(total / 3600);
-        const minutes = Math.floor((total % 3600) / 60);
-        const secs = String(total % 60).padStart(2, '0');
-
-        if (hours > 0) {
-            return `${hours}:${String(minutes).padStart(2, '0')}:${secs}`;
+    };
+    const showControls = () => {
+        controlsBar?.classList.remove('opacity-0', 'pointer-events-none');
+        player.classList.remove('cursor-none');
+        clearTimeout(controlsTimeout);
+        if (!video.paused && !video.ended && speedMenu?.classList.contains('hidden') !== false) {
+            controlsTimeout = setTimeout(hideControls, 2500);
         }
+    };
+    ['pointermove', 'pointerdown', 'focusin'].forEach(evt => player.addEventListener(evt, showControls));
+    player.addEventListener('pointerleave', () => { if (!video.paused && !video.ended) hideControls(); });
 
-        return `${minutes}:${secs}`;
+    // Time formatting (M:SS or H:MM:SS)
+    const formatTime = (secs) => {
+        if (!Number.isFinite(secs) || secs < 0) return '0:00';
+        const t = Math.floor(secs), h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), s = String(t % 60).padStart(2, '0');
+        return h > 0 ? `${h}:${String(m).padStart(2, '0')}:${s}` : `${m}:${s}`;
     };
 
-    // Play / Pause
+    // Playback
     const togglePlayback = () => {
         if (video.paused || video.ended) {
-            if (video.ended) {
-                video.currentTime = 0;
-            }
-
-            video.play().catch(() => {
-                // Playback might be rejected by the browser.
-            });
+            if (video.ended) video.currentTime = 0;
+            video.play().catch(() => {});
         } else {
             video.pause();
         }
@@ -287,77 +138,41 @@ document.querySelectorAll('[data-video-player]').forEach((player) => {
 
     const updatePlaybackUI = () => {
         const playing = !video.paused && !video.ended;
-
         playIcon?.classList.toggle('hidden', playing);
         pauseIcon?.classList.toggle('hidden', !playing);
         centerPlay.classList.toggle('hidden', playing);
-
-        const label = playing
-        ? 'Pause video'
-        : 'Play video';
-
+        const label = playing ? 'Pause video' : 'Play video';
         playButton.setAttribute('aria-label', label);
         centerPlay.setAttribute('aria-label', label);
+        showControls();
     };
 
-    centerPlay.addEventListener('click', togglePlayback);
+    [centerPlay, video].forEach(el => el.addEventListener('click', () => { player.focus(); togglePlayback(); }));
     playButton.addEventListener('click', togglePlayback);
-    video.addEventListener('click', togglePlayback);
 
-    video.addEventListener('play', updatePlaybackUI);
-    video.addEventListener('pause', updatePlaybackUI);
-    video.addEventListener('ended', updatePlaybackUI);
+    video.addEventListener('play', () => {
+        document.querySelectorAll('video').forEach(v => { if (v !== video && !v.paused) v.pause(); });
+        updatePlaybackUI();
+    });
+    ['pause', 'ended'].forEach(evt => video.addEventListener(evt, updatePlaybackUI));
 
-    // Progress bar appearance.
-    const updateSeekTrack = (percent) => {
-        seek.style.background = `
-            linear-gradient(
-                to right,
-                #795BFF 0%,
-                #795BFF ${percent}%,
-                rgba(255,255,255,0.22) ${percent}%,
-                rgba(255,255,255,0.22) 100%
-            )
-        `;
+    // Progress & Seek
+    const updateSeekTrack = (pct) => {
+        seek.style.background = `linear-gradient(to right, #795BFF 0%, #795BFF ${pct}%, rgba(255,255,255,0.22) ${pct}%, rgba(255,255,255,0.22) 100%)`;
     };
 
-    // Elapsed / remaining time and progress.
     const updateProgress = () => {
-        const hasDuration =
-            Number.isFinite(video.duration) && video.duration > 0;
-
-        const total = hasDuration ? video.duration : 0;
-        const elapsed = Number.isFinite(video.currentTime)
-            ? video.currentTime
-            : 0;
-
-        if (showRemainingTime && hasDuration) {
-            currentTime.textContent =
-                `-${formatTime(Math.max(0, total - elapsed))}`;
-        } else {
-            currentTime.textContent = formatTime(elapsed);
-        }
-
+        const valid = Number.isFinite(video.duration) && video.duration > 0;
+        const total = valid ? video.duration : 0, cur = Number.isFinite(video.currentTime) ? video.currentTime : 0;
+        currentTime.textContent = (showRemainingTime && valid) ? `-${formatTime(Math.max(0, total - cur))}` : formatTime(cur);
         duration.textContent = formatTime(total);
-
-        const percent = hasDuration
-            ? Math.min(100, Math.max(0, (elapsed / total) * 100))
-            : 0;
-
-        if (!seek.matches(':active')) {
-            seek.value = String(percent);
-        }
-
-        updateSeekTrack(percent);
+        const pct = valid ? Math.min(100, Math.max(0, (cur / total) * 100)) : 0;
+        if (!seek.matches(':active')) seek.value = String(pct);
+        updateSeekTrack(pct);
     };
 
-    // Toggle the time display when clicked.
     const updateTimeToggleLabel = () => {
-        const label = showRemainingTime
-        ? 'Show elapsed time'
-        : 'Show remaining time';
-
-        timeToggle.setAttribute('aria-label', label);
+        timeToggle.setAttribute('aria-label', showRemainingTime ? 'Show elapsed time' : 'Show remaining time');
         timeToggle.title = 'Switch between elapsed and remaining time';
     };
 
@@ -367,219 +182,163 @@ document.querySelectorAll('[data-video-player]').forEach((player) => {
         updateTimeToggleLabel();
     });
 
-    // Preview the time at the hovered position on the timeline.
     const updateSeekTooltip = (clientX = null) => {
-        if (
-            !Number.isFinite(video.duration) ||
-            video.duration <= 0
-        ) {
-            return;
-        }
-
-        const seekRect = seek.getBoundingClientRect();
-        const timelineRect = timeline.getBoundingClientRect();
-
-        let ratio;
-
-        if (clientX !== null) {
-            ratio = (clientX - seekRect.left) / seekRect.width;
-        } else {
-            ratio = Number(seek.value) / 100;
-        }
-
-        ratio = Math.min(1, Math.max(0, ratio));
-
+        if (!Number.isFinite(video.duration) || video.duration <= 0) return;
+        const sr = seek.getBoundingClientRect(), tr = timeline.getBoundingClientRect();
+        const ratio = Math.min(1, Math.max(0, clientX !== null ? (clientX - sr.left) / sr.width : Number(seek.value) / 100));
         seekTooltip.textContent = formatTime(ratio * video.duration);
-
-        const pointerX = clientX !== null
-            ? clientX
-            : seekRect.left + ratio * seekRect.width;
-
-        const rawX = pointerX - timelineRect.left;
-
-        // Keep the tooltip inside the timeline edges.
-        const edgePadding = Math.min(40, timelineRect.width / 2);
-        const x = Math.max(
-            edgePadding,
-            Math.min(timelineRect.width - edgePadding, rawX)
-        );
-
-        seekTooltip.style.left = `${x}px`;
+        const ptX = clientX !== null ? clientX : sr.left + ratio * sr.width;
+        const pad = Math.min(40, tr.width / 2);
+        seekTooltip.style.left = `${Math.max(pad, Math.min(tr.width - pad, ptX - tr.left))}px`;
         seekTooltip.classList.remove('hidden');
     };
 
-    seek.addEventListener('pointerenter', (event) => {
-        updateSeekTooltip(event.clientX);
-    });
-
-    seek.addEventListener('pointermove', (event) => {
-        updateSeekTooltip(event.clientX);
-    });
-
-    seek.addEventListener('pointerleave', () => {
-        seekTooltip.classList.add('hidden');
-    });
-
-    seek.addEventListener('focus', () => {
-        updateSeekTooltip();
-    });
-
-    seek.addEventListener('blur', () => {
-        seekTooltip.classList.add('hidden');
-    });
-
-    // Seek to the selected position.
+    ['pointerenter', 'pointermove'].forEach(e => seek.addEventListener(e, ev => updateSeekTooltip(ev.clientX)));
+    ['pointerleave', 'blur'].forEach(e => seek.addEventListener(e, () => seekTooltip.classList.add('hidden')));
+    seek.addEventListener('focus', () => updateSeekTooltip());
     seek.addEventListener('input', () => {
-        if (Number.isFinite(video.duration) && video.duration > 0) {
-            video.currentTime =
-                (Number(seek.value) / 100) * video.duration;
-        }
-
+        if (Number.isFinite(video.duration) && video.duration > 0) video.currentTime = (Number(seek.value) / 100) * video.duration;
         updateProgress();
         updateSeekTooltip();
     });
+    ['loadedmetadata', 'durationchange', 'timeupdate'].forEach(e => video.addEventListener(e, updateProgress));
 
-    video.addEventListener('loadedmetadata', updateProgress);
-    video.addEventListener('durationchange', updateProgress);
-    video.addEventListener('timeupdate', updateProgress);
-
-    // Volume / Mute.
+    // Volume
     const updateVolumeUI = () => {
         const muted = video.muted || video.volume === 0;
-
         soundIcon?.classList.toggle('hidden', muted);
         mutedIcon?.classList.toggle('hidden', !muted);
-
-        muteButton?.setAttribute(
-            'aria-label',
-            muted ? 'Turn on sound' : 'Mute sound'
-        );
-
-        if (volume && !volume.matches(':active')) {
-            volume.value = String(muted ? 0 : video.volume);
-        }
+        muteButton?.setAttribute('aria-label', muted ? 'Turn on sound' : 'Mute sound');
+        if (volume && !volume.matches(':active')) volume.value = String(muted ? 0 : video.volume);
     };
 
     muteButton?.addEventListener('click', () => {
-        if (video.muted || video.volume === 0) {
-            video.muted = false;
-
-            if (video.volume === 0) {
-                video.volume = 0.7;
-            }
-        } else {
-            video.muted = true;
-        }
-
+        video.muted = !video.muted && video.volume > 0;
+        if (!video.muted && video.volume === 0) video.volume = 0.7;
         updateVolumeUI();
     });
-
     volume?.addEventListener('input', () => {
         video.volume = Number(volume.value);
         video.muted = video.volume === 0;
         updateVolumeUI();
     });
-
     video.addEventListener('volumechange', updateVolumeUI);
 
-    // Playback speed dropdown.
+    // Speed Menu
     const setSpeedMenuOpen = (open) => {
-        if (!speedMenu || !speedButton) {
-            return;
-        }
-
+        if (!speedMenu || !speedButton) return;
         speedMenu.classList.toggle('hidden', !open);
         speedButton.setAttribute('aria-expanded', String(open));
+        showControls();
     };
 
     const setPlaybackRate = (rate) => {
         video.playbackRate = rate;
-
         if (speedButton) {
             speedButton.textContent = `${rate}×`;
-            speedButton.setAttribute(
-                'aria-label',
-                `Video playback speed ${rate}×`
-            );
+            speedButton.setAttribute('aria-label', `Video playback speed ${rate}×`);
         }
-
-        speedMenu?.querySelectorAll('button[data-speed]').forEach((option) => {
-            const active = Number(option.dataset.speed) === rate;
-
-            option.classList.toggle('bg-violet-600/20', active);
-            option.classList.toggle('text-violet-200', active);
-            option.classList.toggle('text-gray-200', !active);
-
-            option.setAttribute('aria-pressed', String(active));
+        speedMenu?.querySelectorAll('button[data-speed]').forEach((opt) => {
+            const active = Number(opt.dataset.speed) === rate;
+            opt.classList.toggle('bg-violet-600/20', active);
+            opt.classList.toggle('text-violet-200', active);
+            opt.classList.toggle('text-gray-200', !active);
+            opt.setAttribute('aria-pressed', String(active));
         });
     };
 
-    speedButton?.addEventListener('click', (event) => {
-        event.stopPropagation();
-
-        const isOpen = !speedMenu.classList.contains('hidden');
-        setSpeedMenuOpen(!isOpen);
-    });
-
-    speedMenu?.addEventListener('click', (event) => {
-        const option = event.target.closest('button[data-speed]');
-
-        if (!option) {
-            return;
-        }
-
-        const rate = Number(option.dataset.speed);
-
-        if (!Number.isFinite(rate) || rate <= 0) {
-            return;
-        }
-
-        setPlaybackRate(rate);
-        setSpeedMenuOpen(false);
-    });
-
-    // Close the speed menu when clicking outside it or pressing Escape.
-    document.addEventListener('click', (event) => {
-        if (speedControl && !speedControl.contains(event.target)) {
+    speedButton?.addEventListener('click', (e) => { e.stopPropagation(); setSpeedMenuOpen(speedMenu.classList.contains('hidden')); });
+    speedMenu?.addEventListener('click', (e) => {
+        const opt = e.target.closest('button[data-speed]');
+        const rate = Number(opt?.dataset.speed);
+        if (Number.isFinite(rate) && rate > 0) {
+            setPlaybackRate(rate);
             setSpeedMenuOpen(false);
         }
     });
+    document.addEventListener('click', (e) => { if (speedControl && !speedControl.contains(e.target)) setSpeedMenuOpen(false); });
 
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-            setSpeedMenuOpen(false);
-        }
-    });
+    // PiP
+    if (document.pictureInPictureEnabled && video.requestPictureInPicture) {
+        pipButton?.addEventListener('click', async () => {
+            try {
+                document.pictureInPictureElement === video ? await document.exitPictureInPicture() : await video.requestPictureInPicture();
+            } catch {}
+        });
+        video.addEventListener('enterpictureinpicture', () => {
+            pipButton?.classList.add('text-violet-400');
+            pipButton?.setAttribute('aria-label', 'Exit picture in picture');
+        });
+        video.addEventListener('leavepictureinpicture', () => {
+            pipButton?.classList.remove('text-violet-400');
+            pipButton?.setAttribute('aria-label', 'Picture in picture');
+        });
+    } else if (pipButton) {
+        pipButton.classList.add('hidden');
+    }
 
-    // Fullscreen.
+    // Fullscreen
     fullscreenButton?.addEventListener('click', async () => {
         try {
-            if (document.fullscreenElement === player) {
-                await document.exitFullscreen();
-            } else if (player.requestFullscreen) {
-                await player.requestFullscreen();
+            if (document.fullscreenElement === player) await document.exitFullscreen();
+            else if (player.requestFullscreen) await player.requestFullscreen();
+            else if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
+        } catch {}
+    });
+    document.addEventListener('fullscreenchange', () => {
+        fullscreenButton?.setAttribute('aria-label', document.fullscreenElement === player ? 'Exit full screen' : 'Full-screen view');
+    });
+
+    // Hotkeys
+    player.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') return setSpeedMenuOpen(false);
+        const tag = e.target.tagName?.toLowerCase();
+        if (tag === 'textarea' || (tag === 'input' && e.target.type !== 'range')) return;
+
+        const k = e.key;
+        if (k === ' ' || k === 'k' || k === 'K') {
+            if (tag === 'button' && k === ' ') return;
+            e.preventDefault();
+            togglePlayback();
+            showControls();
+        } else if (k === 'ArrowLeft' || k === 'ArrowRight') {
+            e.preventDefault();
+            if (Number.isFinite(video.duration)) {
+                video.currentTime = Math.max(0, Math.min(video.duration, video.currentTime + (k === 'ArrowRight' ? 5 : -5)));
+                updateProgress();
+                showControls();
             }
-        } catch {
-            // Fullscreen may be unavailable in some browsers.
+        } else if (k === 'ArrowUp' || k === 'ArrowDown') {
+            e.preventDefault();
+            const delta = k === 'ArrowUp' ? 0.1 : -0.1;
+            video.volume = Math.max(0, Math.min(1, Math.round((video.volume + delta) * 10) / 10));
+            video.muted = video.volume === 0;
+            updateVolumeUI();
+            showControls();
+        } else if (k === 'm' || k === 'M') {
+            e.preventDefault();
+            video.muted = !video.muted && video.volume > 0;
+            if (!video.muted && video.volume === 0) video.volume = 0.7;
+            updateVolumeUI();
+            showControls();
+        } else if (k === 'f' || k === 'F') {
+            e.preventDefault();
+            fullscreenButton?.click();
+            showControls();
+        } else if (k === 'p' || k === 'P') {
+            if (pipButton && !pipButton.classList.contains('hidden')) {
+                e.preventDefault();
+                pipButton.click();
+                showControls();
+            }
         }
     });
 
-    document.addEventListener('fullscreenchange', () => {
-        fullscreenButton?.setAttribute(
-            'aria-label',
-            document.fullscreenElement === player
-                ? 'Exit full screen'
-                : 'Full-screen view'
-        );
-    });
-
-    // Initial state.
+    // Initial state
     updatePlaybackUI();
     updateProgress();
     updateTimeToggleLabel();
     updateVolumeUI();
     setPlaybackRate(video.playbackRate || 1);
 });
-
 </script>
-

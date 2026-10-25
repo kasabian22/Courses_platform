@@ -6,18 +6,6 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.db import transaction
 
 
-def assign_instructor_permissions(user):
-    """Grant course, module, and content management permissions to an instructor."""
-    codenames = [
-        'add_course', 'change_course', 'delete_course',
-        'add_module', 'change_module', 'delete_module',
-        'add_content', 'change_content', 'delete_content',
-    ]
-    permissions = Permission.objects.filter(
-        content_type__app_label='courses',
-        codename__in=codenames
-    )
-    user.user_permissions.add(*permissions)
 
 
 class SignUpForm(UserCreationForm):
@@ -40,9 +28,9 @@ class SignUpForm(UserCreationForm):
 
     # validation for repitive emails.
     def clean_email(self):
-        email = self.cleaned_data.get('email')
+        email = self.cleaned_data.get('email', '').strip().lower()
         
-        if User.objects.filter(email=email).exists():
+        if User.objects.filter(email__iexact=email).exists():
             raise forms.ValidationError("This email is already registered. Please use a different one.")
         
         return email

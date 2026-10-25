@@ -2,7 +2,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404, render, redirect
 
 from courses.models import Course
-from .forms import SignUpForm, InstructorProfileForm, StudentProfileForm, UserUpdateForm, CustomSignInForm, assign_instructor_permissions
+from .forms import SignUpForm, InstructorProfileForm, StudentProfileForm, UserUpdateForm, CustomSignInForm
 from django.contrib.auth import login, logout
 from .models import InstructorProfile, InstructorRequest, StudentProfile, UserProfile
 from django.contrib.auth.decorators import login_required
@@ -11,7 +11,9 @@ from django.views.decorators.http import require_POST
 from django.contrib.auth.forms import PasswordChangeForm, SetPasswordForm
 from django.contrib.auth import update_session_auth_hash
 from django.contrib import messages
-
+from django.utils.http import url_has_allowed_host_and_scheme
+from .services import process_instructor_upgrade
+from django.contrib.auth.models import User
 
 # region ======================================================    Authorization    ==============================================================
 
@@ -42,6 +44,9 @@ def sign_in(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
+            next_url = request.POST.get('next') or request.GET.get('next')
+            if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
+                return redirect(next_url)
             return redirect('courses:subject_courses_list')
     else:
         form = CustomSignInForm()
@@ -92,12 +97,12 @@ def view_profile(request):
         if role == "student":
             profile, _ = StudentProfile.objects.get_or_create(user=request.user)
             enrolled_courses = Course.objects.filter(students=request.user).select_related(
-                'owner__instructors_profiles'
+                'owner__instructor_profile'
             ).annotate(
                 enrolled_students_count=Count('students', distinct=True),
                 annotated_avg_rating=Avg('review_details__rating'),
                 annotated_reviews_count=Count('review_details', distinct=True),
-                enrollment_date=Min('students_enrolled__enrolled_at')
+                enrollment_date=Min('students__students_enrolled__enrolled_at')
             ).order_by(
                 'enrollment_date'
             )
@@ -112,8 +117,6 @@ def view_profile(request):
                 elif user_request.status == 'rejected' and not user_request.is_seen:
                     show_request_banner = True
                     
-                    user_request.is_seen = True
-                    user_request.save()
 
             return render(request, 'accounts/view_student_profile.html', {
                 'profile': profile,
@@ -125,7 +128,7 @@ def view_profile(request):
         elif role == "instructor":
             profile, _ = InstructorProfile.objects.get_or_create(user=request.user)
             courses = Course.objects.filter(owner=request.user).select_related(
-                'owner__instructors_profiles'
+                'owner__instructor_profile'
             ).annotate(
                 enrolled_students_count=Count('students', distinct=True),
                 annotated_avg_rating=Avg('review_details__rating'),
@@ -134,34 +137,58 @@ def view_profile(request):
                 'id'
             )
 
+            enrolled_courses = Course.objects.filter(students=request.user).select_related(
+                'owner__instructor_profile'
+            ).annotate(
+                enrolled_students_count=Count('students', distinct=True),
+                annotated_avg_rating=Avg('review_details__rating'),
+                annotated_reviews_count=Count('review_details', distinct=True)
+            ).order_by(
+                '-id'
+            )
+
             return render(request, 'accounts/view_instructor_profile.html', {
                 'profile': profile,
-                'courses': courses
+                'courses': courses,
+                'enrolled_courses': enrolled_courses,
             })
     # admin or superuser
     else:
         profile, _ = InstructorProfile.objects.get_or_create(user=request.user)
         courses = Course.objects.filter(owner=request.user).select_related(
-            'owner__instructors_profiles'
+            'owner__instructor_profile'
         ).annotate(
             enrolled_students_count=Count('students', distinct=True)
         )
+
+        enrolled_courses = Course.objects.filter(students=request.user).select_related(
+                'owner__instructor_profile'
+            ).annotate(
+                enrolled_students_count=Count('students', distinct=True),
+                annotated_avg_rating=Avg('review_details__rating'),
+                annotated_reviews_count=Count('review_details', distinct=True)
+            ).order_by(
+                '-id'
+            )
         return render(request, 'accounts/view_instructor_profile.html', {
             'profile': profile,
-            'courses': courses
+            'courses': courses,
+            'enrolled_courses': enrolled_courses,
             })
 
 
 def public_instructor_profile(request, instructor_id):
-    instructor_profile = get_object_or_404(
-        InstructorProfile.objects.select_related('user'),
-        user__id=instructor_id
+    user = get_object_or_404(User, id=instructor_id)
+    # If the user is staff/instructor but lacks a profile row, create it safely
+    instructor_profile, _ = InstructorProfile.objects.get_or_create(
+        user=user,
+        defaults={'full_name': user.get_full_name() or user.username}
     )
 
     courses = Course.objects.filter(
         owner=instructor_profile.user,
         status=Course.Status.AVAILABLE
-    ).select_related('owner__instructors_profiles').annotate(
+    ).select_related('owner__instructor_profile').annotate(
         enrolled_students_count=Count('students', distinct=True),
         annotated_reviews_count=Count('review_details', distinct=True),
         annotated_avg_rating=Avg('review_details__rating')
@@ -214,7 +241,7 @@ def edit_profile(request):
 @require_POST
 def send_instructor_request(request):
     if hasattr(request.user, 'userprofile') and request.user.userprofile.role == 'student':
-        request_exists = InstructorRequest.objects.filter(user=request.user).exists()
+        request_exists = InstructorRequest.objects.filter(user=request.user, status__in=['pending', 'approved']).exists()
         
         if not request_exists:
             InstructorRequest.objects.create(user=request.user)
@@ -229,49 +256,22 @@ def send_instructor_request(request):
 
 @require_POST
 @login_required
-@transaction.atomic
 def upgrade_to_instructor(request):
     student_profile = StudentProfile.objects.filter(user=request.user).first()
-    
-    # Check if the user has an approved instructor request instead of the old boolean field
     approved_request = InstructorRequest.objects.filter(user=request.user, status='approved').first()
-
     if student_profile and approved_request:
-        # 1. Update role in UserProfile
-        UserProfile.objects.update_or_create(
-            user=request.user,
-            defaults={'role': 'instructor'}
-        )
-
-        # 2. Copy all shared BaseProfile data to the new InstructorProfile so nothing is lost
-        InstructorProfile.objects.update_or_create(
-            user=request.user,
-            defaults={
-                'photo': student_profile.photo,
-                'bio': student_profile.bio,
-                'full_name': student_profile.full_name,
-                'country': student_profile.country,
-                'education': student_profile.education,
-                'primary_language_spoken': student_profile.primary_language_spoken,
-                'linkedin': student_profile.linkedin,
-                'github': student_profile.github,
-                'facebook': student_profile.facebook,
-            }
-        )
-
-        # 3. Grant instructor permissions for courses/modules/contents
-        assign_instructor_permissions(request.user)
-
-        # 4. Safely delete the old StudentProfile
-        student_profile.delete()
-        
-        # 5. Delete the request record or mark it as completed so it doesn't stay in the DB forever
-        approved_request.delete() 
-
+        process_instructor_upgrade(request.user, student_profile, approved_request)
         messages.success(request, "Congratulations! Your account has been upgraded to Instructor.")
-        
     return redirect('accounts:view_profile')
 
+@require_POST
+@login_required
+def dismiss_instructor_request(request):
+    req = request.user.instructor_requests.filter(status='rejected', is_seen=False).first()
+    if req:
+        req.is_seen = True
+        req.save()
+    return redirect('accounts:view_profile')
 
 # endregion
 

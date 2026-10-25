@@ -52,10 +52,7 @@ def approve_requests(modeladmin, request, queryset):
         req.is_seen = False  # So that the acceptance message appears to him when he opens the website.
         req.save()
         
-        if hasattr(req.user, 'userprofile'):
-            profile = req.user.userprofile
-            profile.role = 'instructor'
-            profile.save()
+
 
 @admin.action(description='Reject specific requests')
 def reject_requests(modeladmin, request, queryset):

@@ -41,9 +41,13 @@ class CourseAdmin(admin.ModelAdmin):
         )
 
     def display_students(self, obj):
-        # Iterate directly over prefetched cache in memory without calling .exists()
-        names = [student.username for student in obj.students.all()]
-        return ", ".join(names) if names else "No students"
+        count = obj.students.count()
+        if count == 0:
+            return "No students"
+        sample = [s.username for s in obj.students.all()[:3]]
+        if count > 3:
+            return f"{', '.join(sample)} (+{count - 3} more)"
+        return ", ".join(sample)
     display_students.short_description = 'Enrolled Students'
 
     def display_wishlist(self, obj):

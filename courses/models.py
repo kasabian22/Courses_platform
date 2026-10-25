@@ -12,8 +12,9 @@ from .utils import extract_smart_base_slug, generate_unique_slug
 from django_quill.fields import QuillField
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Avg
-from django.conf.global_settings import LANGUAGES
+from django.core.cache import cache
 from unidecode import unidecode
+from django.conf import settings
 
 
 class Subject(models.Model):
@@ -41,10 +42,15 @@ class Subject(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
+        cache.delete('global_subject_categories')  # Purge old cache
         # auto-generate slug from the title
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        cache.delete('global_subject_categories')  # Purge old cache
+        super().delete(*args, **kwargs)
 
 class Course(models.Model):
     class Status(models.TextChoices):
@@ -64,7 +70,7 @@ class Course(models.Model):
     level            = models.CharField(max_length=50, choices=[('beginner', 'Beginner'), ('intermediate', 'Intermediate'), ('advanced', 'Advanced')], default='beginner')
     time_to_complete = models.DurationField(help_text="Enter the course duration in HH:MM:SS format (e.g., 02:30:00 for 2 and a half hours)", null=True, blank=True)
     reviews          = models.ManyToManyField(User, through='Review', related_name='course_reviews', blank=True)
-    language         = models.CharField(max_length=50, choices=LANGUAGES, default='en', help_text="Select the language of the course")
+    language         = models.CharField(max_length=50, choices=settings.LANGUAGES, default='en', help_text="Select the language of the course")
     image            = models.ImageField(upload_to='course_images/', null=True, blank=True, help_text="Upload an image for the course (Recommended aspect ratio: 16:9)")
     
     @property
@@ -138,14 +144,9 @@ class Course(models.Model):
             })
 
     def save(self, *args, **kwargs):
-        # Only auto-regenerate from title if slug is empty, OR if title changed AND user didn't manually change the slug
-        title_changed = (self.pk is not None and self.title != getattr(self, '_initial_title', ''))
-        slug_manually_changed = (self.slug != getattr(self, '_initial_slug', ''))
-
-        if not self.slug or (title_changed and not slug_manually_changed):
+        # Auto-generate ONLY if the course is new, or if slug was explicitly emptied
+        if not self.slug:
             self.slug = generate_unique_slug(Course, title=self.title, exclude_pk=self.pk)
-        else:
-            self.slug = generate_unique_slug(Course, title=self.title, custom_slug=self.slug, exclude_pk=self.pk)
 
         if not self.slug or not self.slug.strip():
             raise ValidationError("Integrity guard: Course slug cannot be empty.")
@@ -274,7 +275,7 @@ class File(ItemBase):
     # Property to extract only the base filename without the folder path
     @property
     def filename(self):
-        return os.path.basename(self.file.name)
+        return os.path.basename(self.file.name) if self.file and self.file.name else ""
 
 
 class Image(ItemBase):
@@ -287,6 +288,13 @@ class Video(ItemBase):
     video_url = models.URLField(null=True, blank=True, help_text="Enter a youtube video URL (optional). If provided, this will be used instead of uploading a video file.")
     video_upload = models.FileField(upload_to="videos", null=True, blank=True, help_text="Upload a video file (optional). If provided, this will be used instead of the URL.")
 
+    def clean(self):
+        super().clean()
+        if not self.video_url and not self.video_upload:
+            raise ValidationError("Please provide either a video URL or upload a video file.")
+        if self.video_url and self.video_upload:
+            raise ValidationError("Please provide only one video source (URL or file, not both).")
+    
     @property
     def youtube_embed_url(self):
         if not self.video_url:

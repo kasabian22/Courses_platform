@@ -278,7 +278,7 @@
                            class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-sm font-medium transition-colors flex items-center shadow-sm">
                             Next Module &rarr;
                         </a>
-                    {% elif is_completed and not next_module and request.user.is_authenticated and is_enrolled and request.user != course.owner %}
+                    {% elif is_course_completed and request.user.is_authenticated and is_enrolled and request.user != course.owner %}
                         <a href="{% url 'courses:course_certificate' course.slug %}" target="_blank" rel="noopener noreferrer" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-sm font-semibold transition-colors flex items-center gap-2 shadow-md">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
                             View Certificate
@@ -292,7 +292,7 @@
                 </div>
 
                 <!-- Course Completed Banner -->
-                {% if request.user.is_authenticated and is_enrolled and is_completed and not next_module and request.user != course.owner %}
+                {% if is_course_completed and request.user.is_authenticated and is_enrolled and request.user != course.owner %}
                     <div class="mb-6 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
                         <div class="text-center sm:text-left">
                             <h4 class="text-base font-bold text-emerald-300">

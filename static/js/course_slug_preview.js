@@ -24,6 +24,17 @@ document.addEventListener("DOMContentLoaded", function () {
     // Increased padding and height (py-1.5, min-h-[46px]) for a spacious modern look
     inputGroup.className = "flex items-center w-full rounded-xl overflow-hidden border border-[#3c4043] bg-[#1c1d22] focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all";
 
+    // Helper to consistently toggle warning border classes
+    function setWarningBorder(isWarning) {
+        if (isWarning) {
+            inputGroup.classList.add("border-amber-500/80", "ring-1", "ring-amber-500/50");
+            inputGroup.classList.remove("border-[#3c4043]");
+        } else {
+            inputGroup.classList.remove("border-amber-500/80", "ring-1", "ring-amber-500/50");
+            inputGroup.classList.add("border-[#3c4043]");
+        }
+    }
+
     // Compact Prefix: Showing only "/course/" saves huge horizontal space for the actual slug
     const prefixSpan = document.createElement("span");
     prefixSpan.className = "px-4 py-3 text-sm font-semibold text-gray-400 bg-[#2a2d30] border-r border-[#3c4043] select-none shrink-0 font-mono";
@@ -33,6 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const resetBtn = document.createElement("button");
     resetBtn.type = "button";
     resetBtn.title = "Regenerate slug automatically from title";
+    resetBtn.setAttribute("aria-label", "Regenerate slug automatically from title");
     resetBtn.className = "px-4 py-3 text-xs sm:text-sm font-medium text-indigo-400 hover:text-white hover:bg-indigo-600 transition-colors shrink-0 border-l border-[#3c4043] cursor-pointer flex items-center gap-1";
     resetBtn.innerHTML = "<span>↻</span> <span>Auto</span>";
 
@@ -79,15 +91,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (updateInputValue) slugInput.value = "";
                 statusText.textContent = data.message;
                 statusText.className = "text-xs font-medium text-amber-400 flex items-center gap-1 break-all";
-                
-                // Highlight input box with warning border
-                inputGroup.classList.add("border-amber-500/80", "ring-1", "ring-amber-500/50");
-                inputGroup.classList.remove("border-[#3c4043]");
+                setWarningBorder(true);
                 return;
             }
-            // Reset warning border
-            inputGroup.classList.remove("border-amber-500/80", "ring-1", "ring-amber-500/50");
-            inputGroup.classList.add("border-[#3c4043]");
+            setWarningBorder(false);
             if (updateInputValue) {
                 slugInput.value = data.slug;
             }
@@ -105,7 +112,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // 3. Listen to Title input (with 350ms Debounce)
+    // 3. Listen to Title input (with 500ms Debounce)
     titleInput.addEventListener("input", function () {
         if (isSlugManuallyEdited) return;
     
@@ -115,23 +122,22 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!currentTitle) {
             slugInput.value = "";
             statusText.textContent = "";
-            inputGroup.classList.remove("border-amber-500/80", "ring-1", "ring-amber-500/50");
-            inputGroup.classList.add("border-[#3c4043]");
+            setWarningBorder(false);
             return;
         }
     
-        // Instant live check: if less than 3 characters, warn immediately without waiting for server
-        if (currentTitle.replace(/[^\w\u0600-\u06FF]/g, '').length < 3) {
+        // Instant live check: supports all international Unicode letters and numbers
+        if (currentTitle.replace(/[^\p{L}\p{N}]/gu, '').length < 3) {
             slugInput.value = "";
             statusText.textContent = "⚠ Title must have at least 3 letters/numbers to create a URL.";
             statusText.className = "text-xs font-medium text-amber-400 break-all";
-            inputGroup.classList.add("border-amber-500/80");
+            setWarningBorder(true);
             return;
         }
     
         debounceTimer = setTimeout(() => {
             fetchSmartSlug({ title: currentTitle, updateInputValue: true });
-        }, 500); // Fast 500ms response
+        }, 500); // 500ms debounce
     });
 
     // 4. Listen to manual typing inside Custom URL Slug (enforce slug format live)
@@ -144,15 +150,18 @@ document.addEventListener("DOMContentLoaded", function () {
             .replace(/[^a-z0-9\u0600-\u06FF\-]/g, "")
             .replace(/\-+/g, "-");
     
-        this.value = formatted;
+        if (this.value !== formatted) {
+            const start = this.selectionStart;
+            this.value = formatted;
+            this.setSelectionRange(start, start);
+        }
         clearTimeout(debounceTimer);
 
         // Check if custom slug exceeds maximum character limit
         if (formatted.length > MAX_SLUG_LIMIT) {
             statusText.textContent = `⚠ This slug is too long (${formatted.length}/${MAX_SLUG_LIMIT} characters). Please write a slug that doesn't exceed the limit.`;
             statusText.className = "text-xs font-medium text-amber-400 break-all";
-            inputGroup.classList.add("border-amber-500/80", "ring-1", "ring-amber-500/50");
-            inputGroup.classList.remove("border-[#3c4043]");
+            setWarningBorder(true);
             return;
         }
     
@@ -160,7 +169,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!formatted || formatted === "-") {
             statusText.textContent = "⚠ Custom slug must contain English letters or numbers.";
             statusText.className = "text-xs font-medium text-amber-400 break-all";
-            inputGroup.classList.add("border-amber-500/80");
+            setWarningBorder(true);
             return;
         }
     
@@ -174,11 +183,25 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 500);
     });
 
-    // 5. Reset / Auto button click: re-link to Title and regenerate immediately
+    // 5. Blur event listener: strip leading and trailing hyphens on leave
+    slugInput.addEventListener("blur", function () {
+        const trimmed = this.value.replace(/^-+|-+$/g, "");
+        if (trimmed !== this.value) {
+            this.value = trimmed;
+            if (trimmed) {
+                fetchSmartSlug({
+                    title: titleInput.value,
+                    customSlug: trimmed,
+                    updateInputValue: true
+                });
+            }
+        }
+    });
+
+    // 6. Reset / Auto button click: re-link to Title and regenerate immediately
     resetBtn.addEventListener("click", function () {
         isSlugManuallyEdited = false;
-        inputGroup.classList.remove("border-amber-500/80", "ring-1", "ring-amber-500/50");
-        inputGroup.classList.add("border-[#3c4043]");
+        setWarningBorder(false);
         if (titleInput.value.trim()) {
             fetchSmartSlug({ title: titleInput.value.trim(), updateInputValue: true });
         } else {

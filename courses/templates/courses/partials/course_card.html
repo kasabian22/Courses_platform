@@ -45,7 +45,7 @@
                 </a>
             </h3>
             <p class="mt-1 text-xs text-gray-500">
-                By <a href="{% url 'accounts:public_instructor_profile' course.owner.id %}" class="font-medium text-gray-300 hover:text-indigo-400 hover:underline transition-colors">{{ course.owner.instructors_profiles.full_name|default:course.owner.get_full_name|default:course.owner.username }}</a>
+                By <a href="{% url 'accounts:public_instructor_profile' course.owner.id %}" class="font-medium text-gray-300 hover:text-indigo-400 hover:underline transition-colors">{{ course.owner.instructor_profile.full_name|default:course.owner.get_full_name|default:course.owner.username }}</a>
             </p>
             <p class="mt-3 mb-5 text-sm text-gray-400 line-clamp-2">
                 {{ course.header|default:"No header provided for this course." }}

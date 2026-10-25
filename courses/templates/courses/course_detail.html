@@ -24,12 +24,21 @@
             {% else %}
                 <!-- 1. Enroll / Unenroll Button -->
                 {% if not enrollment %}
-                    <form method="post" action="{% url 'courses:enroll_course' course.slug %}">
-                        {% csrf_token %}
-                        <button type="submit" class="inline-block bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-indigo-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                    {% if request.user.is_authenticated %}
+                        <!-- Authenticated user: Submit standard POST form to enroll -->
+                        <form method="post" action="{% url 'courses:enroll_course' course.slug %}">
+                            {% csrf_token %}
+                            <button type="submit" class="inline-block bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-indigo-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                                Enroll Now
+                            </button>
+                        </form>
+                    {% else %}
+                        <!-- Unauthenticated user: Send them to sign in, then bring them back to THIS course page -->
+                        <a href="{% url 'accounts:sign_in' %}?next={{ request.path }}" 
+                        class="inline-block bg-indigo-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-indigo-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                             Enroll Now
-                        </button>
-                    </form>
+                        </a>
+                    {% endif %}
                 {% else %}
                     <form method="post" action="{% url 'courses:unenroll_course' course.slug %}">
                         {% csrf_token %}
@@ -215,14 +224,15 @@
                         View
                     </a>
 
-                    {% if perms.courses.add_module and request.user == course.owner %}
+                    {% if perms.courses.change_module and request.user == course.owner %}
                         <!-- Edit Module -->
                         <a href="{% url 'courses:edit_module' course.slug module.id %}" 
                            class="p-2 text-gray-400 hover:text-white bg-transparent hover:bg-gray-700 rounded-lg transition" title="Edit Details">
                             <!-- SVG Edit Icon -->
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                         </a>
-
+                    {% endif %}
+                    {% if perms.courses.delete_module and request.user == course.owner %}
                         <!-- Delete Module -->
                         <form method="POST" action="{% url 'courses:delete_module' course.slug module.id %}" class="m-0 p-0 inline-block"
                         data-confirm-title="Delete Module"
@@ -234,7 +244,9 @@
                                 </svg>
                             </button>
                         </form>
-
+                    
+                    {% endif %}
+                    {% if perms.courses.add_content and request.user == course.owner %}
                         <!-- Add Content Dropdown (CSS-based) -->
                         <div class="relative group">
                             <!-- Dropdown Trigger Button -->
@@ -294,10 +306,10 @@
 
         <!-- Instructor Section -->
         <div class="mt-12 bg-[#1c1d22] border border-gray-700 p-8 rounded-2xl shadow-lg">
-            <h2 class="text-3xl font-semibold text-white mb-4">Instructor: <a href="{% url 'accounts:public_instructor_profile' course.owner.id %}" class="font-medium text-gray-300 hover:text-indigo-400 hover:underline transition-colors">{{ course.owner.instructors_profiles.full_name|default:course.owner.get_full_name|default:course.owner.username }}</a></h2>
+            <h2 class="text-3xl font-semibold text-white mb-4">Instructor: <a href="{% url 'accounts:public_instructor_profile' course.owner.id %}" class="font-medium text-gray-300 hover:text-indigo-400 hover:underline transition-colors">{{ course.owner.instructor_profile.full_name|default:course.owner.get_full_name|default:course.owner.username }}</a></h2>
             <div class="flex items-center">
-                {% if course.owner.instructors_profiles.photo %}
-                    <img src="{{ course.owner.instructors_profiles.photo.url }}" alt="{{ course.owner.username }}" class="w-16 h-16 rounded-full object-cover mr-4">
+                {% if course.owner.instructor_profile.photo %}
+                    <img src="{{ course.owner.instructor_profile.photo.url }}" alt="{{ course.owner.username }}" class="w-16 h-16 rounded-full object-cover mr-4">
                 {% else %}
                     <div class="w-16 h-16 rounded-full bg-gray-600 flex items-center justify-center text-white font-bold mr-4">
                         {{ course.owner.username|slice:":1"|upper }}
@@ -305,8 +317,8 @@
                 {% endif %}
                 <div>
                     <p class="text-gray-300 mb-2">
-                        {% if course.owner.instructors_profiles.bio %}
-                            {{ course.owner.instructors_profiles.bio }}
+                        {% if course.owner.instructor_profile.bio %}
+                            {{ course.owner.instructor_profile.bio }}
                         {% else %}
                             This instructor has not provided a bio yet.
                         {% endif %}
@@ -355,10 +367,10 @@
                             <div class="flex items-start justify-between mb-4">
                                 <div class="flex items-center gap-3">
                                     <!-- Reviewer Avatar (Fallback to first letter if no avatar) -->
-                                    {% if review.user.students_profiles.photo %}
-                                        <img src="{{ review.user.students_profiles.photo.url }}" alt="{{ review.user.username }}" class="w-10 h-10 rounded-full object-cover">
-                                    {% elif review.user.instructors_profiles.photo %}
-                                        <img src="{{ review.user.instructors_profiles.photo.url }}" alt="{{ review.user.username }}" class="w-10 h-10 rounded-full object-cover">
+                                    {% if review.user.student_profile.photo %}
+                                        <img src="{{ review.user.student_profile.photo.url }}" alt="{{ review.user.username }}" class="w-10 h-10 rounded-full object-cover">
+                                    {% elif review.user.instructor_profile.photo %}
+                                        <img src="{{ review.user.instructor_profile.photo.url }}" alt="{{ review.user.username }}" class="w-10 h-10 rounded-full object-cover">
                                     {% else %}
                                         <div class="w-10 h-10 rounded-full bg-[#1e2022] border border-[#3c4043] text-indigo-400 flex items-center justify-center font-bold">
                                             {{ review.user.username|slice:":1"|upper }}

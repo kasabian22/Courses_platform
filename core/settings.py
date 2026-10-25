@@ -11,8 +11,8 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 """
 
 from pathlib import Path
-import os
-from decouple import config
+from decouple import config, Csv
+from django.conf.global_settings import LANGUAGES
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,9 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('THE_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('THE_DEBUG', cast=bool)
+DEBUG = config('THE_DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=Csv())
 
 
 # Application definition
@@ -51,6 +51,11 @@ INSTALLED_APPS = [
     'django_quill',
     'widget_tweaks',
     'django_countries',
+    
+    # When any model record is deleted (Course, Video, Image, File, StudentProfile, InstructorProfile), it automatically removes the physical file from disk.
+    # When a user replaces a file (e.g. uploads a new avatar or new video), it automatically deletes the old file from disk.
+    # it doesn't need you to write any other code.
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
@@ -78,8 +83,8 @@ AUTHENTICATION_BACKENDS = [
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
-            'client_id': config('GOOGLE_CLIENT_ID'),
-            'secret': config('GOOGLE_CLIENT_SECRET'),
+            'client_id': config('GOOGLE_CLIENT_ID', default=''),
+            'secret': config('GOOGLE_CLIENT_SECRET', default=''),
             'key': ''
         }
     }
@@ -90,14 +95,13 @@ ACCOUNT_LOGOUT_REDIRECT_URL = 'accounts:sign_in'
 
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 ACCOUNT_LOGIN_METHODS = {'email', 'username'}
-SOCIALACCOUNT_QUERY_EMAIL = True
 
 ROOT_URLCONF = 'core.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -122,8 +126,8 @@ DATABASES = {
         'NAME': config('DB_NAME'),
         'USER': config('DB_USER'),
         "PASSWORD": config('DB_PASSWORD'),
-        'HOST': 'localhost',
-        'PORT': '5432'
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default='5432'),
     }
 }
 
@@ -166,30 +170,26 @@ USE_TZ = True
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
-}
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    BASE_DIR / 'static',
 ]
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# الرابط الذي سيتم استخدامه في المتصفح للوصول لملفات الميديا
+# URL used in browser to access uploaded media files
 MEDIA_URL = '/media/'
 
-# المسار الفعلي على السيرفر أو جهازك الذي سيتم حفظ الملفات المرفوعة فيه
+# Absolute filesystem path to the directory where uploaded files are stored
 MEDIA_ROOT = BASE_DIR / 'media'
 
 LOGIN_URL = 'accounts:sign_in'
 
 
-# Limit maximum request body/upload size to 100 MB
-DATA_UPLOAD_MAX_MEMORY_SIZE = 100 * 1024 * 1024
-FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+# Limit maximum request body/upload size to 120 MB (100 + 20 for reserve)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 120 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE = 30 * 1024 * 1024

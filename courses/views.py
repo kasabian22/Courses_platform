@@ -3,12 +3,13 @@ import re
 from django.apps import apps
 from django.shortcuts import redirect, render, get_object_or_404
 from unidecode import unidecode
-from .utils import extract_smart_base_slug, generate_unique_slug, paginate_queryset, certificate_number, generate_certificate_png, _display_name
+from .utils import extract_smart_base_slug, generate_unique_slug, paginate_queryset
+from .certificates import certificate_number, generate_certificate_png, _display_name
 from .forms import CourseForm, TextForm, FileForm, VideoForm, ImageForm, ModuleForm, ReviewForm
 from .models import Content, Enrollment, Module, Progress, Review, Subject, Course
 from django.contrib.auth.decorators import login_required, permission_required
 from django.views.decorators.http import require_POST
-from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
+from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
 from django.utils.text import slugify
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.contrib import messages
@@ -25,7 +26,7 @@ def subject_courses_list(request):
     courses_prefetch = Prefetch(
         'courses',
         queryset=Course.objects.filter(status=Course.Status.AVAILABLE).select_related(
-            'owner__instructors_profiles'
+            'owner__instructor_profile'
         ).annotate(
             enrolled_students_count=Count('students', distinct=True),
             annotated_avg_rating=Avg('review_details__rating'),
@@ -48,7 +49,7 @@ def subject_courses_list(request):
         # "select_related" works only with ForeignKey and OneToOneField fields
         # we used owner__instruct... because we display instructor full_name or username on the course card
         # ).select_related(
-            # 'owner__instructors_profiles'
+            # 'owner__instructor_profile'
         # "annotate" used with functions that are used in the templates, it makes using functions more effictive.
         # you can use "annotated functions" in order_by, models.py, and templates, but best practice in templates to use a @property that checks the value of the annotated function, and makes the same thing, just in case something go wrong.
         # ).annotate(
@@ -72,7 +73,7 @@ def search_courses(request):
     query = request.GET.get('q', '')
     
     courses_qs = Course.objects.filter(status=Course.Status.AVAILABLE).select_related(
-        'owner__instructors_profiles'
+        'owner__instructor_profile'
     ).annotate(
         enrolled_students_count=Count('students', distinct=True),
         annotated_avg_rating=Avg('review_details__rating'),
@@ -84,10 +85,13 @@ def search_courses(request):
     
     if query:
         # Search in course title OR course overview OR subject title OR course owner
+        query_slug = slugify(query)
         courses_qs = courses_qs.filter(
             Q(title__icontains=query) | 
             Q(overview__icontains=query) |
             Q(subject__title__icontains=query)|
+            Q(subject__slug__icontains=query_slug)|
+            Q(subject__description__icontains=query)|
             Q(owner__username__icontains=query)
         ).distinct() 
 
@@ -105,7 +109,7 @@ def category_courses(request, subject_slug):
     subject = get_object_or_404(Subject, slug=subject_slug)
     
     courses_qs = Course.objects.filter(subject=subject, status=Course.Status.AVAILABLE).select_related(
-        'owner__instructors_profiles'
+        'owner__instructor_profile'
     ).annotate(
         enrolled_students_count=Count('students', distinct=True),
         annotated_avg_rating=Avg('review_details__rating'),
@@ -127,7 +131,7 @@ def category_courses(request, subject_slug):
 def course_detail(request, slug):
     course = get_object_or_404(
         Course.objects.select_related(
-        'owner__instructors_profiles', 'subject'
+        'owner__instructor_profile', 'subject'
         # "prefetch_related" is used to fetch all the related "modules" objects in a separate query, but still in a single database hit, which reduces the number of queries to the database and improves performance.
         ).prefetch_related('modules').annotate(
         enrolled_students_count=Count('students', distinct=True),
@@ -136,9 +140,14 @@ def course_detail(request, slug):
     ),
         slug=slug
     )
+
+    # Only allow the owner or staff/superusers to view Draft courses
+    if course.status == Course.Status.DRAFT:
+        if not request.user.is_authenticated or (request.user != course.owner and not request.user.is_staff):
+            raise Http404("This course is currently in draft mode and not available.")
     
     reviews_qs = Review.objects.filter(course=course).select_related(
-        'user', 'user__students_profiles', 'user__instructors_profiles'
+        'user', 'user__student_profile', 'user__instructor_profile'
     ).order_by('-created_at')
 
     reviews_page = paginate_queryset(request, reviews_qs, per_page=8)
@@ -290,10 +299,12 @@ def delete_course(request, slug):
 
 # region ----------------------------------------------- Enrollment ---------------------------------------------------------------------
 
-@require_POST
 @login_required
 def enroll_course(request, slug):
     course = get_object_or_404(Course, slug=slug, status=Course.Status.AVAILABLE)
+    # If accessed via GET (e.g. following a redirect), safely redirect to course detail
+    if request.method != 'POST':
+        return redirect('courses:course_detail', slug=course.slug)
     if course.owner == request.user:
         messages.error(request, 'You cannot enroll in your own course.')
         return redirect('courses:course_detail', slug=course.slug)
@@ -303,8 +314,6 @@ def enroll_course(request, slug):
         messages.success(request, 'You have successfully enrolled in this course')
     else:
         messages.info(request, 'You are already enrolled in this course.')
-
-
     
     return redirect('courses:course_detail', slug=course.slug)
 
@@ -345,7 +354,7 @@ def toggle_wishlist(request, slug):
 @login_required
 def view_wishlist(request):
     wishlist_qs = request.user.wishlist.select_related(
-        'owner__instructors_profiles'
+        'owner__instructor_profile'
     ).annotate(
         enrolled_students_count=Count('students', distinct=True),
         annotated_avg_rating=Avg('review_details__rating'),
@@ -394,6 +403,9 @@ def view_module(request, course_slug, module_id):
     is_owner = (course.owner == request.user)
     is_enrolled = course.students.filter(id=request.user.id).exists()
 
+    enrollment = Enrollment.objects.filter(user=request.user, course=course).first() if is_enrolled else None
+    is_course_completed = (enrollment.progress_percentage >= 100) if enrollment else False
+
     if not is_enrolled and not is_owner:
         messages.error(request, 'You must be enrolled in this course to view its modules.')
         return redirect('courses:course_detail', slug=course.slug)
@@ -419,7 +431,8 @@ def view_module(request, course_slug, module_id):
         'previous_module': previous_module,
         'next_module': next_module,
         'is_enrolled': is_enrolled,
-        'has_reviewed': has_reviewed
+        'has_reviewed': has_reviewed,
+        'is_course_completed': is_course_completed
     })
 
 @login_required
@@ -542,6 +555,15 @@ def content_create_update(request, slug, module_id, model_name, id=None):
 
     # if the request is an edit request.
     if id:
+        # Verify that the item is linked to the specified module
+        content_exists = Content.objects.filter(
+            module=module,
+            object_id=id,
+            content_type__model=model_name
+        ).exists()
+
+        if not content_exists:
+            raise Http404("This content item does not belong to the specified module.")
         obj = get_object_or_404(model_class, id=id, owner=request.user)
 
     if request.method == 'POST':
@@ -573,6 +595,7 @@ def content_create_update(request, slug, module_id, model_name, id=None):
 
 @login_required
 @require_POST
+@permission_required('courses.delete_content', raise_exception=True)
 def delete_content(request, course_slug, module_id, content_id):
     # Ensure the content belongs to the specified module and the course is owned by the current user
     content = get_object_or_404(
