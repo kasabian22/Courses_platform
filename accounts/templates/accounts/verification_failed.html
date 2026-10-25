@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Verification Link Invalid | E-Learning Platform
+{% endblock title %}
+
+{% block content %}
+<div class="flex justify-center items-center min-h-screen bg-[#1e2022] py-12 px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md bg-[#2a2d30] border border-[#3c4043] p-8 rounded-2xl shadow-lg text-center">
+        
+        <!-- Icon -->
+        <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-amber-900/40 text-amber-400 flex items-center justify-center border border-amber-700/40 shadow-lg shadow-amber-950/40">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+        </div>
+
+        <!-- Heading -->
+        <h2 class="text-2xl font-bold text-gray-100">Link Invalid or Expired</h2>
+        <p class="text-sm text-gray-300 mt-3 leading-relaxed">
+            This verification link has expired, is invalid, or your account has already been activated.
+        </p>
+
+        <!-- Actions -->
+        <div class="mt-8 pt-6 border-t border-[#3c4043] flex flex-col gap-3">
+            <a href="{% url 'accounts:resend_verification' %}"
+               class="w-full inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-colors text-sm">
+                Request a New Activation Link
+            </a>
+            <a href="{% url 'accounts:sign_in' %}"
+               class="text-xs text-gray-400 hover:text-white transition-colors py-2">
+                Already Verified? Sign In
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+

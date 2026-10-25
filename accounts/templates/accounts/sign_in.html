@@ -22,16 +22,24 @@
                 {% for error in form.non_field_errors %}
                     <p>{{ error }}</p>
                 {% endfor %}
+                <p class="mt-2 text-xs">
+                    <a href="{% url 'accounts:resend_verification' %}" class="text-indigo-400 hover:text-indigo-300 font-medium underline">
+                        Need a new activation link? Resend it here
+                    </a>
+                </p>
             </div>
         {% endif %}
 
         <form method="POST" novalidate>
             {% csrf_token %}
+            {% if request.GET.next %}
+                <input type="hidden" name="next" value="{{ request.GET.next }}">
+            {% endif %}
             
             <!-- Username Field -->
             <div class="mb-5">
                 <label for="{{ form.username.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
-                    Username*
+                    Username or Email*
                 </label>
                 {% render_field form.username class="w-full bg-[#151718] border border-[#3c4043] text-gray-200 placeholder-gray-500 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="Enter Your Username" %}
                 {% if form.username.errors %}
@@ -43,9 +51,14 @@
             
             <!-- Password Field -->
             <div class="mb-6">
-                <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
-                    Password*
-                </label>
+                <div class="flex items-center justify-between mb-2">
+                    <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-300">
+                        Password*
+                    </label>
+                    <a href="{% url 'accounts:password_reset' %}" class="text-xs text-indigo-400 hover:text-indigo-300 font-medium transition-colors">
+                        Forgot password?
+                    </a>
+                </div>
                 <div class="relative flex items-center">
                     {% render_field form.password id="my-password-field" class="w-full bg-[#151718] border border-[#3c4043] text-gray-200 placeholder-gray-500 rounded-xl pl-4 pr-11 py-3 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="Enter Your Password" %}
                     

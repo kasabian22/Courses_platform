@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Resend Activation Email | E-Learning Platform
+{% endblock title %}
+
+{% block content %}
+<div class="flex justify-center items-center min-h-screen bg-[#1e2022] py-12 px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md bg-[#2a2d30] border border-[#3c4043] p-8 rounded-2xl shadow-lg">
+        
+        <!-- Header -->
+        <div class="mb-8 text-center">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-indigo-900/40 text-indigo-400 flex items-center justify-center border border-indigo-700/40 shadow-lg shadow-indigo-950/40">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-gray-100">Resend Activation Link</h2>
+            <p class="text-sm text-gray-400 mt-2">Enter your email address to receive a fresh verification link</p>
+        </div>
+
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            <div class="mb-6">
+                <label for="id_email" class="block text-sm font-medium text-gray-300 mb-2">
+                    Email Address*
+                </label>
+                <input type="email"
+                       name="email"
+                       id="id_email"
+                       required
+                       value="{{ email|default:'' }}"
+                       placeholder="Enter your registered email"
+                       class="w-full bg-[#151718] border border-[#3c4043] text-gray-200 placeholder-gray-500 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 transition-colors text-sm"/>
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition-colors cursor-pointer text-sm">
+                Send Activation Link
+            </button>
+        </form>
+
+        <div class="mt-6 pt-6 border-t border-[#3c4043] text-center">
+            <a href="{% url 'accounts:sign_in' %}" class="text-xs text-gray-400 hover:text-white transition-colors">
+                Back to Sign In
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+

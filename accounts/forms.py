@@ -1,23 +1,10 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import Permission, User
+from django.contrib.auth.models import User
 from .models import InstructorProfile, StudentProfile, UserProfile
 from django.contrib.auth.forms import AuthenticationForm
 from django.db import transaction
-
-
-def assign_instructor_permissions(user):
-    """Grant course, module, and content management permissions to an instructor."""
-    codenames = [
-        'add_course', 'change_course', 'delete_course',
-        'add_module', 'change_module', 'delete_module',
-        'add_content', 'change_content', 'delete_content',
-    ]
-    permissions = Permission.objects.filter(
-        content_type__app_label='courses',
-        codename__in=codenames
-    )
-    user.user_permissions.add(*permissions)
+from email_validator import validate_email, EmailNotValidError
 
 
 class SignUpForm(UserCreationForm):
@@ -29,25 +16,26 @@ class SignUpForm(UserCreationForm):
     # the variable name 'email' must be the same as the field item 'email' and so on...
     email = forms.EmailField(required=True)
 
-    # old version of role field, we now default the role to student, and if the user is an instructor, we will change it in the view after the user is created, by upgrading him.
-    # role = forms.ChoiceField(choices=ROLE_CHOICES, required=True)
-
-
     class Meta:
         model = User
-        # we don't add role field because we add only fields that is related to User model, and role added automatially because it's a Declarative Field, but doesn't saved in user model, but saved in UserProfile model that we added before
         fields = ['username', 'email']
 
-    # validation for repitive emails.
+    # validation for repetitive emails and deliverability.
     def clean_email(self):
-        email = self.cleaned_data.get('email')
-        
-        if User.objects.filter(email=email).exists():
+        email = self.cleaned_data.get('email', '').strip().lower()
+        # Check if domain has deliverable mail servers (DNS MX check)
+        try:
+            valid = validate_email(email, check_deliverability=True)
+            email = valid.normalized
+        except EmailNotValidError as e:
+            raise forms.ValidationError(f"Invalid email address: {str(e)}")
+        # Check for duplicate registration
+        if User.objects.filter(email__iexact=email).exists():
             raise forms.ValidationError("This email is already registered. Please use a different one.")
         
         return email
     
-    # We add here the placeholders of the fields, and hiding help_text that appers always under fields in default settings.
+    # We add here the placeholders of the fields, and hiding help_text that appears always under fields in default settings.
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if 'password1' in self.fields:
@@ -70,36 +58,31 @@ class SignUpForm(UserCreationForm):
         self.fields['password1'].help_text = ''
         self.fields['password2'].help_text = ''
 
-    # Wrap the entire save method in an atomic database transaction (all done or nothing).
+    # Wrap the entire save method in an atomic database transaction.
     @transaction.atomic
-    def save(self, commit=True):
-        user = super().save(commit=commit)
-
+    def save(self, commit=True, is_active=True):
+        user = super().save(commit=False)
+        user.is_active = is_active
         if commit:
+            user.save()
             UserProfile.objects.update_or_create(
                 user=user,
                 defaults={'role': 'student'}
             )
-
-            # Create the corresponding StudentProfile directly
             StudentProfile.objects.get_or_create(user=user)
-
-            # selected_role = self.cleaned_data.get('role')
-            # UserProfile.objects.update_or_create(
-            #     user=user,
-            #     defaults={'role': selected_role}
-            # )
-
-            # this is one of three ways to add profile when the user makes an account, the second way is made with signals in models.py file, the third is to take the same line and use it in views.py.
-            # if selected_role == 'student':
-            #     StudentProfile.objects.get_or_create(user=user)
-            # elif selected_role == 'instructor':
-            #     InstructorProfile.objects.get_or_create(user=user)
 
         return user
 
-# I added this (over AuthenticationForm) to be able to use placeholders in the sign-in form.
+
+# Customized AuthenticationForm with custom messages and placeholders
 class CustomSignInForm(AuthenticationForm):
+    def confirm_login_allowed(self, user):
+        if not user.is_active:
+            raise forms.ValidationError(
+                "Your account is not verified yet. Please check your inbox for the activation link.",
+                code='inactive',
+            )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if 'password' in self.fields:
