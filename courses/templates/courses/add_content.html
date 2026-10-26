@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load widget_tweaks %}
+{% load widget_tweaks static %}
 
 {% block title %}
     {% if object %}Edit{% else %}Add New{% endif %} {{ model_name|capfirst }}
@@ -32,7 +32,9 @@
         {% endif %}
 
         <!-- Form -->
-        <form id="content-upload-form" method="post" enctype="multipart/form-data" novalidate>
+        <form id="content-upload-form" method="post" enctype="multipart/form-data" 
+              {% if model_name == 'video' %}data-default-video-source="{% if form.video_upload.errors or object.video_upload %}upload{% else %}url{% endif %}"{% endif %} 
+              novalidate>
             {% csrf_token %}
             
             {% if model_name == 'video' %}
@@ -200,87 +202,10 @@
 
     </div>
 </div>
-
-
-{% if model_name == 'video' %}
-<script>
-    const urlContainer = document.getElementById('video-url-container');
-    const uploadContainer = document.getElementById('video-upload-container');
-    const tabUrlBtn = document.getElementById('tab-url-btn');
-    const tabUploadBtn = document.getElementById('tab-upload-btn');
-    const urlInput = document.getElementById('{{ form.video_url.id_for_label }}');
-    const uploadInput = document.getElementById('{{ form.video_upload.id_for_label }}');
-
-    function switchVideoSource(source) {
-        if (source === 'url') {
-            urlContainer.classList.remove('hidden');
-            uploadContainer.classList.add('hidden');
-            tabUrlBtn.className = 'py-2.5 px-4 rounded-lg text-xs font-semibold transition-all bg-indigo-600 text-white';
-            tabUploadBtn.className = 'py-2.5 px-4 rounded-lg text-xs font-semibold transition-all text-gray-400 hover:text-white';
-            if (uploadInput) uploadInput.value = '';
-            const clearVideoCheckbox = document.getElementById('video_upload-clear_id');
-            if (clearVideoCheckbox) clearVideoCheckbox.checked = true;
-        } else {
-            uploadContainer.classList.remove('hidden');
-            urlContainer.classList.add('hidden');
-            tabUploadBtn.className = 'py-2.5 px-4 rounded-lg text-xs font-semibold transition-all bg-indigo-600 text-white';
-            tabUrlBtn.className = 'py-2.5 px-4 rounded-lg text-xs font-semibold transition-all text-gray-400 hover:text-white';
-            if (urlInput) urlInput.value = '';
-            const clearVideoCheckbox = document.getElementById('video_upload-clear_id');
-            if (clearVideoCheckbox) clearVideoCheckbox.checked = false;
-        }
-    }
-
-    // Keep upload tab open if validation failed on video_upload
-    {% if form.video_upload.errors or object.video_upload %}
-        switchVideoSource('upload');
-    {% endif %}
-
-    // Live Progress Bar using XMLHttpRequest when uploading a video file
-    const form = document.getElementById('content-upload-form');
-    form.addEventListener('submit', function(e) {
-        if (uploadInput && uploadInput.files.length > 0) {
-            e.preventDefault();
-            const progressWrapper = document.getElementById('upload-progress-wrapper');
-            const progressBar = document.getElementById('upload-progress-bar');
-            const percentageText = document.getElementById('upload-percentage');
-            const submitBtn = document.getElementById('submit-content-btn');
-
-            progressWrapper.classList.remove('hidden');
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Uploading...';
-
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', window.location.href, true);
-
-            xhr.upload.onprogress = function(event) {
-                if (event.lengthComputable) {
-                    const percent = Math.round((event.loaded / event.total) * 100);
-                    progressBar.style.width = percent + '%';
-                    percentageText.textContent = percent + '%';
-                }
-            };
-
-            xhr.onload = function() {
-                if (xhr.status >= 200 && xhr.status < 400) {
-                    // If Django redirected after successful upload, follow the final URL
-                    if (xhr.responseURL && xhr.responseURL !== window.location.href) {
-                        window.location.href = xhr.responseURL;
-                    } else {
-                        // Form had validation errors; replace document with returned HTML
-                        document.open();
-                        document.write(xhr.responseText);
-                        document.close();
-                    }
-                } else {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Save Video';
-                }
-            };
-
-            xhr.send(new FormData(form));
-        }
-    });
-</script>
-{% endif %}
 {% endblock content %}
+
+{% block extra_js %}
+{% if model_name == 'video' %}
+<script src="{% static 'js/add_content.js' %}"></script>
+{% endif %}
+{% endblock extra_js %}

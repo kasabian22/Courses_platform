@@ -25,7 +25,9 @@
                 {% endfor %}
             </div>
         {% endif %}
-        <form method="post" enctype="multipart/form-data" class="dark-form" novalidate>
+        <form method="post" enctype="multipart/form-data" class="dark-form" 
+              data-course-id="{{ form.instance.pk|default:'' }}" 
+              data-preview-url="{% url 'courses:generate_slug_preview' %}" novalidate>
             {% csrf_token %}
             {{ form.media }}
 
@@ -106,13 +108,8 @@
 
     </div>
 </div>
-
-
-<script>
-    // Pass dynamic Django context to the external script
-    window.CURRENT_COURSE_ID = "{{ form.instance.pk|default:'' }}";
-    window.SLUG_PREVIEW_URL = "{% url 'courses:generate_slug_preview' %}";
-</script>
-<script src="{% static 'js/course_slug_preview.js' %}"></script>
-
 {% endblock content %}
+
+{% block extra_js %}
+<script src="{% static 'js/course_slug_preview.js' %}"></script>
+{% endblock extra_js %}

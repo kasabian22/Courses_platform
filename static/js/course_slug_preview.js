@@ -11,7 +11,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const MAX_SLUG_LIMIT = 240; // Max allowed slug length to ensure uniqueness suffix fits within 250 chars
 
     // Optional: If editing an existing course, lock auto-generation initially so we don't accidentally change published URLs
-    const currentCourseId = window.CURRENT_COURSE_ID || slugInput.dataset.courseId || "";
+    const courseForm = slugInput.closest("form");
+    const currentCourseId = window.CURRENT_COURSE_ID || slugInput.dataset.courseId || (courseForm ? courseForm.dataset.courseId : "") || "";
     if (slugInput.value.trim() !== "") {
         isSlugManuallyEdited = true;
     }
@@ -81,8 +82,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         activeAbortController = new AbortController();
 
-        // Replace the hardcoded {% url %} string with the global variable
-        const previewUrl = window.SLUG_PREVIEW_URL || '/api/generate-slug-preview/';
+        // Replace the hardcoded {% url %} string with the global variable or data attribute
+        const previewUrl = window.SLUG_PREVIEW_URL || slugInput.dataset.previewUrl || (courseForm ? courseForm.dataset.previewUrl : "") || '/api/generate-slug-preview/';
 
         fetch(`${previewUrl}?${params.toString()}`, { signal: activeAbortController.signal })
         .then(response => response.json())
@@ -112,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // 3. Listen to Title input (with 500ms Debounce)
+    // 3. Listen to Title input (with 750ms Debounce)
     titleInput.addEventListener("input", function () {
         if (isSlugManuallyEdited) return;
     
@@ -137,7 +138,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
         debounceTimer = setTimeout(() => {
             fetchSmartSlug({ title: currentTitle, updateInputValue: true });
-        }, 500); // 500ms debounce
+        }, 750); // 750ms debounce
     });
 
     // 4. Listen to manual typing inside Custom URL Slug (enforce slug format live)
@@ -180,7 +181,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 customSlug: formatted,
                 updateInputValue: hasArabic
             });
-        }, 500);
+        }, 750);
     });
 
     // 5. Blur event listener: strip leading and trailing hyphens on leave

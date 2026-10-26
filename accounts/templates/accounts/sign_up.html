@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load socialaccount %}
-{% load widget_tweaks %}
+{% load widget_tweaks static %}
 
 {% block title %}
     Sign Up
@@ -158,19 +158,8 @@
 
     </div>
 </div>
-
-<script>
-    function togglePasswordVisibility(inputId, btn) {
-        const input = document.getElementById(inputId);
-        if (input && btn) {
-            if (input.type === 'password') {
-                input.type = 'text';
-                btn.classList.add('text-indigo-400');
-            } else {
-                input.type = 'password';
-                btn.classList.remove('text-indigo-400');
-            }
-        }
-    }
-</script>
 {% endblock content %}
+
+{% block extra_js %}
+<script src="{% static 'js/auth.js' %}"></script>
+{% endblock extra_js %}

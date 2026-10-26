@@ -2,6 +2,15 @@ html {
     scroll-behavior: smooth;
 }
 
+/* Hide ugly default browser scrollbar while keeping smooth scrolling */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
 /* =========================================================
    1. Dark Form Default Styles
    ========================================================= */
@@ -246,6 +255,7 @@ html.light-mode [data-video-player] :is([data-seek], [data-volume]) {
    5. Subject Category Bar in Light Mode
    ========================================================= */
 html.light-mode .subject-category-bar {
+    background-color: #ffffff !important;
     border-color: #e2e8f0 !important;
 }
 html.light-mode #subject-nav a:not(.bg-indigo-600) {

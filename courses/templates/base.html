@@ -11,60 +11,8 @@
         <script src="https://cdn.tailwindcss.com"></script>
         <link rel="stylesheet" href="{% static 'css/light-mode.css' %}">
 
-        <!-- 2. Separate Inline Script to Apply Saved Theme Immediately -->
-        <script>
-            (function() {
-                function applySavedTheme() {
-                    if (localStorage.getItem('theme') === 'light') {
-                        document.documentElement.classList.add('light-mode');
-                    } else {
-                        document.documentElement.classList.remove('light-mode');
-                    }
-                }
-                applySavedTheme();
-                // Ensure theme persists when navigating via browser Back/Forward cache
-                window.addEventListener('pageshow', applySavedTheme);
-            })();
-        </script>
-        <style>
-            /* Hide ugly default browser scrollbar while keeping smooth scrolling */
-            .no-scrollbar::-webkit-scrollbar {
-                display: none;
-            }
-            .no-scrollbar {
-                -ms-overflow-style: none;
-                scrollbar-width: none;
-            }
-
-            /* Light mode styling for subject category bar */
-            html.light-mode .subject-category-bar {
-                background-color: #ffffff !important;
-                border-color: #e2e8f0 !important;
-            }
-            html.light-mode #subject-nav a:not(.bg-indigo-600) {
-                background-color: #f1f5f9 !important;
-                color: #334155 !important;
-                border-color: #e2e8f0 !important;
-            }
-            html.light-mode #subject-nav a:not(.bg-indigo-600):hover {
-                background-color: #e2e8f0 !important;
-                color: #0f172a !important;
-                border-color: #cbd5e1 !important;
-            }
-            html.light-mode #subject-scroll-left,
-            html.light-mode #subject-scroll-right {
-                background-color: #ffffff !important;
-                color: #475569 !important;
-                border-color: #e2e8f0 !important;
-                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08) !important;
-            }
-            html.light-mode #subject-scroll-left:hover,
-            html.light-mode #subject-scroll-right:hover {
-                background-color: #6366f1 !important;
-                color: #ffffff !important;
-                border-color: #6366f1 !important;
-            }
-        </style>
+        <!-- 2. Synchronous Script to Apply Saved Theme Immediately (Prevents FOUC) -->
+        <script src="{% static 'js/theme-init.js' %}"></script>
     </head>
 
 <body class="bg-[#1E2022] text-gray-300 flex flex-col min-h-screen">
@@ -295,25 +243,6 @@
                     </div>
                 {% endfor %}
             </div>
-        
-            <!-- Script to auto-dismiss toasts -->
-            <script>
-                document.addEventListener("DOMContentLoaded", function() {
-                    setTimeout(function() {
-                        const toasts = document.querySelectorAll('.toast-message');
-                        toasts.forEach(toast => {
-                            // Add fade-out and slide-down transition classes
-                            toast.classList.remove('opacity-100', 'translate-y-0');
-                            toast.classList.add('opacity-0', 'translate-y-4');
-                            
-                            // Remove element completely from DOM after animation completes
-                            setTimeout(() => {
-                                toast.remove();
-                            }, 500);
-                        });
-                    }, 8000); // Auto-dismiss after 8000ms
-                });
-            </script>
         {% endif %}
     
         {% block content %}
@@ -422,179 +351,11 @@
         </div>
     </div>
 
-    <!-- Script to intercept any form or button with data-confirm -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const modal = document.getElementById('custom-confirm-modal');
-            const box = document.getElementById('custom-confirm-box');
-            const titleEl = document.getElementById('confirm-modal-title');
-            const messageEl = document.getElementById('confirm-modal-message');
-            const cancelBtn = document.getElementById('confirm-cancel-btn');
-            const acceptBtn = document.getElementById('confirm-accept-btn');
+    <!-- Global JavaScript -->
+    <script src="{% static 'js/main.js' %}"></script>
 
-            let pendingForm = null;
-
-            function openConfirmModal(form, message, title) {
-                pendingForm = form;
-                messageEl.textContent = message || 'Are you sure you want to proceed?';
-                titleEl.textContent = title || 'Confirm Deletion';
-
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-                requestAnimationFrame(() => {
-                    modal.classList.remove('opacity-0');
-                    box.classList.remove('scale-95');
-                    box.classList.add('scale-100');
-                });
-            }
-
-            function closeConfirmModal() {
-                modal.classList.add('opacity-0');
-                box.classList.remove('scale-100');
-                box.classList.add('scale-95');
-                setTimeout(() => {
-                    modal.classList.remove('flex');
-                    modal.classList.add('hidden');
-                    pendingForm = null;
-                }, 200);
-            }
-
-            // Listen for form submissions that have data-confirm attribute
-            document.addEventListener('submit', function (e) {
-                const form = e.target.closest('form[data-confirm]');
-                if (form && !form.dataset.confirmed) {
-                    e.preventDefault();
-                    openConfirmModal(form, form.dataset.confirm, form.dataset.confirmTitle);
-                }
-            });
-
-            acceptBtn.addEventListener('click', function () {
-                if (pendingForm) {
-                    pendingForm.dataset.confirmed = "true";
-                    pendingForm.submit();
-                }
-            });
-
-            cancelBtn.addEventListener('click', closeConfirmModal);
-
-            // Close when clicking outside the box or pressing Escape
-            modal.addEventListener('click', function (e) {
-                if (e.target === modal) closeConfirmModal();
-            });
-            document.addEventListener('keydown', function (e) {
-                if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-                    closeConfirmModal();
-                }
-            });
-        });
-    </script>
-
-
-    <!-- Telegram Circular Ripple Theme Transition Script -->
-    <script>
-        function syncThemeIcons() {
-            const isLight = document.documentElement.classList.contains('light-mode');
-            const sunIcon = document.getElementById('theme-icon-sun');
-            const moonIcon = document.getElementById('theme-icon-moon');
-            if (sunIcon && moonIcon) {
-                sunIcon.classList.toggle('hidden', isLight);
-                moonIcon.classList.toggle('hidden', !isLight);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', syncThemeIcons);
-        window.addEventListener('pageshow', syncThemeIcons);
-        syncThemeIcons();
-
-        function toggleThemeWithRipple(event) {
-            const root = document.documentElement;
-
-            const applyToggle = () => {
-                const isNowLight = root.classList.toggle('light-mode');
-                localStorage.setItem('theme', isNowLight ? 'light' : 'dark');
-                syncThemeIcons();
-            };
-
-            if (!document.startViewTransition) {
-                applyToggle();
-                return;
-            }
-
-            const btn = event.currentTarget;
-            const rect = btn.getBoundingClientRect();
-            const x = event.clientX || (rect.left + rect.width / 2);
-            const y = event.clientY || (rect.top + rect.height / 2);
-
-            const endRadius = Math.hypot(
-                Math.max(x, window.innerWidth - x),
-                Math.max(y, window.innerHeight - y)
-            );
-
-            const transition = document.startViewTransition(() => {
-                applyToggle();
-            });
-
-            transition.ready.then(() => {
-                document.documentElement.animate(
-                    {
-                        clipPath: [
-                            `circle(0px at ${x}px ${y}px)`,
-                            `circle(${endRadius}px at ${x}px ${y}px)`
-                        ]
-                    },
-                    {
-                        duration: 550,
-                        easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
-                        pseudoElement: '::view-transition-new(root)'
-                    }
-                );
-            });
-        }
-    </script>
-        
-    <script>
-        function scrollSubjects(amount) {
-            const nav = document.getElementById('subject-nav');
-            if (nav) {
-                nav.scrollBy({ left: amount, behavior: 'smooth' });
-            }
-        }
-
-        // Enable horizontal scrolling with mouse wheel over the subject bar
-        document.addEventListener('DOMContentLoaded', function() {
-            const subjectNav = document.getElementById('subject-nav');
-            if (subjectNav) {
-                subjectNav.addEventListener('wheel', function(e) {
-                    if (e.deltaY !== 0) {
-                        e.preventDefault();
-                        subjectNav.scrollBy({ left: e.deltaY * 2, behavior: 'smooth' });
-                    }
-                }, { passive: false });
-            }
-        });
-    </script>
-    <script>
-        // Mobile Menu Toggle
-        document.addEventListener('DOMContentLoaded', function() {
-            const mobileBtn = document.getElementById('mobile-menu-btn');
-            const mobileMenu = document.getElementById('mobile-menu');
-            const iconOpen = document.getElementById('mobile-menu-icon-open');
-            const iconClose = document.getElementById('mobile-menu-icon-close');
-
-            if (mobileBtn && mobileMenu) {
-                mobileBtn.addEventListener('click', function() {
-                    const isHidden = mobileMenu.classList.toggle('hidden');
-                    mobileBtn.setAttribute('aria-expanded', !isHidden);
-                    if (iconOpen && iconClose) {
-                        iconOpen.classList.toggle('hidden', !isHidden);
-                        iconOpen.classList.toggle('block', isHidden);
-                        iconClose.classList.toggle('hidden', isHidden);
-                        iconClose.classList.toggle('block', !isHidden);
-                    }
-                });
-            }
-        });
-    </script>
+    <!-- Page-Specific JavaScript Block -->
+    {% block extra_js %}{% endblock extra_js %}
 </body>
 
 
