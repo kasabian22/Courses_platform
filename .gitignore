@@ -1,8 +1,8 @@
 __pycache__/
 *.pyc
 venv/
+.venv/
 .env
-db.sqlite3
 media/
-!media/.gitkeep
 migrations/
+.vscode/
