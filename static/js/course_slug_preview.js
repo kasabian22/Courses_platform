@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // 3. Listen to Title input (with 750ms Debounce)
+    // 3. Listen to Title input (with 300ms Debounce)
     titleInput.addEventListener("input", function () {
         if (isSlugManuallyEdited) return;
     
@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", function () {
     
         debounceTimer = setTimeout(() => {
             fetchSmartSlug({ title: currentTitle, updateInputValue: true });
-        }, 750); // 750ms debounce
+        }, 300); // 300ms debounce
     });
 
     // 4. Listen to manual typing inside Custom URL Slug (enforce slug format live)
@@ -181,7 +181,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 customSlug: formatted,
                 updateInputValue: hasArabic
             });
-        }, 750);
+        }, 300);
     });
 
     // 5. Blur event listener: strip leading and trailing hyphens on leave

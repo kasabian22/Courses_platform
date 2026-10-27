@@ -49,17 +49,30 @@
                 {% endif %}
             {% endif %}
 
-            <!-- 2. Wishlist Toggle Button (The Heart Icon) -->
-            <!-- Ensure user is logged in to show the button -->
-            {% if request.user.is_authenticated %}
+            {% if request.user == course.owner %}
+                <form method="post" action="{% url 'courses:delete_course' course.slug %}" class="inline-block"
+                      data-confirm-title="Delete Course"
+                      data-confirm="Are you sure you want to permanently delete '{{ course.title }}'? All modules and enrollments will be lost.">
+                    {% csrf_token %}
+                    <button type="submit"
+                            class="p-3 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition group focus:outline-none focus:ring-2 focus:ring-red-500 shadow-md"
+                            title="Delete Course"
+                            aria-label="Delete course">
+                        <svg class="w-6 h-6 text-red-500 group-hover:text-red-400 transition-colors duration-200"
+                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                </form>
+            {% elif request.user.is_authenticated %}
+                <!-- Wishlist Toggle Button -->
                 <form method="post" action="{% url 'courses:toggle_wishlist' course.slug %}" class="inline-block">
                     {% csrf_token %}
                     <button type="submit" 
                             class="p-3 bg-gray-800 border border-gray-700 rounded-lg hover:bg-gray-700 transition group focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-md"
                             title="{% if request.user in course.wishlist.all %}Remove from Wishlist{% else %}Add to Wishlist{% endif %}">
                         
-                        <!-- The SVG Heart -->
-                        <!-- The logic here checks if the current user is in the wishlist relationship you created in step 1 -->
                         <svg class="w-6 h-6 transition-colors duration-200 
                                   {% if course in request.user.wishlist.all %}
                                       text-red-500 fill-current 
