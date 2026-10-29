@@ -1,0 +1,247 @@
+[
+{
+  "model": "courses.subject",
+  "pk": 2,
+  "fields": {
+    "title": "web-development",
+    "slug": "web-development",
+    "description": "\"Master modern front-end and back-end web technologies. Learn to build responsive, dynamic web applications, scalable APIs, and full-stack solutions using HTML, CSS, JavaScript, Python, Django, React, and modern web frameworks.\""
+  }
+},
+{
+  "model": "courses.subject",
+  "pk": 3,
+  "fields": {
+    "title": "mobile-development",
+    "slug": "mobile-development",
+    "description": "\"Learn to design, build, and deploy native and cross-platform mobile applications for iOS and Android. Master leading tools and frameworks including Flutter, React Native, Swift, Kotlin, and mobile UI design patterns.\""
+  }
+},
+{
+  "model": "courses.subject",
+  "pk": 4,
+  "fields": {
+    "title": "data-science",
+    "slug": "data-science",
+    "description": "\"Transform raw data into actionable insights and business intelligence. Explore data cleaning, exploratory data analysis, statistical modeling, and interactive visualization using Python, Pandas, NumPy, SQL, and Tableau.\""
+  }
+},
+{
+  "model": "courses.subject",
+  "pk": 5,
+  "fields": {
+    "title": "devops-cloud",
+    "slug": "devops-cloud",
+    "description": "\"Bridge the gap between development and operations. Master continuous integration and deployment (CI/CD), containerization with Docker, orchestration with Kubernetes, and scalable cloud infrastructure on AWS, Azure, and Google Cloud.\""
+  }
+},
+{
+  "model": "courses.subject",
+  "pk": 7,
+  "fields": {
+    "title": "ai-machine-learning",
+    "slug": "ai-machine-learning",
+    "description": "\"Dive into the forefront of artificial intelligence. Learn supervised and unsupervised learning, deep neural networks, natural language processing (NLP), and computer vision using frameworks like PyTorch, TensorFlow, and Scikit-Learn.\""
+  }
+},
+{
+  "model": "courses.subject",
+  "pk": 8,
+  "fields": {
+    "title": "cybersecurity",
+    "slug": "cybersecurity",
+    "description": "\"Protect critical systems, networks, and data from digital threats. Learn network security, vulnerability assessment, penetration testing, ethical hacking techniques, cryptography, and modern defensive security best practices.\""
+  }
+},
+{
+  "model": "courses.subject",
+  "pk": 9,
+  "fields": {
+    "title": "game-development",
+    "slug": "game-development",
+    "description": "\"Bring creative gameplay and interactive worlds to life. Master 2D and 3D game design, physics engines, character animation, shader programming, and game logic using Unity, Unreal Engine, C#, and C++.\""
+  }
+},
+{
+  "model": "courses.subject",
+  "pk": 10,
+  "fields": {
+    "title": "software-engineering",
+    "slug": "software-engineering",
+    "description": "\"Level up your foundational computer science and engineering craft. Master data structures, algorithms, system design, object-oriented design patterns, clean architecture, and test-driven development (TDD).\""
+  }
+},
+{
+  "model": "courses.subject",
+  "pk": 11,
+  "fields": {
+    "title": "ui-ux-design",
+    "slug": "ui-ux-design",
+    "description": "\"Craft intuitive, accessible, and user-centric digital experiences. Learn the complete design lifecycle from user research and wireframing to interactive prototyping and component design systems using Figma and modern design tools.\""
+  }
+},
+{
+  "model": "courses.subject",
+  "pk": 12,
+  "fields": {
+    "title": "databases",
+    "slug": "databases",
+    "description": "\"Design, manage, and optimize relational and NoSQL database systems. Learn complex SQL querying, indexing, schema design, data integrity, and high-performance database tuning for PostgreSQL, MySQL, and MongoDB.\""
+  }
+},
+{
+  "model": "courses.subject",
+  "pk": 14,
+  "fields": {
+    "title": "other",
+    "slug": "other",
+    "description": "\"Explore specialized skills, emerging technologies, developer productivity tools, and interdisciplinary topics that support your lifelong tech learning journey.\""
+  }
+},
+{
+  "model": "courses.course",
+  "pk": 1,
+  "fields": {
+    "owner": [
+      "kasabian"
+    ],
+    "subject": 2,
+    "title": "Django | Full Course",
+    "slug": "django-full-course",
+    "overview": "{\"delta\":\"{\\\"ops\\\":[{\\\"insert\\\":\\\"Learn Django, and DRF, and PostgreSQL, with me kasabian.\\\\n\\\"}]}\",\"html\":\"<p>Learn Django, and DRF, and PostgreSQL, with me kasabian.</p>\"}",
+    "header": "Build real-world web applications with Django.",
+    "date_created": "2026-09-16T09:00:57.767Z",
+    "status": "AV",
+    "level": "beginner",
+    "time_to_complete": "05:05:30",
+    "language": "ar",
+    "image": "course_images/WhatsApp_Image_2026-10-29_at_9_spZrDms.31.07_AM.jpeg",
+    "wishlist": [
+      [
+        "kasabian"
+      ],
+      [
+        "Student1"
+      ],
+      [
+        "abduallah"
+      ]
+    ]
+  }
+},
+{
+  "model": "courses.course",
+  "pk": 3,
+  "fields": {
+    "owner": [
+      "sam12"
+    ],
+    "subject": 3,
+    "title": "Go to school by car",
+    "slug": "go-to-school-by-car",
+    "overview": "{\"delta\":\"{\\\"ops\\\":[{\\\"insert\\\":\\\"This is About Go language.\\\\n\\\"}]}\",\"html\":\"<p>This is About Go language.</p>\"}",
+    "header": null,
+    "date_created": "2026-09-20T15:36:52.559Z",
+    "status": "DF",
+    "level": "beginner",
+    "time_to_complete": null,
+    "language": "af",
+    "image": "",
+    "wishlist": []
+  }
+},
+{
+  "model": "courses.course",
+  "pk": 4,
+  "fields": {
+    "owner": [
+      "Instructor"
+    ],
+    "subject": 2,
+    "title": "Coding with Python",
+    "slug": "coding-with-python",
+    "overview": "{\"delta\":\"{\\\"ops\\\":[{\\\"insert\\\":\\\"This course is about coding in Python.\\\\n\\\"}]}\",\"html\":\"<p>This course is about coding in Python.</p>\"}",
+    "header": null,
+    "date_created": "2026-10-04T19:19:12.393Z",
+    "status": "DF",
+    "level": "beginner",
+    "time_to_complete": null,
+    "language": "af",
+    "image": "",
+    "wishlist": []
+  }
+},
+{
+  "model": "courses.course",
+  "pk": 8,
+  "fields": {
+    "owner": [
+      "kasabian"
+    ],
+    "subject": 14,
+    "title": "Historical Course",
+    "slug": "important-course-new",
+    "overview": "{\"delta\":\"{\\\"ops\\\":[{\\\"insert\\\":\\\"\\\\\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\\\\\"\\\"},{\\\"attributes\\\":{\\\"align\\\":\\\"justify\\\"},\\\"insert\\\":\\\"\\\\n\\\"},{\\\"insert\\\":\\\"\\\\\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\\\\\"\\\"},{\\\"attributes\\\":{\\\"align\\\":\\\"justify\\\"},\\\"insert\\\":\\\"\\\\n\\\"}]}\",\"html\":\"<p class=\\\"ql-align-justify\\\">\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\"</p><p class=\\\"ql-align-justify\\\">\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\"</p>\"}",
+    "header": "√Â„Ì… Â–« «·ﬂÊ—”  ﬂ„‰ ›Ì ≈‰Â ﬂÊ—”  ⁄·Ì„Ì",
+    "date_created": "2026-10-19T13:42:05.338Z",
+    "status": "DF",
+    "level": "beginner",
+    "time_to_complete": "00:10:00",
+    "language": "ar",
+    "image": "course_images/WhatsApp_Image_2026-10-19_at_3_ZBaiMMd.48.24_PM.jpeg",
+    "wishlist": []
+  }
+},
+{
+  "model": "courses.course",
+  "pk": 11,
+  "fields": {
+    "owner": [
+      "kasabian"
+    ],
+    "subject": 10,
+    "title": "œÊ—…  ⁄·„ ⁄·Ê„ «·Õ«”»",
+    "slug": "dwr-tlm-lwm-lhsb",
+    "overview": "{\"delta\":\"{\\\"ops\\\":[{\\\"insert\\\":\\\"‘”Ì‘”Ì‘”Ì‘”\\\\n\\\"}]}\",\"html\":\"<p>‘”Ì‘”Ì‘”Ì‘”</p>\"}",
+    "header": "œÊ—… · ⁄·„ ⁄·Ê„ «·Õ«”»",
+    "date_created": "2026-10-20T11:17:21.484Z",
+    "status": "DF",
+    "level": "beginner",
+    "time_to_complete": "00:10:00",
+    "language": "en",
+    "image": "",
+    "wishlist": []
+  }
+},
+{
+  "model": "courses.course",
+  "pk": 15,
+  "fields": {
+    "owner": [
+      "kasabian"
+    ],
+    "subject": 14,
+    "title": "Mastering Python -  ⁄·„ »«ÌÀÊ‰",
+    "slug": "mastering-python",
+    "overview": "{\"delta\":\"{\\\"ops\\\":[{\\\"attributes\\\":{\\\"background\\\":\\\"#181a1b\\\",\\\"color\\\":\\\"#e8e6e3\\\",\\\"bold\\\":true},\\\"insert\\\":\\\"Lorem \\\"},{\\\"attributes\\\":{\\\"background\\\":\\\"#181a1b\\\",\\\"color\\\":\\\"#e8e6e3\\\"},\\\"insert\\\":\\\"ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\"},{\\\"insert\\\":\\\"\\\\n\\\"},{\\\"attributes\\\":{\\\"background\\\":\\\"#181a1b\\\",\\\"color\\\":\\\"#e8e6e3\\\",\\\"bold\\\":true},\\\"insert\\\":\\\"Lorem \\\"},{\\\"attributes\\\":{\\\"background\\\":\\\"#181a1b\\\",\\\"color\\\":\\\"#e8e6e3\\\"},\\\"insert\\\":\\\"ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\"},{\\\"insert\\\":\\\"\\\\n\\\"}]}\",\"html\":\"<p><strong style=\\\"background-color: rgb(24, 26, 27); color: rgb(232, 230, 227);\\\">Lorem </strong><span style=\\\"background-color: rgb(24, 26, 27); color: rgb(232, 230, 227);\\\">ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span></p><p><strong style=\\\"background-color: rgb(24, 26, 27); color: rgb(232, 230, 227);\\\">Lorem </strong><span style=\\\"background-color: rgb(24, 26, 27); color: rgb(232, 230, 227);\\\">ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span></p>\"}",
+    "header": "Mastering Python in Arabic And Learn Info About All Paths",
+    "date_created": "2026-10-29T05:50:15.056Z",
+    "status": "AV",
+    "level": "beginner",
+    "time_to_complete": "23:00:00",
+    "language": "ar",
+    "image": "course_images/WhatsApp_Image_2026-10-29_at_8.49.59_AM.jpeg",
+    "wishlist": []
+  }
+},
+{
+  "model": "courses.course",
+  "pk": 16,
+  "fields": {
+    "owner": [
+      "kasabian"
+    ],
+    "subject": 2,
+    "title": "Django ORM Deep Dive",
+    "slug": "django-orm-deep-dive",
+    "overview": 

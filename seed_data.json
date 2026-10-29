@@ -1,0 +1,2085 @@
+[
+{
+  "model": "courses.subject",
+  "pk": 2,
+  "fields": {
+    "title": "web-development",
+    "slug": "web-development",
+    "description": "\"Master modern front-end and back-end web technologies. Learn to build responsive, dynamic web applications, scalable APIs, and full-stack solutions using HTML, CSS, JavaScript, Python, Django, React, and modern web frameworks.\""
+  }
+},
+{
+  "model": "courses.subject",
+  "pk": 3,
+  "fields": {
+    "title": "mobile-development",
+    "slug": "mobile-development",
+    "description": "\"Learn to design, build, and deploy native and cross-platform mobile applications for iOS and Android. Master leading tools and frameworks including Flutter, React Native, Swift, Kotlin, and mobile UI design patterns.\""
+  }
+},
+{
+  "model": "courses.subject",
+  "pk": 4,
+  "fields": {
+    "title": "data-science",
+    "slug": "data-science",
+    "description": "\"Transform raw data into actionable insights and business intelligence. Explore data cleaning, exploratory data analysis, statistical modeling, and interactive visualization using Python, Pandas, NumPy, SQL, and Tableau.\""
+  }
+},
+{
+  "model": "courses.subject",
+  "pk": 5,
+  "fields": {
+    "title": "devops-cloud",
+    "slug": "devops-cloud",
+    "description": "\"Bridge the gap between development and operations. Master continuous integration and deployment (CI/CD), containerization with Docker, orchestration with Kubernetes, and scalable cloud infrastructure on AWS, Azure, and Google Cloud.\""
+  }
+},
+{
+  "model": "courses.subject",
+  "pk": 7,
+  "fields": {
+    "title": "ai-machine-learning",
+    "slug": "ai-machine-learning",
+    "description": "\"Dive into the forefront of artificial intelligence. Learn supervised and unsupervised learning, deep neural networks, natural language processing (NLP), and computer vision using frameworks like PyTorch, TensorFlow, and Scikit-Learn.\""
+  }
+},
+{
+  "model": "courses.subject",
+  "pk": 8,
+  "fields": {
+    "title": "cybersecurity",
+    "slug": "cybersecurity",
+    "description": "\"Protect critical systems, networks, and data from digital threats. Learn network security, vulnerability assessment, penetration testing, ethical hacking techniques, cryptography, and modern defensive security best practices.\""
+  }
+},
+{
+  "model": "courses.subject",
+  "pk": 9,
+  "fields": {
+    "title": "game-development",
+    "slug": "game-development",
+    "description": "\"Bring creative gameplay and interactive worlds to life. Master 2D and 3D game design, physics engines, character animation, shader programming, and game logic using Unity, Unreal Engine, C#, and C++.\""
+  }
+},
+{
+  "model": "courses.subject",
+  "pk": 10,
+  "fields": {
+    "title": "software-engineering",
+    "slug": "software-engineering",
+    "description": "\"Level up your foundational computer science and engineering craft. Master data structures, algorithms, system design, object-oriented design patterns, clean architecture, and test-driven development (TDD).\""
+  }
+},
+{
+  "model": "courses.subject",
+  "pk": 11,
+  "fields": {
+    "title": "ui-ux-design",
+    "slug": "ui-ux-design",
+    "description": "\"Craft intuitive, accessible, and user-centric digital experiences. Learn the complete design lifecycle from user research and wireframing to interactive prototyping and component design systems using Figma and modern design tools.\""
+  }
+},
+{
+  "model": "courses.subject",
+  "pk": 12,
+  "fields": {
+    "title": "databases",
+    "slug": "databases",
+    "description": "\"Design, manage, and optimize relational and NoSQL database systems. Learn complex SQL querying, indexing, schema design, data integrity, and high-performance database tuning for PostgreSQL, MySQL, and MongoDB.\""
+  }
+},
+{
+  "model": "courses.subject",
+  "pk": 14,
+  "fields": {
+    "title": "other",
+    "slug": "other",
+    "description": "\"Explore specialized skills, emerging technologies, developer productivity tools, and interdisciplinary topics that support your lifelong tech learning journey.\""
+  }
+},
+{
+  "model": "courses.course",
+  "pk": 1,
+  "fields": {
+    "owner": 1,
+    "subject": 2,
+    "title": "Django | Full Course",
+    "slug": "django-full-course",
+    "overview": "{\"delta\":\"{\\\"ops\\\":[{\\\"insert\\\":\\\"Learn Django, and DRF, and PostgreSQL, with me kasabian.\\\\n\\\"}]}\",\"html\":\"<p>Learn Django, and DRF, and PostgreSQL, with me kasabian.</p>\"}",
+    "header": "Build real-world web applications with Django.",
+    "date_created": "2026-09-16T09:00:57.767Z",
+    "status": "AV",
+    "level": "beginner",
+    "time_to_complete": "05:05:30",
+    "language": "ar",
+    "image": "course_images/WhatsApp_Image_2026-10-29_at_9_spZrDms.31.07_AM.jpeg",
+    "wishlist": [
+      1,
+      9,
+      26
+    ]
+  }
+},
+{
+  "model": "courses.course",
+  "pk": 3,
+  "fields": {
+    "owner": 8,
+    "subject": 3,
+    "title": "Go to school by car",
+    "slug": "go-to-school-by-car",
+    "overview": "{\"delta\":\"{\\\"ops\\\":[{\\\"insert\\\":\\\"This is About Go language.\\\\n\\\"}]}\",\"html\":\"<p>This is About Go language.</p>\"}",
+    "header": null,
+    "date_created": "2026-09-20T15:36:52.559Z",
+    "status": "DF",
+    "level": "beginner",
+    "time_to_complete": null,
+    "language": "af",
+    "image": "",
+    "wishlist": []
+  }
+},
+{
+  "model": "courses.course",
+  "pk": 4,
+  "fields": {
+    "owner": 11,
+    "subject": 2,
+    "title": "Coding with Python",
+    "slug": "coding-with-python",
+    "overview": "{\"delta\":\"{\\\"ops\\\":[{\\\"insert\\\":\\\"This course is about coding in Python.\\\\n\\\"}]}\",\"html\":\"<p>This course is about coding in Python.</p>\"}",
+    "header": null,
+    "date_created": "2026-10-04T19:19:12.393Z",
+    "status": "DF",
+    "level": "beginner",
+    "time_to_complete": null,
+    "language": "af",
+    "image": "",
+    "wishlist": []
+  }
+},
+{
+  "model": "courses.course",
+  "pk": 8,
+  "fields": {
+    "owner": 1,
+    "subject": 14,
+    "title": "Historical Course",
+    "slug": "important-course-new",
+    "overview": "{\"delta\":\"{\\\"ops\\\":[{\\\"insert\\\":\\\"\\\\\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\\\\\"\\\"},{\\\"attributes\\\":{\\\"align\\\":\\\"justify\\\"},\\\"insert\\\":\\\"\\\\n\\\"},{\\\"insert\\\":\\\"\\\\\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\\\\\"\\\"},{\\\"attributes\\\":{\\\"align\\\":\\\"justify\\\"},\\\"insert\\\":\\\"\\\\n\\\"}]}\",\"html\":\"<p class=\\\"ql-align-justify\\\">\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\"</p><p class=\\\"ql-align-justify\\\">\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\"</p>\"}",
+    "header": "أهمية هذا الكورس تكمن في إنه كورس تعليمي",
+    "date_created": "2026-10-19T13:42:05.338Z",
+    "status": "DF",
+    "level": "beginner",
+    "time_to_complete": "00:10:00",
+    "language": "ar",
+    "image": "course_images/WhatsApp_Image_2026-10-19_at_3_ZBaiMMd.48.24_PM.jpeg",
+    "wishlist": []
+  }
+},
+{
+  "model": "courses.course",
+  "pk": 11,
+  "fields": {
+    "owner": 1,
+    "subject": 10,
+    "title": "دورة تعلم علوم الحاسب",
+    "slug": "dwr-tlm-lwm-lhsb",
+    "overview": "{\"delta\":\"{\\\"ops\\\":[{\\\"insert\\\":\\\"شسيشسيشسيشس\\\\n\\\"}]}\",\"html\":\"<p>شسيشسيشسيشس</p>\"}",
+    "header": "دورة لتعلم علوم الحاسب",
+    "date_created": "2026-10-20T11:17:21.484Z",
+    "status": "DF",
+    "level": "beginner",
+    "time_to_complete": "00:10:00",
+    "language": "en",
+    "image": "",
+    "wishlist": []
+  }
+},
+{
+  "model": "courses.course",
+  "pk": 15,
+  "fields": {
+    "owner": 1,
+    "subject": 14,
+    "title": "Mastering Python - تعلم بايثون",
+    "slug": "mastering-python",
+    "overview": "{\"delta\":\"{\\\"ops\\\":[{\\\"attributes\\\":{\\\"background\\\":\\\"#181a1b\\\",\\\"color\\\":\\\"#e8e6e3\\\",\\\"bold\\\":true},\\\"insert\\\":\\\"Lorem \\\"},{\\\"attributes\\\":{\\\"background\\\":\\\"#181a1b\\\",\\\"color\\\":\\\"#e8e6e3\\\"},\\\"insert\\\":\\\"ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\"},{\\\"insert\\\":\\\"\\\\n\\\"},{\\\"attributes\\\":{\\\"background\\\":\\\"#181a1b\\\",\\\"color\\\":\\\"#e8e6e3\\\",\\\"bold\\\":true},\\\"insert\\\":\\\"Lorem \\\"},{\\\"attributes\\\":{\\\"background\\\":\\\"#181a1b\\\",\\\"color\\\":\\\"#e8e6e3\\\"},\\\"insert\\\":\\\"ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\"},{\\\"insert\\\":\\\"\\\\n\\\"}]}\",\"html\":\"<p><strong style=\\\"background-color: rgb(24, 26, 27); color: rgb(232, 230, 227);\\\">Lorem </strong><span style=\\\"background-color: rgb(24, 26, 27); color: rgb(232, 230, 227);\\\">ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span></p><p><strong style=\\\"background-color: rgb(24, 26, 27); color: rgb(232, 230, 227);\\\">Lorem </strong><span style=\\\"background-color: rgb(24, 26, 27); color: rgb(232, 230, 227);\\\">ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span></p>\"}",
+    "header": "Mastering Python in Arabic And Learn Info About All Paths",
+    "date_created": "2026-10-29T05:50:15.056Z",
+    "status": "AV",
+    "level": "beginner",
+    "time_to_complete": "23:00:00",
+    "language": "ar",
+    "image": "course_images/WhatsApp_Image_2026-10-29_at_8.49.59_AM.jpeg",
+    "wishlist": []
+  }
+},
+{
+  "model": "courses.course",
+  "pk": 16,
+  "fields": {
+    "owner": 1,
+    "subject": 2,
+    "title": "Django ORM Deep Dive",
+    "slug": "django-orm-deep-dive",
+    "overview": "{\"delta\":\"{\\\"ops\\\":[{\\\"attributes\\\":{\\\"background\\\":\\\"#181a1b\\\",\\\"color\\\":\\\"#e8e6e3\\\"},\\\"insert\\\":\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\"},{\\\"insert\\\":\\\"\\\\n\\\"},{\\\"attributes\\\":{\\\"background\\\":\\\"#181a1b\\\",\\\"color\\\":\\\"#e8e6e3\\\"},\\\"insert\\\":\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\"},{\\\"insert\\\":\\\"\\\\n\\\"}]}\",\"html\":\"<p><span style=\\\"background-color: rgb(24, 26, 27); color: rgb(232, 230, 227);\\\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span></p><p><span style=\\\"background-color: rgb(24, 26, 27); color: rgb(232, 230, 227);\\\"><span class=\\\"ql-cursor\\\">﻿</span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span></p>\"}",
+    "header": "Learn Django ORM in deep knowledge.",
+    "date_created": "2026-10-29T05:53:10.220Z",
+    "status": "AV",
+    "level": "beginner",
+    "time_to_complete": "20:00:00",
+    "language": "en",
+    "image": "course_images/WhatsApp_Image_2026-10-29_at_8.52.45_AM.jpeg",
+    "wishlist": []
+  }
+},
+{
+  "model": "courses.course",
+  "pk": 17,
+  "fields": {
+    "owner": 1,
+    "subject": 11,
+    "title": "HTML & CSS Full Course - Beginner to Pro",
+    "slug": "html-css-full-course-beginner-to-pro",
+    "overview": "{\"delta\":\"{\\\"ops\\\":[{\\\"insert\\\":\\\"This HTML CSS full course is a series of HTML CSS tutorials, teaching the major skills that we need to create complex websites. Each HTML CSS tutorial builds on a project and provides some HTML CSS exercises to practice what we learned. By the end, we'll learn the basics of web development and we'll be on our way to becoming a web developer and software engineer.\\\\n\\\"}]}\",\"html\":\"<p>This HTML CSS full course is a series of HTML CSS tutorials, teaching the major skills that we need to create complex websites. Each HTML CSS tutorial builds on a project and provides some HTML CSS exercises to practice what we learned. By the end, we'll learn the basics of web development and we'll be on our way to becoming a web developer and software engineer.</p>\"}",
+    "header": "Frontend Course with a lot of knowledge.",
+    "date_created": "2026-10-29T05:57:50.544Z",
+    "status": "AV",
+    "level": "beginner",
+    "time_to_complete": "06:30:00",
+    "language": "en",
+    "image": "course_images/WhatsApp_Image_2026-10-29_at_8.57.29_AM.jpeg",
+    "wishlist": []
+  }
+},
+{
+  "model": "courses.course",
+  "pk": 18,
+  "fields": {
+    "owner": 1,
+    "subject": 14,
+    "title": "Learn Git & GitHub",
+    "slug": "learn-git-github",
+    "overview": "{\"delta\":\"{\\\"ops\\\":[{\\\"attributes\\\":{\\\"background\\\":\\\"#181a1b\\\",\\\"color\\\":\\\"#e8e6e3\\\"},\\\"insert\\\":\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\"},{\\\"insert\\\":\\\"\\\\n\\\"},{\\\"attributes\\\":{\\\"background\\\":\\\"#181a1b\\\",\\\"color\\\":\\\"#e8e6e3\\\"},\\\"insert\\\":\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\"},{\\\"insert\\\":\\\"\\\\n\\\"}]}\",\"html\":\"<p><span style=\\\"background-color: rgb(24, 26, 27); color: rgb(232, 230, 227);\\\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span></p><p><span style=\\\"background-color: rgb(24, 26, 27); color: rgb(232, 230, 227);\\\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span></p>\"}",
+    "header": "Learn Git and GitHub With Practical Examples",
+    "date_created": "2026-10-29T06:01:52.981Z",
+    "status": "AV",
+    "level": "beginner",
+    "time_to_complete": "06:00:00",
+    "language": "ar",
+    "image": "course_images/WhatsApp_Image_2026-10-29_at_8.59.35_AM.jpeg",
+    "wishlist": []
+  }
+},
+{
+  "model": "courses.course",
+  "pk": 19,
+  "fields": {
+    "owner": 1,
+    "subject": 10,
+    "title": "Command Line",
+    "slug": "command-line",
+    "overview": "{\"delta\":\"{\\\"ops\\\":[{\\\"attributes\\\":{\\\"background\\\":\\\"#181a1b\\\",\\\"color\\\":\\\"#e8e6e3\\\"},\\\"insert\\\":\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\"},{\\\"insert\\\":\\\"\\\\n\\\"},{\\\"attributes\\\":{\\\"background\\\":\\\"#181a1b\\\",\\\"color\\\":\\\"#e8e6e3\\\"},\\\"insert\\\":\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\"},{\\\"insert\\\":\\\"\\\\n\\\"}]}\",\"html\":\"<p><span style=\\\"background-color: rgb(24, 26, 27); color: rgb(232, 230, 227);\\\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span></p><p><span style=\\\"background-color: rgb(24, 26, 27); color: rgb(232, 230, 227);\\\"><span class=\\\"ql-cursor\\\">﻿</span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span></p>\"}",
+    "header": "Master Commands and Build Simple Bash Scripts",
+    "date_created": "2026-10-29T06:07:01.950Z",
+    "status": "AV",
+    "level": "beginner",
+    "time_to_complete": "08:00:00",
+    "language": "ar",
+    "image": "course_images/WhatsApp_Image_2026-10-29_at_9.06.24_AM.jpeg",
+    "wishlist": []
+  }
+},
+{
+  "model": "courses.course",
+  "pk": 20,
+  "fields": {
+    "owner": 1,
+    "subject": 2,
+    "title": "Django REST Framework - API Development with Django",
+    "slug": "django-rest-framework-api-development-with-django",
+    "overview": "{\"delta\":\"{\\\"ops\\\":[{\\\"attributes\\\":{\\\"background\\\":\\\"#181a1b\\\",\\\"color\\\":\\\"#e8e6e3\\\"},\\\"insert\\\":\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\"},{\\\"insert\\\":\\\"\\\\n\\\"},{\\\"attributes\\\":{\\\"background\\\":\\\"#181a1b\\\",\\\"color\\\":\\\"#e8e6e3\\\"},\\\"insert\\\":\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\"},{\\\"insert\\\":\\\"\\\\n\\\"}]}\",\"html\":\"<p><span style=\\\"background-color: rgb(24, 26, 27); color: rgb(232, 230, 227);\\\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span></p><p><span style=\\\"background-color: rgb(24, 26, 27); color: rgb(232, 230, 227);\\\"><span class=\\\"ql-cursor\\\">﻿</span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span></p>\"}",
+    "header": "This playlist will showcase the core features and functionality of Django REST Framework.",
+    "date_created": "2026-10-29T06:11:10.942Z",
+    "status": "AV",
+    "level": "beginner",
+    "time_to_complete": "18:00:00",
+    "language": "en",
+    "image": "course_images/WhatsApp_Image_2026-10-29_at_9.10.52_AM.jpeg",
+    "wishlist": []
+  }
+},
+{
+  "model": "courses.course",
+  "pk": 21,
+  "fields": {
+    "owner": 1,
+    "subject": 10,
+    "title": "AI-Assisted Coding Tutorial",
+    "slug": "ai-assisted-coding-tutorial",
+    "overview": "{\"delta\":\"{\\\"ops\\\":[{\\\"attributes\\\":{\\\"background\\\":\\\"#181a1b\\\",\\\"color\\\":\\\"#e8e6e3\\\"},\\\"insert\\\":\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\"},{\\\"insert\\\":\\\"\\\\n\\\"},{\\\"attributes\\\":{\\\"background\\\":\\\"#181a1b\\\",\\\"color\\\":\\\"#e8e6e3\\\"},\\\"insert\\\":\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\"},{\\\"insert\\\":\\\"\\\\n\\\"}]}\",\"html\":\"<p><span style=\\\"background-color: rgb(24, 26, 27); color: rgb(232, 230, 227);\\\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span></p><p><span style=\\\"background-color: rgb(24, 26, 27); color: rgb(232, 230, 227);\\\"><span class=\\\"ql-cursor\\\">﻿</span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span></p>\"}",
+    "header": "Build an workflow with AI.",
+    "date_created": "2026-10-29T06:19:40.715Z",
+    "status": "AV",
+    "level": "beginner",
+    "time_to_complete": "01:30:00",
+    "language": "en",
+    "image": "course_images/WhatsApp_Image_2026-10-29_at_9.18.00_AM.jpeg",
+    "wishlist": []
+  }
+},
+{
+  "model": "courses.course",
+  "pk": 22,
+  "fields": {
+    "owner": 1,
+    "subject": 2,
+    "title": "Django & HTMX",
+    "slug": "django-htmx",
+    "overview": "{\"delta\":\"{\\\"ops\\\":[{\\\"attributes\\\":{\\\"background\\\":\\\"#181a1b\\\",\\\"color\\\":\\\"#e8e6e3\\\"},\\\"insert\\\":\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\"},{\\\"insert\\\":\\\"\\\\n\\\"},{\\\"attributes\\\":{\\\"background\\\":\\\"#181a1b\\\",\\\"color\\\":\\\"#e8e6e3\\\"},\\\"insert\\\":\\\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\\\"},{\\\"insert\\\":\\\"\\\\n\\\"}]}\",\"html\":\"<p><span style=\\\"background-color: rgb(24, 26, 27); color: rgb(232, 230, 227);\\\">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span></p><p><span style=\\\"background-color: rgb(24, 26, 27); color: rgb(232, 230, 227);\\\"><span class=\\\"ql-cursor\\\">﻿</span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span></p>\"}",
+    "header": "The original playlist for Django & HTMX integration",
+    "date_created": "2026-10-29T08:35:02.741Z",
+    "status": "AV",
+    "level": "beginner",
+    "time_to_complete": "06:00:00",
+    "language": "en",
+    "image": "course_images/WhatsApp_Image_2026-10-29_at_11.34.37_AM.jpeg",
+    "wishlist": []
+  }
+},
+{
+  "model": "courses.module",
+  "pk": 1,
+  "fields": {
+    "course": 1,
+    "title": "Django",
+    "description": "This the Django part of the course.",
+    "date_created": "2026-10-05T14:34:18.850Z"
+  }
+},
+{
+  "model": "courses.module",
+  "pk": 3,
+  "fields": {
+    "course": 1,
+    "title": "PosrtgreSQL",
+    "description": "This the PosrtgreSQL part of the course.",
+    "date_created": "2026-10-05T14:34:18.850Z"
+  }
+},
+{
+  "model": "courses.module",
+  "pk": 8,
+  "fields": {
+    "course": 8,
+    "title": "Video Module",
+    "description": "This module contains a video",
+    "date_created": "2026-10-19T14:32:56.575Z"
+  }
+},
+{
+  "model": "courses.module",
+  "pk": 11,
+  "fields": {
+    "course": 22,
+    "title": "Django & HTMX - with Server-Sent Events (SSE)",
+    "description": "",
+    "date_created": "2026-10-29T08:39:08.015Z"
+  }
+},
+{
+  "model": "courses.module",
+  "pk": 12,
+  "fields": {
+    "course": 22,
+    "title": "Continue Course",
+    "description": "",
+    "date_created": "2026-10-29T08:40:38.113Z"
+  }
+},
+{
+  "model": "courses.module",
+  "pk": 13,
+  "fields": {
+    "course": 1,
+    "title": "Continue Course",
+    "description": "",
+    "date_created": "2026-10-29T08:42:20.932Z"
+  }
+},
+{
+  "model": "courses.module",
+  "pk": 14,
+  "fields": {
+    "course": 1,
+    "title": "Test file",
+    "description": "",
+    "date_created": "2026-10-29T08:44:09.041Z"
+  }
+},
+{
+  "model": "courses.module",
+  "pk": 15,
+  "fields": {
+    "course": 16,
+    "title": "Django ORM Deep Dive - Introduction to Databases & SQL",
+    "description": "",
+    "date_created": "2026-10-29T08:48:50.773Z"
+  }
+},
+{
+  "model": "courses.module",
+  "pk": 16,
+  "fields": {
+    "course": 16,
+    "title": "Continue the Course",
+    "description": "",
+    "date_created": "2026-10-29T08:49:20.144Z"
+  }
+},
+{
+  "model": "courses.module",
+  "pk": 17,
+  "fields": {
+    "course": 20,
+    "title": "Django REST Framework series - Setup and Models",
+    "description": "",
+    "date_created": "2026-10-29T08:50:34.860Z"
+  }
+},
+{
+  "model": "courses.module",
+  "pk": 18,
+  "fields": {
+    "course": 20,
+    "title": "Continue the Course",
+    "description": "",
+    "date_created": "2026-10-29T08:50:51.711Z"
+  }
+},
+{
+  "model": "courses.module",
+  "pk": 20,
+  "fields": {
+    "course": 19,
+    "title": "The complete Playlist of the course",
+    "description": "",
+    "date_created": "2026-10-29T08:54:46.153Z"
+  }
+},
+{
+  "model": "courses.module",
+  "pk": 21,
+  "fields": {
+    "course": 21,
+    "title": "AI-Assisted Coding Tutorial – OpenClaw, GitHub Copilot, Claude Code, CodeRabbit, Gemini CLI",
+    "description": "",
+    "date_created": "2026-10-29T08:56:04.866Z"
+  }
+},
+{
+  "model": "courses.module",
+  "pk": 22,
+  "fields": {
+    "course": 17,
+    "title": "HTML & CSS Full Course - Beginner to Pro",
+    "description": "",
+    "date_created": "2026-10-29T08:57:04.946Z"
+  }
+},
+{
+  "model": "courses.module",
+  "pk": 23,
+  "fields": {
+    "course": 15,
+    "title": "The complete Playlist",
+    "description": "",
+    "date_created": "2026-10-29T08:58:25.309Z"
+  }
+},
+{
+  "model": "courses.module",
+  "pk": 24,
+  "fields": {
+    "course": 18,
+    "title": "The complete playlist",
+    "description": "",
+    "date_created": "2026-10-29T08:59:15.400Z"
+  }
+},
+{
+  "model": "courses.content",
+  "pk": 5,
+  "fields": {
+    "module": 3,
+    "content_type": 12,
+    "object_id": 1
+  }
+},
+{
+  "model": "courses.content",
+  "pk": 15,
+  "fields": {
+    "module": 1,
+    "content_type": 13,
+    "object_id": 2
+  }
+},
+{
+  "model": "courses.content",
+  "pk": 20,
+  "fields": {
+    "module": 1,
+    "content_type": 14,
+    "object_id": 13
+  }
+},
+{
+  "model": "courses.content",
+  "pk": 22,
+  "fields": {
+    "module": 8,
+    "content_type": 14,
+    "object_id": 15
+  }
+},
+{
+  "model": "courses.content",
+  "pk": 23,
+  "fields": {
+    "module": 1,
+    "content_type": 14,
+    "object_id": 16
+  }
+},
+{
+  "model": "courses.content",
+  "pk": 24,
+  "fields": {
+    "module": 11,
+    "content_type": 14,
+    "object_id": 17
+  }
+},
+{
+  "model": "courses.content",
+  "pk": 25,
+  "fields": {
+    "module": 12,
+    "content_type": 13,
+    "object_id": 3
+  }
+},
+{
+  "model": "courses.content",
+  "pk": 26,
+  "fields": {
+    "module": 12,
+    "content_type": 13,
+    "object_id": 4
+  }
+},
+{
+  "model": "courses.content",
+  "pk": 27,
+  "fields": {
+    "module": 13,
+    "content_type": 13,
+    "object_id": 5
+  }
+},
+{
+  "model": "courses.content",
+  "pk": 28,
+  "fields": {
+    "module": 14,
+    "content_type": 11,
+    "object_id": 2
+  }
+},
+{
+  "model": "courses.content",
+  "pk": 29,
+  "fields": {
+    "module": 15,
+    "content_type": 14,
+    "object_id": 18
+  }
+},
+{
+  "model": "courses.content",
+  "pk": 30,
+  "fields": {
+    "module": 16,
+    "content_type": 13,
+    "object_id": 6
+  }
+},
+{
+  "model": "courses.content",
+  "pk": 31,
+  "fields": {
+    "module": 17,
+    "content_type": 14,
+    "object_id": 19
+  }
+},
+{
+  "model": "courses.content",
+  "pk": 32,
+  "fields": {
+    "module": 18,
+    "content_type": 13,
+    "object_id": 7
+  }
+},
+{
+  "model": "courses.content",
+  "pk": 34,
+  "fields": {
+    "module": 20,
+    "content_type": 13,
+    "object_id": 8
+  }
+},
+{
+  "model": "courses.content",
+  "pk": 35,
+  "fields": {
+    "module": 21,
+    "content_type": 14,
+    "object_id": 21
+  }
+},
+{
+  "model": "courses.content",
+  "pk": 37,
+  "fields": {
+    "module": 22,
+    "content_type": 13,
+    "object_id": 9
+  }
+},
+{
+  "model": "courses.content",
+  "pk": 38,
+  "fields": {
+    "module": 23,
+    "content_type": 13,
+    "object_id": 10
+  }
+},
+{
+  "model": "courses.content",
+  "pk": 39,
+  "fields": {
+    "module": 24,
+    "content_type": 13,
+    "object_id": 11
+  }
+},
+{
+  "model": "courses.enrollment",
+  "pk": 2,
+  "fields": {
+    "user": 9,
+    "course": 1,
+    "enrolled_at": "2026-10-06T16:14:56.896Z"
+  }
+},
+{
+  "model": "courses.enrollment",
+  "pk": 3,
+  "fields": {
+    "user": 13,
+    "course": 1,
+    "enrolled_at": "2026-10-12T18:27:45.478Z"
+  }
+},
+{
+  "model": "courses.enrollment",
+  "pk": 14,
+  "fields": {
+    "user": 20,
+    "course": 1,
+    "enrolled_at": "2026-10-19T09:05:13.893Z"
+  }
+},
+{
+  "model": "courses.enrollment",
+  "pk": 17,
+  "fields": {
+    "user": 1,
+    "course": 3,
+    "enrolled_at": "2026-10-20T12:20:39.224Z"
+  }
+},
+{
+  "model": "courses.enrollment",
+  "pk": 20,
+  "fields": {
+    "user": 21,
+    "course": 1,
+    "enrolled_at": "2026-10-20T17:56:25.662Z"
+  }
+},
+{
+  "model": "courses.enrollment",
+  "pk": 22,
+  "fields": {
+    "user": 25,
+    "course": 8,
+    "enrolled_at": "2026-10-25T12:30:13.472Z"
+  }
+},
+{
+  "model": "courses.enrollment",
+  "pk": 23,
+  "fields": {
+    "user": 25,
+    "course": 1,
+    "enrolled_at": "2026-10-25T16:15:50.480Z"
+  }
+},
+{
+  "model": "courses.enrollment",
+  "pk": 24,
+  "fields": {
+    "user": 26,
+    "course": 1,
+    "enrolled_at": "2026-10-26T18:00:34.281Z"
+  }
+},
+{
+  "model": "courses.enrollment",
+  "pk": 29,
+  "fields": {
+    "user": 26,
+    "course": 8,
+    "enrolled_at": "2026-10-26T18:22:09.196Z"
+  }
+},
+{
+  "model": "courses.progress",
+  "pk": 1,
+  "fields": {
+    "user": 9,
+    "module": 1,
+    "is_completed": true,
+    "completed_at": "2026-10-06T16:44:10.255Z"
+  }
+},
+{
+  "model": "courses.progress",
+  "pk": 3,
+  "fields": {
+    "user": 9,
+    "module": 3,
+    "is_completed": true,
+    "completed_at": "2026-10-06T16:47:47.991Z"
+  }
+},
+{
+  "model": "courses.progress",
+  "pk": 5,
+  "fields": {
+    "user": 21,
+    "module": 1,
+    "is_completed": true,
+    "completed_at": "2026-10-21T18:34:13.082Z"
+  }
+},
+{
+  "model": "courses.progress",
+  "pk": 7,
+  "fields": {
+    "user": 21,
+    "module": 3,
+    "is_completed": true,
+    "completed_at": "2026-10-21T18:34:22.603Z"
+  }
+},
+{
+  "model": "courses.progress",
+  "pk": 8,
+  "fields": {
+    "user": 25,
+    "module": 1,
+    "is_completed": true,
+    "completed_at": "2026-10-25T16:15:57.726Z"
+  }
+},
+{
+  "model": "courses.progress",
+  "pk": 10,
+  "fields": {
+    "user": 25,
+    "module": 3,
+    "is_completed": true,
+    "completed_at": "2026-10-25T16:16:11.825Z"
+  }
+},
+{
+  "model": "courses.progress",
+  "pk": 11,
+  "fields": {
+    "user": 26,
+    "module": 1,
+    "is_completed": true,
+    "completed_at": "2026-10-26T18:00:55.598Z"
+  }
+},
+{
+  "model": "courses.progress",
+  "pk": 12,
+  "fields": {
+    "user": 26,
+    "module": 8,
+    "is_completed": true,
+    "completed_at": "2026-10-26T18:16:27.837Z"
+  }
+},
+{
+  "model": "courses.progress",
+  "pk": 14,
+  "fields": {
+    "user": 26,
+    "module": 3,
+    "is_completed": true,
+    "completed_at": "2026-10-26T18:48:47.305Z"
+  }
+},
+{
+  "model": "courses.review",
+  "pk": 1,
+  "fields": {
+    "user": 9,
+    "course": 1,
+    "rating": 5,
+    "comment": "good.",
+    "created_at": "2026-10-13T16:40:18.417Z"
+  }
+},
+{
+  "model": "courses.review",
+  "pk": 4,
+  "fields": {
+    "user": 14,
+    "course": 8,
+    "rating": 5,
+    "comment": "very good",
+    "created_at": "2026-10-19T15:55:41.179Z"
+  }
+},
+{
+  "model": "courses.review",
+  "pk": 5,
+  "fields": {
+    "user": 1,
+    "course": 3,
+    "rating": 1,
+    "comment": "bad",
+    "created_at": "2026-10-20T12:20:54.096Z"
+  }
+},
+{
+  "model": "courses.review",
+  "pk": 6,
+  "fields": {
+    "user": 21,
+    "course": 1,
+    "rating": 2,
+    "comment": "good",
+    "created_at": "2026-10-20T17:44:22.698Z"
+  }
+},
+{
+  "model": "courses.file",
+  "pk": 1,
+  "fields": {
+    "owner": 1,
+    "title": "",
+    "date_created": "2026-10-06T11:51:51.687Z",
+    "updated": "2026-10-06T11:51:51.687Z",
+    "file": "files/خريطة_باك.pdf"
+  }
+},
+{
+  "model": "courses.file",
+  "pk": 2,
+  "fields": {
+    "owner": 1,
+    "title": "Test this file",
+    "date_created": "2026-10-29T08:45:24.737Z",
+    "updated": "2026-10-29T08:45:24.737Z",
+    "file": "files/Test.docx"
+  }
+},
+{
+  "model": "courses.image",
+  "pk": 1,
+  "fields": {
+    "owner": 1,
+    "title": "",
+    "date_created": "2026-10-06T11:50:33.348Z",
+    "updated": "2026-10-06T11:50:33.348Z",
+    "image": "images/postgresql.webp"
+  }
+},
+{
+  "model": "courses.image",
+  "pk": 2,
+  "fields": {
+    "owner": 1,
+    "title": "",
+    "date_created": "2026-10-06T12:13:31.432Z",
+    "updated": "2026-10-06T12:13:31.432Z",
+    "image": "images/Python.ico"
+  }
+},
+{
+  "model": "courses.video",
+  "pk": 13,
+  "fields": {
+    "owner": 1,
+    "title": "Python Django 7 Hour Course",
+    "date_created": "2026-10-19T09:15:52.816Z",
+    "updated": "2026-10-19T09:15:52.816Z",
+    "video_url": "https://youtu.be/PtQiiknWUcI",
+    "video_upload": ""
+  }
+},
+{
+  "model": "courses.video",
+  "pk": 15,
+  "fields": {
+    "owner": 1,
+    "title": "\"فديو تفاعلي لكتاب \"الأمصار ذوات الآثار",
+    "date_created": "2026-10-19T14:33:23.322Z",
+    "updated": "2026-10-26T18:26:33.903Z",
+    "video_url": null,
+    "video_upload": "videos/video_2026-10-19_15-45-17.mp4"
+  }
+},
+{
+  "model": "courses.video",
+  "pk": 16,
+  "fields": {
+    "owner": 1,
+    "title": "Django Introduction - Installation & Python Virtual Environments",
+    "date_created": "2026-10-26T18:51:20.052Z",
+    "updated": "2026-10-26T18:51:20.052Z",
+    "video_url": null,
+    "video_upload": "videos/Django_Introduction_-_Installation__Python_Virtual_Environments.mp4"
+  }
+},
+{
+  "model": "courses.video",
+  "pk": 17,
+  "fields": {
+    "owner": 1,
+    "title": "Django & HTMX - with Server-Sent Events (SSE)!",
+    "date_created": "2026-10-29T08:39:47.166Z",
+    "updated": "2026-10-29T08:39:47.166Z",
+    "video_url": "https://youtu.be/9qwCc0FgPRg",
+    "video_upload": ""
+  }
+},
+{
+  "model": "courses.video",
+  "pk": 18,
+  "fields": {
+    "owner": 1,
+    "title": "Django ORM Deep Dive - Introduction to Databases & SQL",
+    "date_created": "2026-10-29T08:49:01.835Z",
+    "updated": "2026-10-29T08:49:01.835Z",
+    "video_url": "https://youtu.be/EsBqIZmR2Uc",
+    "video_upload": ""
+  }
+},
+{
+  "model": "courses.video",
+  "pk": 19,
+  "fields": {
+    "owner": 1,
+    "title": "Django REST Framework series - Setup and Models",
+    "date_created": "2026-10-29T08:51:17.707Z",
+    "updated": "2026-10-29T08:51:17.707Z",
+    "video_url": "https://youtu.be/6AEvlNgRPNc",
+    "video_upload": ""
+  }
+},
+{
+  "model": "courses.video",
+  "pk": 20,
+  "fields": {
+    "owner": 1,
+    "title": "Introduction about the course",
+    "date_created": "2026-10-29T08:53:12.133Z",
+    "updated": "2026-10-29T08:54:09.006Z",
+    "video_url": "https://www.youtube.com/embed/84ncbd9QaY4?si=AKJIKKhgOlmnLtn5",
+    "video_upload": ""
+  }
+},
+{
+  "model": "courses.video",
+  "pk": 21,
+  "fields": {
+    "owner": 1,
+    "title": "AI-Assisted Coding Tutorial – OpenClaw, GitHub Copilot, Claude Code, CodeRabbit, Gemini CLI",
+    "date_created": "2026-10-29T08:56:21.212Z",
+    "updated": "2026-10-29T08:56:21.212Z",
+    "video_url": "https://youtu.be/wlpBCazAY9Q",
+    "video_upload": ""
+  }
+},
+{
+  "model": "courses.text",
+  "pk": 1,
+  "fields": {
+    "owner": 1,
+    "title": "",
+    "date_created": "2026-10-06T11:51:16.574Z",
+    "updated": "2026-10-06T11:51:16.574Z",
+    "content": "Learn The lesson right."
+  }
+},
+{
+  "model": "courses.text",
+  "pk": 2,
+  "fields": {
+    "owner": 1,
+    "title": "تجربة",
+    "date_created": "2026-10-19T08:50:18.171Z",
+    "updated": "2026-10-19T08:50:18.171Z",
+    "content": "تجربة"
+  }
+},
+{
+  "model": "courses.text",
+  "pk": 3,
+  "fields": {
+    "owner": 1,
+    "title": "Link of the Playlist",
+    "date_created": "2026-10-29T08:41:06.016Z",
+    "updated": "2026-10-29T08:41:06.016Z",
+    "content": "https://www.youtube.com/playlist?list=PL-2EBeDYMIbSP9TBPMsiMcRdLWeRzz1Gu"
+  }
+},
+{
+  "model": "courses.text",
+  "pk": 4,
+  "fields": {
+    "owner": 1,
+    "title": "Link of the Playlist",
+    "date_created": "2026-10-29T08:41:11.902Z",
+    "updated": "2026-10-29T08:41:11.902Z",
+    "content": "https://www.youtube.com/playlist?list=PL-2EBeDYMIbSP9TBPMsiMcRdLWeRzz1Gu"
+  }
+},
+{
+  "model": "courses.text",
+  "pk": 5,
+  "fields": {
+    "owner": 1,
+    "title": "Link of the Playlist",
+    "date_created": "2026-10-29T08:42:46.705Z",
+    "updated": "2026-10-29T08:42:46.705Z",
+    "content": "https://youtube.com/playlist?list=PL-2EBeDYMIbQaapZunsYsll5MphTRL1qB&si=695a0dqhWKriAsJx"
+  }
+},
+{
+  "model": "courses.text",
+  "pk": 6,
+  "fields": {
+    "owner": 1,
+    "title": "Continue the course",
+    "date_created": "2026-10-29T08:49:45.226Z",
+    "updated": "2026-10-29T08:49:45.226Z",
+    "content": "https://www.youtube.com/playlist?list=PL-2EBeDYMIbTT7ri4pNEBu9VoVSAkOvd2"
+  }
+},
+{
+  "model": "courses.text",
+  "pk": 7,
+  "fields": {
+    "owner": 1,
+    "title": "Link of the playlist",
+    "date_created": "2026-10-29T08:51:44.919Z",
+    "updated": "2026-10-29T08:51:44.919Z",
+    "content": "https://www.youtube.com/playlist?list=PL-2EBeDYMIbSXhV8FMC1hVD32Fi6e4l2u"
+  }
+},
+{
+  "model": "courses.text",
+  "pk": 8,
+  "fields": {
+    "owner": 1,
+    "title": "Learn Command Line",
+    "date_created": "2026-10-29T08:55:11.588Z",
+    "updated": "2026-10-29T08:55:11.588Z",
+    "content": "https://www.youtube.com/playlist?list=PLPekubhUiZ90"
+  }
+},
+{
+  "model": "courses.text",
+  "pk": 9,
+  "fields": {
+    "owner": 1,
+    "title": "HTML & CSS Full Course - Beginner to Pro",
+    "date_created": "2026-10-29T08:57:33.367Z",
+    "updated": "2026-10-29T08:57:33.367Z",
+    "content": "https://youtu.be/G3e-cpL7ofc"
+  }
+},
+{
+  "model": "courses.text",
+  "pk": 10,
+  "fields": {
+    "owner": 1,
+    "title": "Mastering Python - تعلم بايثون",
+    "date_created": "2026-10-29T08:58:34.584Z",
+    "updated": "2026-10-29T08:58:34.584Z",
+    "content": "https://youtube.com/playlist?list=PLDoPjvoNmBAyE_gei5d18qkfIe-Z8mocs&si=OcFQzy1ouUdCxWKb"
+  }
+},
+{
+  "model": "courses.text",
+  "pk": 11,
+  "fields": {
+    "owner": 1,
+    "title": "The complete playlist",
+    "date_created": "2026-10-29T08:59:43.752Z",
+    "updated": "2026-10-29T08:59:43.752Z",
+    "content": "https://youtube.com/playlist?list=PLDoPjvoNmBAw4eOj58MZPakHjaO3frVMF&si=Z9sQq_hsqaI58kEW"
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$XeE9PQg1NZCbCj0dHODuPk$Sr4QkeiaQwRY/JNVyl0WLPl2uwKv3CHA01QHVaky6D8=",
+    "last_login": "2026-10-29T08:38:23.251Z",
+    "is_superuser": true,
+    "username": "kasabian",
+    "first_name": "",
+    "last_name": "",
+    "email": "kasabian@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-09-16T08:49:18.511Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$CeB5hw8trUSabVmetD1fj6$kJ4IyEFGJy9djqco7HTlW6pe+ywL6MZ+eBMDc6HcIyo=",
+    "last_login": "2026-09-19T11:25:39.394Z",
+    "is_superuser": false,
+    "username": "django",
+    "first_name": "",
+    "last_name": "",
+    "email": "django@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-09-18T19:25:11.135Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$hsULvOaV6jSqouxSM0h9vJ$GH13kcSdthtx8WZ/auUrP8h0Fd7P97qq4BVKFUzW908=",
+    "last_login": "2026-09-19T06:59:32.045Z",
+    "is_superuser": false,
+    "username": "New",
+    "first_name": "",
+    "last_name": "",
+    "email": "new@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-09-19T06:59:03.418Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 4,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$Qsw2XEJ3ZxwSRQrbea6I5E$pzHwsdaFcx/BI9HsKvjXJG2nhyfSis5XRg/2TebetI4=",
+    "last_login": "2026-09-19T11:39:26.106Z",
+    "is_superuser": true,
+    "username": "momo",
+    "first_name": "",
+    "last_name": "",
+    "email": "momo@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-09-19T11:39:05.351Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 5,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$KLWJ0soAJ3nN4V89LQ2wup$FPXTb1am42SuxAjF5LM+lLNLirgpvrEda77BWQgmWy4=",
+    "last_login": "2026-09-19T12:11:11.965Z",
+    "is_superuser": false,
+    "username": "koko",
+    "first_name": "",
+    "last_name": "",
+    "email": "koko@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-09-19T12:11:10.816Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 6,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$4qDLtYJNqVV5BbJtNNZiEg$Vt4jzHU1OI5okLSsdXvitk0w3XXEJj6VnCBmhYHvAfw=",
+    "last_login": "2026-09-19T12:18:24.843Z",
+    "is_superuser": false,
+    "username": "fofo",
+    "first_name": "",
+    "last_name": "",
+    "email": "fofo@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-09-19T12:18:23.683Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 7,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$GY3WrEOyjjiCANWf38balx$XYOwD3be5szZqklrrNkWa5qBLMWUYCO8wawJcDopEdE=",
+    "last_login": "2026-09-19T15:19:36.822Z",
+    "is_superuser": false,
+    "username": "sam",
+    "first_name": "",
+    "last_name": "",
+    "email": "sam@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-09-19T15:19:35.599Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 8,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$S56PhiFWJpmY5hh5UBa9jt$90VPkSS8ENOdO9gT6HN5FFjBh7nNc8Ar8q5Djxr58Fc=",
+    "last_login": "2026-09-19T15:20:37.501Z",
+    "is_superuser": false,
+    "username": "sam12",
+    "first_name": "",
+    "last_name": "",
+    "email": "sam12@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-09-19T15:20:36.403Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 9,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$k8qTwEU3OyA06T1Q29X1u5$Pvr1cX8W9O/g5r6Tw0aca+KHIsruirEM89dhCo2/iD0=",
+    "last_login": "2026-10-18T07:32:40.235Z",
+    "is_superuser": false,
+    "username": "Student1",
+    "first_name": "",
+    "last_name": "",
+    "email": "student@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-09-28T17:56:36.978Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 10,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$S3cgVcA4hmAnPWC7bjo3lQ$qH8/mU3VJvKh8lkPj7tywZ+l1mtuwE3DqFDLmCDoKPU=",
+    "last_login": "2026-10-18T07:47:04.245Z",
+    "is_superuser": false,
+    "username": "Student2",
+    "first_name": "",
+    "last_name": "",
+    "email": "student2@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-09-28T18:07:42.386Z",
+    "groups": [],
+    "user_permissions": [
+      37,
+      38,
+      39,
+      29,
+      30,
+      31,
+      33,
+      34,
+      35
+    ]
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 11,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$g1HakbvzETfgDeWnHABaQ1$8PypoCVuF+1i9IYEwFAjYvrQlUw7oaBc4MztgeMuVW0=",
+    "last_login": "2026-10-15T14:05:43.009Z",
+    "is_superuser": false,
+    "username": "Instructor",
+    "first_name": "",
+    "last_name": "",
+    "email": "instructor@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-04T19:13:52.737Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 13,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$sI4wVtedL26aOIz2GhBtE8$bMwY2U4hroJlDK5w/bOd2RaSYIwgLHZWOIkslAtCJ/A=",
+    "last_login": "2026-10-11T18:01:00.062Z",
+    "is_superuser": false,
+    "username": "toto",
+    "first_name": "",
+    "last_name": "",
+    "email": "toto@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-11T18:00:59.377Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 14,
+  "fields": {
+    "password": "!i2uwsoU3yIroqOvKjuuD8DSDvymLyBK5mKe2tMv6",
+    "last_login": "2026-10-19T15:54:54.215Z",
+    "is_superuser": false,
+    "username": "abd_allah",
+    "first_name": "Abd allah",
+    "last_name": "Elkasaby",
+    "email": "abdallahelkasaby221@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-14T09:17:55.376Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 16,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$MopvVdAhlqCq8WYgC1TInB$weFpHvNpghWApYf7SDyyjgObQwDBXsWvkb6ZuXEG3mI=",
+    "last_login": "2026-10-18T08:07:57.518Z",
+    "is_superuser": false,
+    "username": "NewUser",
+    "first_name": "",
+    "last_name": "",
+    "email": "NewUser@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-18T08:07:35.903Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 17,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$YW1caUQY077lckuHLB1Wqh$pi1kqwj1uLMPd8V2jHPwV7igzNbLxxXnh316ap5VFi0=",
+    "last_login": "2026-10-18T08:15:31.342Z",
+    "is_superuser": false,
+    "username": "Tester",
+    "first_name": "",
+    "last_name": "",
+    "email": "tester@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-18T08:15:11.577Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 18,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$M0kOtmr98mI8Bs67St6sLX$6N1May9CT61kE+ePa3JQemQYecKMNNW9mL3iKNSzEqQ=",
+    "last_login": "2026-10-18T08:30:04.208Z",
+    "is_superuser": false,
+    "username": "Toast",
+    "first_name": "",
+    "last_name": "",
+    "email": "toast@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-18T08:21:20.883Z",
+    "groups": [],
+    "user_permissions": [
+      37,
+      38,
+      39,
+      29,
+      30,
+      31,
+      33,
+      34,
+      35
+    ]
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 19,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$d0LlFcllTD5rINODJN7i3z$HvUTcZCsSoSwMqBBOnjE7w/23JApHbvUyM2gZK+URmo=",
+    "last_login": "2026-10-18T08:38:26.478Z",
+    "is_superuser": false,
+    "username": "gege",
+    "first_name": "",
+    "last_name": "",
+    "email": "gege@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-18T08:31:46.300Z",
+    "groups": [],
+    "user_permissions": [
+      37,
+      38,
+      39,
+      29,
+      30,
+      31,
+      33,
+      34,
+      35
+    ]
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 20,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$odUu3RnxnhtAPWVG2RIjB7$KcOtr0IbqPYDbBHxu4X/MmoJAsK3s4VS9Srog6IOikY=",
+    "last_login": "2026-10-18T09:15:44.305Z",
+    "is_superuser": false,
+    "username": "yoyo",
+    "first_name": "",
+    "last_name": "",
+    "email": "yoyo@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-18T09:15:07.056Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 21,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$unwSIUYnorvQpFEexkJB9H$1oRXLPMhYylcOqOo/Ap3hOzEs8zoTJ+SoqpOgyO2AYI=",
+    "last_login": "2026-10-29T08:35:43.774Z",
+    "is_superuser": false,
+    "username": "عبدالله",
+    "first_name": "",
+    "last_name": "",
+    "email": "abduallah@gmai.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-20T06:01:38.408Z",
+    "groups": [],
+    "user_permissions": [
+      37,
+      38,
+      39,
+      29,
+      30,
+      31,
+      33,
+      34,
+      35
+    ]
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 22,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$o8gYTqBQh5WwooqdoMSepa$sw0Y8RfYHK6LGGs0yVcwYa5/QAH4Rfea8WEkkGTk23U=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "try2",
+    "first_name": "",
+    "last_name": "",
+    "email": "trya96136@gmail.com",
+    "is_staff": false,
+    "is_active": false,
+    "date_joined": "2026-10-25T11:03:06.946Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 24,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$7B6CvSewBzl7UNdozbSxwv$ako9ilaQ5iYg/Gm8nrCHvMX7GT7qtKBIMTaLrpsNsqU=",
+    "last_login": "2026-10-25T11:31:18.354Z",
+    "is_superuser": false,
+    "username": "boody",
+    "first_name": "",
+    "last_name": "",
+    "email": "boodyelkasaby22@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-25T11:27:31.493Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 25,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$o7PfMDH2MH6zHitgSLctN2$D04UIAkizy5ndfmNp24/rZNUf6L/3+/GXvUzBHzlFyE=",
+    "last_login": "2026-10-26T06:25:56.210Z",
+    "is_superuser": false,
+    "username": "boody2",
+    "first_name": "",
+    "last_name": "",
+    "email": "boody2@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-25T12:15:14.319Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "auth.user",
+  "pk": 26,
+  "fields": {
+    "password": "pbkdf2_sha256$1500000$x647EkKBcCuPkTiUfhfHBW$UDTTc4cfVbT6qXS+DegVN3Osg8B0E3MCINysxwRizB0=",
+    "last_login": "2026-10-27T11:08:07.281Z",
+    "is_superuser": false,
+    "username": "abduallah",
+    "first_name": "",
+    "last_name": "",
+    "email": "abduallah@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-10-26T17:58:46.876Z",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 1,
+  "fields": {
+    "user": 9,
+    "role": "student"
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 2,
+  "fields": {
+    "user": 10,
+    "role": "instructor"
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 3,
+  "fields": {
+    "user": 11,
+    "role": "instructor"
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 4,
+  "fields": {
+    "user": 13,
+    "role": "student"
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 7,
+  "fields": {
+    "user": 1,
+    "role": "instructor"
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 9,
+  "fields": {
+    "user": 16,
+    "role": "student"
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 10,
+  "fields": {
+    "user": 17,
+    "role": "student"
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 11,
+  "fields": {
+    "user": 18,
+    "role": "instructor"
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 12,
+  "fields": {
+    "user": 19,
+    "role": "instructor"
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 13,
+  "fields": {
+    "user": 20,
+    "role": "student"
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 14,
+  "fields": {
+    "user": 21,
+    "role": "instructor"
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 15,
+  "fields": {
+    "user": 22,
+    "role": "student"
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 17,
+  "fields": {
+    "user": 24,
+    "role": "student"
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 18,
+  "fields": {
+    "user": 25,
+    "role": "student"
+  }
+},
+{
+  "model": "accounts.userprofile",
+  "pk": 19,
+  "fields": {
+    "user": 26,
+    "role": "student"
+  }
+},
+{
+  "model": "accounts.studentprofile",
+  "pk": 1,
+  "fields": {
+    "photo": "",
+    "bio": "This is Student1 bio.",
+    "full_name": "student elkasaby ali",
+    "country": "",
+    "education": "high_school",
+    "primary_language_spoken": "ca",
+    "linkedin": "",
+    "github": "",
+    "facebook": "",
+    "user": 9
+  }
+},
+{
+  "model": "accounts.studentprofile",
+  "pk": 4,
+  "fields": {
+    "photo": "",
+    "bio": "",
+    "full_name": "",
+    "country": "",
+    "education": "",
+    "primary_language_spoken": "",
+    "linkedin": "",
+    "github": "",
+    "facebook": "",
+    "user": 13
+  }
+},
+{
+  "model": "accounts.studentprofile",
+  "pk": 7,
+  "fields": {
+    "photo": "",
+    "bio": "",
+    "full_name": "",
+    "country": "",
+    "education": "",
+    "primary_language_spoken": "",
+    "linkedin": "",
+    "github": "",
+    "facebook": "",
+    "user": 16
+  }
+},
+{
+  "model": "accounts.studentprofile",
+  "pk": 8,
+  "fields": {
+    "photo": "",
+    "bio": "",
+    "full_name": "",
+    "country": "",
+    "education": "",
+    "primary_language_spoken": "",
+    "linkedin": "",
+    "github": "",
+    "facebook": "",
+    "user": 17
+  }
+},
+{
+  "model": "accounts.studentprofile",
+  "pk": 11,
+  "fields": {
+    "photo": "",
+    "bio": "",
+    "full_name": "",
+    "country": "",
+    "education": "",
+    "primary_language_spoken": "",
+    "linkedin": "",
+    "github": "",
+    "facebook": "",
+    "user": 20
+  }
+},
+{
+  "model": "accounts.studentprofile",
+  "pk": 14,
+  "fields": {
+    "photo": "",
+    "bio": "",
+    "full_name": "",
+    "country": "",
+    "education": "",
+    "primary_language_spoken": "",
+    "linkedin": "",
+    "github": "",
+    "facebook": "",
+    "user": 22
+  }
+},
+{
+  "model": "accounts.studentprofile",
+  "pk": 16,
+  "fields": {
+    "photo": "",
+    "bio": "",
+    "full_name": "",
+    "country": "",
+    "education": "",
+    "primary_language_spoken": "",
+    "linkedin": "",
+    "github": "",
+    "facebook": "",
+    "user": 24
+  }
+},
+{
+  "model": "accounts.studentprofile",
+  "pk": 17,
+  "fields": {
+    "photo": "",
+    "bio": "",
+    "full_name": "",
+    "country": "",
+    "education": "",
+    "primary_language_spoken": "",
+    "linkedin": "",
+    "github": "",
+    "facebook": "",
+    "user": 25
+  }
+},
+{
+  "model": "accounts.studentprofile",
+  "pk": 18,
+  "fields": {
+    "photo": "",
+    "bio": "",
+    "full_name": "",
+    "country": "",
+    "education": "",
+    "primary_language_spoken": "",
+    "linkedin": "",
+    "github": "",
+    "facebook": "",
+    "user": 26
+  }
+},
+{
+  "model": "accounts.instructorprofile",
+  "pk": 1,
+  "fields": {
+    "photo": "defaults/default.jpg",
+    "bio": "",
+    "full_name": "",
+    "country": "",
+    "education": "",
+    "primary_language_spoken": "",
+    "linkedin": "",
+    "github": "",
+    "facebook": "",
+    "user": 2,
+    "contact_email": null,
+    "header": null
+  }
+},
+{
+  "model": "accounts.instructorprofile",
+  "pk": 2,
+  "fields": {
+    "photo": "",
+    "bio": "This is kasabian.",
+    "full_name": "",
+    "country": "EG",
+    "education": "bachelor",
+    "primary_language_spoken": "ar",
+    "linkedin": "https://www.linkedin.com/in/abduallah-el-kasaby-1675a3251",
+    "github": "https://github.com/kasabian22",
+    "facebook": "https://www.facebook.com/abduallah.elkasaby/",
+    "user": 1,
+    "contact_email": "kasabian@gmail.com",
+    "header": "kasabian for education purposes."
+  }
+},
+{
+  "model": "accounts.instructorprofile",
+  "pk": 3,
+  "fields": {
+    "photo": "defaults/default.jpg",
+    "bio": "This is my bio.",
+    "full_name": "",
+    "country": "",
+    "education": "",
+    "primary_language_spoken": "",
+    "linkedin": "",
+    "github": "",
+    "facebook": "",
+    "user": 5,
+    "contact_email": "koko@gmail.com",
+    "header": "KOKO ACADEMY"
+  }
+},
+{
+  "model": "accounts.instructorprofile",
+  "pk": 4,
+  "fields": {
+    "photo": "defaults/default.jpg",
+    "bio": "",
+    "full_name": "",
+    "country": "",
+    "education": "",
+    "primary_language_spoken": "",
+    "linkedin": "",
+    "github": "",
+    "facebook": "",
+    "user": 6,
+    "contact_email": null,
+    "header": null
+  }
+},
+{
+  "model": "accounts.instructorprofile",
+  "pk": 5,
+  "fields": {
+    "photo": "defaults/default.jpg",
+    "bio": "",
+    "full_name": "",
+    "country": "",
+    "education": "",
+    "primary_language_spoken": "",
+    "linkedin": "",
+    "github": "",
+    "facebook": "",
+    "user": 7,
+    "contact_email": null,
+    "header": null
+  }
+},
+{
+  "model": "accounts.instructorprofile",
+  "pk": 6,
+  "fields": {
+    "photo": "Instructor/photos/default.jpg",
+    "bio": "I'm koko.",
+    "full_name": "",
+    "country": "",
+    "education": "",
+    "primary_language_spoken": "",
+    "linkedin": "",
+    "github": "",
+    "facebook": "",
+    "user": 8,
+    "contact_email": "sam12@gmail.com",
+    "header": "KOKO ACADEMY"
+  }
+},
+{
+  "model": "accounts.instructorprofile",
+  "pk": 7,
+  "fields": {
+    "photo": "",
+    "bio": "",
+    "full_name": "",
+    "country": "",
+    "education": "",
+    "primary_language_spoken": "",
+    "linkedin": "",
+    "github": "",
+    "facebook": "",
+    "user": 11,
+    "contact_email": null,
+    "header": null
+  }
+},
+{
+  "model": "accounts.instructorprofile",
+  "pk": 9,
+  "fields": {
+    "photo": "",
+    "bio": "",
+    "full_name": "",
+    "country": "",
+    "education": "",
+    "primary_language_spoken": "",
+    "linkedin": "",
+    "github": "",
+    "facebook": "",
+    "user": 10,
+    "contact_email": null,
+    "header": null
+  }
+},
+{
+  "model": "accounts.instructorprofile",
+  "pk": 10,
+  "fields": {
+    "photo": "",
+    "bio": "",
+    "full_name": "",
+    "country": "",
+    "education": "",
+    "primary_language_spoken": "",
+    "linkedin": "",
+    "github": "",
+    "facebook": "",
+    "user": 18,
+    "contact_email": null,
+    "header": null
+  }
+},
+{
+  "model": "accounts.instructorprofile",
+  "pk": 11,
+  "fields": {
+    "photo": "",
+    "bio": "",
+    "full_name": "",
+    "country": "",
+    "education": "",
+    "primary_language_spoken": "",
+    "linkedin": "",
+    "github": "",
+    "facebook": "",
+    "user": 19,
+    "contact_email": null,
+    "header": null
+  }
+},
+{
+  "model": "accounts.instructorprofile",
+  "pk": 12,
+  "fields": {
+    "photo": "",
+    "bio": "",
+    "full_name": "",
+    "country": "",
+    "education": "",
+    "primary_language_spoken": "",
+    "linkedin": "",
+    "github": "",
+    "facebook": "",
+    "user": 21,
+    "contact_email": null,
+    "header": null
+  }
+},
+{
+  "model": "accounts.instructorrequest",
+  "pk": 1,
+  "fields": {
+    "user": 9,
+    "status": "rejected",
+    "is_seen": true,
+    "created_at": "2026-10-18T07:31:07.733Z"
+  }
+}
+]
