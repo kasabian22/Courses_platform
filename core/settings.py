@@ -42,15 +42,27 @@ DEBUG = config(
     cast=bool
 )
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=Csv())
+# Allow Back4App domains (.b4a.run, .back4app.io) and local hosts by default
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS',
+    default='127.0.0.1,localhost,.b4a.run,.back4app.io',
+    cast=Csv()
+)
 
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://*.b4a.run',
-    'http://127.0.0.1:8000',
-    'http://localhost:8000',
-]
+CSRF_TRUSTED_ORIGINS = config(
+    'CSRF_TRUSTED_ORIGINS',
+    default='https://*.b4a.run,https://*.back4app.io,http://127.0.0.1:8000,http://localhost:8000',
+    cast=Csv()
+)
 
+
+# ==========================================
+# Cloudinary Detection (Must happen before INSTALLED_APPS)
+# ==========================================
+CLOUDINARY_URL = config('CLOUDINARY_URL', default=None)
+CLOUDINARY_CLOUD_NAME = config('CLOUDINARY_CLOUD_NAME', default=None)
+USE_CLOUDINARY = bool(CLOUDINARY_URL or CLOUDINARY_CLOUD_NAME)
 
 
 # Application definition
@@ -74,9 +86,6 @@ INSTALLED_APPS = [
     'django_quill',
     'widget_tweaks',
     'django_countries',
-
-    # Automatically removes physical files on disk/cloud when model records are replaced or deleted
-    'django_cleanup.apps.CleanupConfig',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
@@ -95,11 +104,15 @@ MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',
 ]
 
+
+
 # Related to visual debug tool
 # INTERNAL_IPS = [
 #     "127.0.0.1",
 # ]
 
+if DEBUG and 'debug_toolbar' in INSTALLED_APPS:
+    MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
 
 AUTHENTICATION_BACKENDS = [
     # Needed to login by username in Django admin, regardless of `allauth`
@@ -146,24 +159,24 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/6.1/ref/settings/#databases
+# ==========================================
+# Database (Neon PostgreSQL / Local Fallback)
+# ==========================================
 
 DATABASE_URL = config('DATABASE_URL', default=None)
 DB_NAME = config('DB_NAME', default=None)
 
 if DATABASE_URL:
-    # Used on Render with Neon PostgreSQL (or any external database URL)
+    # Neon serverless Postgres works best with conn_max_age=0 (especially with -pooler URLs)
     DATABASES = {
         'default': dj_database_url.parse(
             DATABASE_URL,
-            conn_max_age=600,
+            conn_max_age=0,
             conn_health_checks=True,
             ssl_require=True,
         )
     }
 elif DB_NAME:
-    # Local PostgreSQL database configured via .env variables
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
@@ -175,7 +188,6 @@ elif DB_NAME:
         }
     }
 else:
-    # Zero-configuration fallback for fresh local clones
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -222,20 +234,19 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.1/howto/static-files/
-
+# Static & Media files
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-
-# Media files (User uploads)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Limit maximum request body/upload size to 120 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 120 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE = 30 * 1024 * 1024
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
@@ -244,28 +255,14 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 LOGIN_URL = 'accounts:sign_in'
 
-
-# Limit maximum request body/upload size to 120 MB (100 + 20 for reserve)
-DATA_UPLOAD_MAX_MEMORY_SIZE = 120 * 1024 * 1024
-FILE_UPLOAD_MAX_MEMORY_SIZE = 30 * 1024 * 1024
-
-
 # ==========================================
 # Cloudinary (Media) & WhiteNoise (Static)
 # ==========================================
 
-CLOUDINARY_URL = config('CLOUDINARY_URL', default=None)
-CLOUDINARY_CLOUD_NAME = config('CLOUDINARY_CLOUD_NAME', default=None)
-
-USE_CLOUDINARY = bool(CLOUDINARY_URL or CLOUDINARY_CLOUD_NAME)
+# Compatibility shims required by django-cloudinary-storage 0.3.0 on Django 5.1 / 6.x
+STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 if USE_CLOUDINARY:
-    # Production Mode (Cloudinary for media + WhiteNoise for static files)
-    INSTALLED_APPS += [
-        'cloudinary_storage',
-        'cloudinary',
-    ]
-
     if CLOUDINARY_CLOUD_NAME:
         CLOUDINARY_STORAGE = {
             'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
@@ -273,9 +270,9 @@ if USE_CLOUDINARY:
             'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
         }
 
+    DEFAULT_FILE_STORAGE = "core.storage.MediaCloudinaryStorageWithType"
     STORAGES = {
         "default": {
-            # Uses our custom storage that correctly tags images, videos, and raw files
             "BACKEND": "core.storage.MediaCloudinaryStorageWithType",
         },
         "staticfiles": {
@@ -283,7 +280,7 @@ if USE_CLOUDINARY:
         },
     }
 else:
-    # Local Development Mode (Normal FileSystemStorage - Zero setup required!)
+    DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
     STORAGES = {
         "default": {
             "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -314,22 +311,27 @@ if DEBUG:
         pass
 
 
+# CRITICAL: django_cleanup MUST always be the very last app in INSTALLED_APPS
+# Automatically removes physical files on disk/cloud when model records are replaced or deleted
+INSTALLED_APPS.append('django_cleanup.apps.CleanupConfig')
+
+
 # ==========================================
 # Production Security (Active only when DEBUG=False)
 # ==========================================
 
 if not DEBUG:
-    # Tell Django to trust the X-Forwarded-Proto header set by Back4App's reverse proxy
+    # Trust X-Forwarded-Proto header set by Back4App's reverse proxy
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-    SECURE_SSL_REDIRECT = True
+    # Keep False by default on Back4App so internal HTTP health checks aren't 301-redirected
+    # (Back4App's edge proxy already forces HTTPS for external visitors)
+    SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=False, cast=bool)
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
-    SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
-    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
-
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
