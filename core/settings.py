@@ -15,7 +15,8 @@ from decouple import config, Csv
 from django.conf.global_settings import LANGUAGES
 import logging
 import sys
-
+import dj_database_url
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,12 +26,31 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('THE_SECRET_KEY')
+SECRET_KEY = config(
+    'SECRET_KEY',
+    default=config(
+        'THE_SECRET_KEY',
+        default='django-insecure-default-local-key-for-development-only'
+    )
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('THE_DEBUG', default=False, cast=bool)
+# Defaults to True locally. On Render, set DEBUG=False in Environment Variables.
+DEBUG = config(
+    'DEBUG',
+    default=config('THE_DEBUG', default=True, cast=bool),
+    cast=bool
+)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost', cast=Csv())
+
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.b4a.run',
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+]
+
 
 
 # Application definition
@@ -54,35 +74,31 @@ INSTALLED_APPS = [
     'django_quill',
     'widget_tweaks',
     'django_countries',
-    
-    # When any model record is deleted (Course, Video, Image, File, StudentProfile, InstructorProfile), it automatically removes the physical file from disk.
-    # When a user replaces a file (e.g. uploads a new avatar or new video), it automatically deletes the old file from disk.
-    # it doesn't need you to write any other code.
+
+    # Automatically removes physical files on disk/cloud when model records are replaced or deleted
     'django_cleanup.apps.CleanupConfig',
-    'debug_toolbar',
-    'nplusone.ext.django',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 CRISPY_TEMPLATE_PACK = "tailwind"
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-    # 'nplusone.ext.django.NPlusOneMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    # WhiteNoise must be immediately after SecurityMiddleware for static files
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "allauth.account.middleware.AccountMiddleware",
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
-# related to visual debug tool
-INTERNAL_IPS = [
-    "127.0.0.1",
-]
+# Related to visual debug tool
+# INTERNAL_IPS = [
+#     "127.0.0.1",
+# ]
 
 
 AUTHENTICATION_BACKENDS = [
@@ -133,17 +149,39 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        "PASSWORD": config('DB_PASSWORD'),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='5432'),
-    }
-}
+DATABASE_URL = config('DATABASE_URL', default=None)
+DB_NAME = config('DB_NAME', default=None)
 
+if DATABASE_URL:
+    # Used on Render with Neon PostgreSQL (or any external database URL)
+    DATABASES = {
+        'default': dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=True,
+        )
+    }
+elif DB_NAME:
+    # Local PostgreSQL database configured via .env variables
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': DB_NAME,
+            'USER': config('DB_USER', default='postgres'),
+            'PASSWORD': config('DB_PASSWORD', default='postgres'),
+            'HOST': config('DB_HOST', default='localhost'),
+            'PORT': config('DB_PORT', default='5432'),
+        }
+    }
+else:
+    # Zero-configuration fallback for fresh local clones
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Use fast in-memory SQLite database when running tests
 if 'test' in sys.argv:
@@ -151,7 +189,6 @@ if 'test' in sys.argv:
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': ':memory:',
     }
-
 
 
 # Password validation
@@ -188,26 +225,22 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+
+# Media files (User uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-
-STATIC_URL = '/static/'
-
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
-
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# URL used in browser to access uploaded media files
-MEDIA_URL = '/media/'
-
-# Absolute filesystem path to the directory where uploaded files are stored
-MEDIA_ROOT = BASE_DIR / 'media'
 
 LOGIN_URL = 'accounts:sign_in'
 
@@ -217,9 +250,86 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 120 * 1024 * 1024
 FILE_UPLOAD_MAX_MEMORY_SIZE = 30 * 1024 * 1024
 
 
+# ==========================================
+# Cloudinary (Media) & WhiteNoise (Static)
+# ==========================================
 
-# ========================== nplusone debug tool ===============================
-# NPLUSONE_LOGGER = logging.getLogger('nplusone')
-# NPLUSONE_LOG_LEVEL = logging.WARN
+CLOUDINARY_URL = config('CLOUDINARY_URL', default=None)
+CLOUDINARY_CLOUD_NAME = config('CLOUDINARY_CLOUD_NAME', default=None)
 
-# NPLUSONE_RAISE = True
+USE_CLOUDINARY = bool(CLOUDINARY_URL or CLOUDINARY_CLOUD_NAME)
+
+if USE_CLOUDINARY:
+    # Production Mode (Cloudinary for media + WhiteNoise for static files)
+    INSTALLED_APPS += [
+        'cloudinary_storage',
+        'cloudinary',
+    ]
+
+    if CLOUDINARY_CLOUD_NAME:
+        CLOUDINARY_STORAGE = {
+            'CLOUD_NAME': CLOUDINARY_CLOUD_NAME,
+            'API_KEY': config('CLOUDINARY_API_KEY', default=''),
+            'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
+        }
+
+    STORAGES = {
+        "default": {
+            # Uses our custom storage that correctly tags images, videos, and raw files
+            "BACKEND": "core.storage.MediaCloudinaryStorageWithType",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        },
+    }
+else:
+    # Local Development Mode (Normal FileSystemStorage - Zero setup required!)
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        },
+    }
+
+
+# ==========================================
+# Development Tools (Active only when DEBUG=True)
+# ==========================================
+
+if DEBUG:
+    try:
+        import debug_toolbar
+        INSTALLED_APPS.append('debug_toolbar')
+        MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
+    except ImportError:
+        pass
+
+    try:
+        import nplusone.ext.django
+        INSTALLED_APPS.append('nplusone.ext.django')
+        # MIDDLEWARE.insert(0, 'nplusone.ext.django.NPlusOneMiddleware')
+    except ImportError:
+        pass
+
+
+# ==========================================
+# Production Security (Active only when DEBUG=False)
+# ==========================================
+
+if not DEBUG:
+    # Tell Django to trust the X-Forwarded-Proto header set by Back4App's reverse proxy
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
