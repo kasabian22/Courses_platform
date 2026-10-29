@@ -6,7 +6,7 @@
 [![Styling](https://img.shields.io/badge/Frontend-Tailwind_CSS-38B2AC.svg?logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Docker Ready](https://img.shields.io/badge/Docker-Compose_Ready-2496ED.svg?logo=docker&logoColor=white)](https://www.docker.com/)
 
-A modern, production-grade Learning Management System (LMS) built with **Django 6**, **Tailwind CSS**, and **Vanilla JavaScript**. Engineered with multi-role access (Students & Instructors), polymorphic course content, custom HTTP 206 byte-range video streaming, real-time progress tracking, and automated completion certificate generation with bidirectional Arabic (RTL) typography.
+A modern, Learning Management System (LMS) built with **Django 6**, **Tailwind CSS**, and **Vanilla JavaScript**. Engineered with multi-role access (Students & Instructors), polymorphic course content, real-time progress tracking, and automated completion certificate generation with bidirectional Arabic (RTL) typography.
 
 
 ![Platform Walkthrough & Theme Toggle](docs/images/hero-demo.gif)
@@ -77,8 +77,6 @@ A modern, production-grade Learning Management System (LMS) built with **Django 
 
 ### Engineering & Architectural Highlights
 
-- **Custom HTTP 206 Partial Content Video Server (`core/media_views.py`):**
-  Standard development media serving fails when seeking HTML5 videos in Chrome or Safari. E-Learn implements a custom HTTP 206 byte-range streaming server with `LimitedFile` chunked reading, preventing high RAM consumption and including path-traversal protection (`is_relative_to(MEDIA_ROOT)`).
 - **Smart Multilingual Slug Heuristics (`courses/utils.py`):**
   Solves Django's standard `slugify()` limitation with Arabic and non-Latin scripts:
   - *Bilingual Titles (e.g., "أساسيات بايثون | Python Basics"):* Automatically isolates technical English keywords ($\ge$ 3 characters) for clean SEO URLs (`python-basics`).

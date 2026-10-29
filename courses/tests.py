@@ -1,7 +1,54 @@
+import json
 from django.test import SimpleTestCase, TestCase
 from django.contrib.auth.models import User
-
+from django.urls import reverse
 from .models import Course, Enrollment, Module, Progress, Subject, Video
+
+
+def quill_content(text="Course overview"):
+    return json.dumps({
+        "delta": json.dumps({"ops": [{"insert": f"{text}\n"}]}),
+        "html": f"<p>{text}</p>"
+    })
+
+
+class CourseTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username="kasabian", password="password")
+        self.subject = Subject.objects.create(
+            title=Subject.Subjects.WEB_DEV,
+            slug="web-development"
+        )
+
+        self.c1 = Course.objects.create(
+            owner=self.user,
+            subject=self.subject,
+            title="Django | Orm System",
+            slug="django-orm-system",
+            overview=quill_content("Overview 1"),
+            header="header",
+            status=Course.Status.AVAILABLE,
+        )
+
+        self.c2 = Course.objects.create(
+            owner=self.user,
+            subject=self.subject,
+            title="Django | Views System",
+            slug="django-views-system",
+            overview=quill_content("Overview 2"),
+            header="header2",
+            status=Course.Status.AVAILABLE,
+        )
+
+    def test_index(self):
+        response1 = self.client.get(reverse('courses:course_detail', kwargs={'slug': 'django-orm-system'}))
+        response2 = self.client.get(reverse('courses:course_detail', kwargs={'slug': 'django-views-system'}))
+        response3 = self.client.get(reverse('courses:category_courses', kwargs={'subject_slug': 'web-development'}))
+
+        self.assertEqual(response1.status_code, 200)
+        self.assertEqual(response2.status_code, 200)
+        self.assertEqual(response3.status_code, 200)
+        self.assertEqual(len(response3.context["courses"]), 2)
 
 
 class YouTubeEmbedUrlTests(SimpleTestCase):
@@ -31,12 +78,15 @@ class YouTubeEmbedUrlTests(SimpleTestCase):
 class EnrollmentProgressTests(TestCase):
     def test_progress_percentage_preserves_fractional_progress(self):
         user = User.objects.create_user(username='student', password='password')
-        subject = Subject.objects.create(title='Testing', slug='testing')
+        subject = Subject.objects.create(
+            title=Subject.Subjects.OTHER,
+            slug='other'
+        )
         course = Course.objects.create(
             owner=user,
             subject=subject,
             title='Large course',
-            overview='A course with enough modules to expose integer truncation.',
+            overview=quill_content("A course with enough modules to expose integer truncation."),
         )
         enrollment = Enrollment.objects.create(user=user, course=course)
         modules = Module.objects.bulk_create([
@@ -45,4 +95,4 @@ class EnrollmentProgressTests(TestCase):
         ])
         Progress.objects.create(user=user, module=modules[0], is_completed=True)
 
-        self.assertEqual(enrollment.get_progress_percentage, 0.99)
+        self.assertEqual(enrollment.progress_percentage, 0.99)

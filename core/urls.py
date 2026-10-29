@@ -27,7 +27,10 @@ urlpatterns = [
 ]
 # Serve media files during development only (DEBUG = True)
 if settings.DEBUG:
+    import debug_toolbar
     urlpatterns += [
         path('media/<path:media_path>', serve_media, name='serve_media'),
+        # related to visual debug tool
+        path('__debug__/', include(debug_toolbar.urls)),
     ]
     

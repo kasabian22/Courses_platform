@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 from pathlib import Path
 from decouple import config, Csv
 from django.conf.global_settings import LANGUAGES
+import logging
+import sys
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -56,12 +59,16 @@ INSTALLED_APPS = [
     # When a user replaces a file (e.g. uploads a new avatar or new video), it automatically deletes the old file from disk.
     # it doesn't need you to write any other code.
     'django_cleanup.apps.CleanupConfig',
+    'debug_toolbar',
+    'nplusone.ext.django',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
 CRISPY_TEMPLATE_PACK = "tailwind"
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # 'nplusone.ext.django.NPlusOneMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -71,6 +78,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "allauth.account.middleware.AccountMiddleware",
 ]
+
+# related to visual debug tool
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
 
 AUTHENTICATION_BACKENDS = [
     # Needed to login by username in Django admin, regardless of `allauth`
@@ -130,6 +143,15 @@ DATABASES = {
         'PORT': config('DB_PORT', default='5432'),
     }
 }
+
+
+# Use fast in-memory SQLite database when running tests
+if 'test' in sys.argv:
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
+    }
+
 
 
 # Password validation
@@ -193,3 +215,11 @@ LOGIN_URL = 'accounts:sign_in'
 # Limit maximum request body/upload size to 120 MB (100 + 20 for reserve)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 120 * 1024 * 1024
 FILE_UPLOAD_MAX_MEMORY_SIZE = 30 * 1024 * 1024
+
+
+
+# ========================== nplusone debug tool ===============================
+# NPLUSONE_LOGGER = logging.getLogger('nplusone')
+# NPLUSONE_LOG_LEVEL = logging.WARN
+
+# NPLUSONE_RAISE = True

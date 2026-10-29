@@ -94,17 +94,16 @@ def view_profile(request):
             defaults={'role': 'student'}
         )
         role = user_profile.role
+        request.user.userprofile = user_profile
         if role == "student":
             profile, _ = StudentProfile.objects.get_or_create(user=request.user)
             enrolled_courses = Course.objects.filter(students=request.user).select_related(
                 'owner__instructor_profile'
             ).annotate(
-                enrolled_students_count=Count('students', distinct=True),
                 annotated_avg_rating=Avg('review_details__rating'),
                 annotated_reviews_count=Count('review_details', distinct=True),
-                enrollment_date=Min('students__students_enrolled__enrolled_at')
             ).order_by(
-                'enrollment_date'
+                'courses_enrolled__enrolled_at'
             )
 
             user_request = request.user.instructor_requests.first()

@@ -34,7 +34,7 @@ def subject_courses_list(request):
         ).order_by('-enrolled_students_count', '-annotated_avg_rating'),
         to_attr='available_courses'
     )
-    subjects = Subject.objects.prefetch_related(courses_prefetch)
+    subjects = Subject.objects.prefetch_related(courses_prefetch).order_by('id')
     for subject in subjects:
         subject.top_courses = subject.available_courses[:3]
 

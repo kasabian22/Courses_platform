@@ -61,7 +61,7 @@ class Course(models.Model):
     subject          = models.ForeignKey(Subject, related_name='courses', on_delete=models.PROTECT)
     title            = models.CharField(max_length=250, help_text="Write the title of the course here (Must contain English characters or numbers)")
     slug             = models.SlugField(max_length=250, unique=True, blank=True)
-    overview         = QuillField(help_text="Write the description of the course here")
+    overview         = QuillField(help_text="Write the description of the course here", default="")
     header           = models.CharField(max_length=250, blank=True, null=True, help_text="Write the header that appers below the course title both on the course card, and in the course page (optional)")
     date_created     = models.DateTimeField(auto_now_add=True)
     status           = models.CharField(max_length=2, choices=Status.choices, default=Status.AVAILABLE)
@@ -106,7 +106,9 @@ class Course(models.Model):
         ordering = ['-date_created']
         indexes = [
             # With an index: The database creates a small, pre-sorted index (like the index at the back of a book). Instead of reading the whole book, the database jumps straight to the exact page in a fraction of a millisecond (O(logN)).
+            # Indexes speed up search, but slow down update.
             # A Composite Index indexes two columns together into a single lookup structure.
+            # You can use too a single index instead of composite index.
             # we use this because in almost every view on the site, we show Available courses ordered newest first.
             models.Index(fields=['status', '-date_created']),
             
